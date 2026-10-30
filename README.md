@@ -3,7 +3,6 @@
 **District crop productivity evidence for agricultural planners in Rwanda.**
 NISR Big Data Hackathon 2026, Track 1: Agricultural Productivity.
 
-Deployed app: *not yet deployed* (see `docs/deployment.md`). Demo video: *not yet recorded* (script in `demo/demo_script.md`).
 
 ## The problem
 
@@ -101,6 +100,5 @@ deliverables/               plain-English guide (guide.pdf) and presentation dec
 Yields are farmer-reported; NISR does not publish district standard errors; input uptake is pooled across crops; associations are not effects; "below national" is not "below potential" (for example Irish potato in the eastern lowlands); only five releases; the tool has not been tested with planners.
 
 ## Competition notes
-- AI use is disclosed in `docs/AI_USE_DISCLOSURE.md`.
-- The competition requires assigning all IP rights in the submission to NISR (announcement p.3). See `docs/compliance_matrix.md`.
-- Student eligibility documents are **not** in this public repository; see `reports/submission_checklist.md`.
+- AI use is disclosed in `docs/AI_USE_DISCLOSURE.md`..
+
