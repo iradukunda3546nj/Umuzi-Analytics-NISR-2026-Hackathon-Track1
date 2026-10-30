@@ -34,7 +34,7 @@ PLOT_CONFIG = {"displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "sele
 
 st.markdown("""
 <style>
-  .block-container {padding-top: 1.2rem; padding-bottom: 2rem; max-width: 1440px;}
+  .block-container {padding-top: 4.5rem; padding-bottom: 2rem; max-width: 1440px;}
   [data-testid="stSidebar"] {border-right: 1px solid #e4e4df;}
   [data-testid="stSidebar"] .block-container {padding-top: 1rem;}
   .umz-header {display:flex; justify-content:space-between; align-items:flex-end;
