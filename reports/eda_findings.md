@@ -19,7 +19,7 @@ Pre-specified tests are labelled **[H1] [H2] [H3]**; anything else is **[explora
 | Publication inconsistency | 2026A Table 5, Fruits: estimate 8,183 ha outside its own 95% CI (9,050 to 17,975) |
 | Missing release | 2025 Season B not found on the NISR site at retrieval |
 
-Two pipeline defects were found and fixed during this diagnostic (documented in `EXECUTION_LOG.md`). The national fertilizer row labelled "Total" was first dropped, which silently classified every district as "inputs at or above national". The fix added a gate so a missing national reference now blocks publication.
+Two pipeline defects were found and fixed during this diagnostic (documented in `docs/EXECUTION_LOG.md`). The national fertilizer row labelled "Total" was first dropped, which silently classified every district as "inputs at or above national". The fix added a gate so a missing national reference now blocks publication.
 
 ## Part 2. Findings (story arc)
 

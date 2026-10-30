@@ -1,7 +1,7 @@
 # Submission Checklist
 
 Deadline: **30 October 2026, 11:59 PM** ([C] p.3; no timezone stated).
-[C] = `2026 Hackathon Competition.pdf`, [W] = `2026 NISR Hackathon Webinar 2.pdf`.
+[C] = `2026 Hackathon Competition.pdf`, [W] = `2026 NISR Hackathon Webinar 2.pdf` (organiser documents, kept locally in `residuals/`, not published).
 
 ## Evaluation criteria ([C] p.4, 20 points each)
 

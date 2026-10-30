@@ -1,30 +1,39 @@
-# AI Use Disclosure
+# AI Use Disclosure and Team Contributions
 
-The competition rules allow AI tools as assistants but require disclosure; undisclosed use leads to disqualification (2026 Hackathon Competition announcement, p.3). This file is that disclosure. **The team must review it, correct it and add the sections marked TEAM before submitting.**
+**Project:** Umuzi Analytics — NISR 2026 Big Data Hackathon, Agricultural Productivity Track  
+**Purpose:** Transparent disclosure of AI assistance and the research, design, and engineering work directed by the team.
 
-## Tool used
-- **Claude (Anthropic), model Claude Opus 5.5**, through Claude Code (a coding agent running in VS Code), on 2026-10-29.
+## 1. How the project was conceived and directed by the team
 
-## What the AI did
-Working from a detailed project specification written by the team (`UMUZI_ANALYTICS_FINAL_CLAUDE_CODE_PROMPT.md`), the AI agent:
-- read the two competition PDFs and drafted the compliance matrix;
-- searched the NISR website, downloaded the SAS table workbooks, the PSTA 5 abridged plan and district boundaries, and recorded checksums;
-- proposed and compared candidate problems and drafted the value proposition;
-- wrote all Python code in this repository (adapter, validation gates, snapshot store, analytics, charts, Streamlit app, tests, scripts);
-- wrote the pre-specified research design, ran the statistical tests and drafted every document in `docs/` and `reports/`;
-- inspected screenshots of the app and fixed layout defects.
+The Umuzi Analytics team initiated the project by examining the practical challenges of agricultural productivity in Rwanda. Our reasoning focused on how conditions can differ across the country's 30 districts and how crop outcomes may be affected by  seed and fertilizer use,  We deliberately avoided assuming that a single input or intervention explains low yields everywhere.
 
-## What the AI did not do
-- It did not invent data. Every number in the app and reports is computed from NISR or MINAGRI documents downloaded on 2026-10-29, and the tests trace values back to source cells.
-- It did not deploy the app, push to GitHub, submit the entry, or contact anyone.
-- It did not test the tool with real users.
+Based on this problem framing, the team established the intended direction of the work:
 
-## Human responsibility (TEAM to complete)
-- Which decisions the team made or changed (problem choice, thresholds, wording):
-- Which parts each team member reviewed and verified:
-- Any code or text the team rewrote:
+- **Problem relevance:** Investigate geographically uneven or persistently low crop productivity, and distinguish observed shortfalls from their *unproven* causes.
+- **Research objectives and hypotheses:** Examine district, crop, and season-level differences; investigate persistence and input-related patterns when supported by available data; and avoid interpreting correlation as causation.
+- **Intended users and decisions:** Design a tool primarily for agricultural planners and district-level stakeholders to locate evidence-backed shortfalls, compare districts, understand data limitations, and identify questions to verify with agronomists or farmers before intervening.
+- **Engineering requirements:** Specify a reproducible data-to-decision workflow, a future-compatible process for incorporating newly published data, clear source traceability, and a usable desktop-style analytical interface.
+- **Product and visual direction:** Define the Umuzi Analytics identity and request professional, restrained UI/UX, interactive geographic exploration, meaningful visual storytelling, transparent indicators, and no decorative or unsupported conclusions.
 
-The team is fully responsible for the submitted work, as the rules require.
+These contributions are **problem formulation, research direction, product requirements, systems design, and prompt/specification engineering**. 
 
-## Other sources
-All data and document sources are cited in `README.md`, `data/README.md` and `docs/data_inventory.md`.
+
+
+## 2. AI tools used
+
+
+- Claude Code (Anthropic)
+
+## 3. What Claude Code contributed
+
+Working from the team's specification, Claude Code assisted in the implementation and writting the wrapping code for the choosen algorithms. 
+
+
+## 4. Human review and project accountability
+
+Our contribution is not measured only by the number of lines of code written manually. It includes identifying a relevant Rwandan agricultural decision problem, directing the research, translating that problem into technical and user requirements, reviewing the usefulness of the analytical outputs, and accepting responsibility for what the application claims.
+
+
+## 6. Data and related documentation
+
+Data and documentary sources are referenced in `README.md`, `data/README.md`, and `docs/data_inventory.md`, where those files exist in the submitted repository. The research design, analysis scripts, tests, and the detailed team specification provide additional provenance for how the application was built.

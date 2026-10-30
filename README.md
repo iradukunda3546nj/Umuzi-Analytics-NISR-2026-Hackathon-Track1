@@ -93,7 +93,8 @@ src/viz/                    chart builders shared by app and reports
 scripts/                    refresh_data, download_sources, run_analysis
 tests/                      pipeline (synthetic fixtures), rules, real-data integrity, app
 data/                       raw files, snapshots, registry, sources, PSTA 5 targets
-docs/  reports/  demo/      documentation, findings, demo script
+docs/  reports/  demo/      documentation (incl. EXECUTION_LOG.md), findings, demo script
+deliverables/               plain-English guide (guide.pdf) and presentation deck
 ```
 
 ## Limitations (summary; full list in `docs/limitations.md`)

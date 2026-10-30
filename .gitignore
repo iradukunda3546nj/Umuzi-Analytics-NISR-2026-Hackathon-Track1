@@ -20,3 +20,9 @@ data/incoming/
 *.log
 .DS_Store
 Thumbs.db
+
+# Working material kept locally, not part of the submission (organiser PDFs, build prompt).
+residuals/
+
+# Office lock files
+~$*
