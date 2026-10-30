@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8
+pypdf>=4          # only for re-checking cited report pages
+playwright>=1.45  # only for desktop screenshots (uses an installed Chrome)

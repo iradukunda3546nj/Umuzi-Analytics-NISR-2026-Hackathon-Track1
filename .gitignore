@@ -1,0 +1,22 @@
+# Private material: student identity documents and anything not cleared for publication.
+submission_private/
+student_cards/
+
+# Environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/secrets.toml
+
+# Rejected releases are kept locally for diagnosis, not published.
+data/quarantine/
+
+# Original downloads are retained as immutable, checksum-named copies in data/raw/nisr_sas/.
+data/incoming/
+
+# Local scratch
+*.log
+.DS_Store
+Thumbs.db

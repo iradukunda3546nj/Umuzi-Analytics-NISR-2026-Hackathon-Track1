@@ -1,0 +1,96 @@
+{
+  "snapshot_id": "snap-20261029T103243Z-5cb547bc",
+  "created_utc": "2026-10-29T10:32:43Z",
+  "parent_snapshot": "snap-20261029T103242Z-af45ecd5",
+  "ruleset_version": "evidence-rules-1.0",
+  "records_sha256": "5cb547bc3cc17c772f4b10243525e06bee80cd756f20d0d29a8ff3ca8dffc442",
+  "n_records": 7263,
+  "releases": [
+    {
+      "release_id": "SAS-2024A",
+      "season_year": 2024,
+      "season": "A",
+      "publisher": "National Institute of Statistics of Rwanda",
+      "source_url": "https://statistics.gov.rw/sites/default/files/documents/2024-10/Tables_2024%20Season%20A%20%281%29.xlsx",
+      "publication_date": "2024-10 (upload folder)",
+      "raw_file": "raw/nisr_sas/SAS-2024A__6848e1b3c8ca.xlsx",
+      "sha256": "6848e1b3c8caadbf68c75916512f435e43a65d07734cbcdb3bcbbef3bb45c358",
+      "retrieved_or_imported_utc": "2026-10-29T10:32:42Z",
+      "tables_used": {
+        "yield_kg_ha": "Table 11",
+        "harvested_ha": "Table 10",
+        "cultivated_ha": "Table 9",
+        "production_t": "Table 13",
+        "improved_seed_farmers_pct": "Table 18",
+        "inorganic_fert_farmers_pct": "Table 23",
+        "organic_fert_farmers_pct": "Table 22",
+        "erosion_protection_farmers_pct": "Table 29"
+      },
+      "current": true,
+      "supersedes": null
+    },
+    {
+      "release_id": "SAS-2024B",
+      "season_year": 2024,
+      "season": "B",
+      "publisher": "National Institute of Statistics of Rwanda",
+      "source_url": "https://statistics.gov.rw/sites/default/files/documents/2026-09/Tables_2024%20Season%20B.xlsx",
+      "publication_date": "2026-09 (upload folder; file re-uploaded by NISR)",
+      "raw_file": "raw/nisr_sas/SAS-2024B__0be9b2749740.xlsx",
+      "sha256": "0be9b2749740d6a9fdb963fddd1874f448dfedf9c54e15fef55f6fdbe459c911",
+      "retrieved_or_imported_utc": "2026-10-29T10:32:42Z",
+      "tables_used": {
+        "yield_kg_ha": "Table 10",
+        "harvested_ha": "Table 9",
+        "cultivated_ha": "Table 8",
+        "production_t": "Table 12",
+        "improved_seed_farmers_pct": "Table 17",
+        "inorganic_fert_farmers_pct": "Table 22",
+        "organic_fert_farmers_pct": "Table 21",
+        "erosion_protection_farmers_pct": "Table 28"
+      },
+      "current": true,
+      "supersedes": null
+    },
+    {
+      "release_id": "SAS-2025A",
+      "season_year": 2025,
+      "season": "A",
+      "publisher": "National Institute of Statistics of Rwanda",
+      "source_url": "https://statistics.gov.rw/sites/default/files/documents/2025-05/Tables_2025%20Season%20A.xlsx",
+      "publication_date": "2025-05 (upload folder)",
+      "raw_file": "raw/nisr_sas/SAS-2025A__d853e32bdf8e.xlsx",
+      "sha256": "d853e32bdf8e1c396ffa487c3a786413e82753d0f89a95679cd56a6c20d2669b",
+      "retrieved_or_imported_utc": "2026-10-29T10:32:43Z",
+      "tables_used": {
+        "yield_kg_ha": "Table 12",
+        "harvested_ha": "Table 11",
+        "cultivated_ha": "Table 10",
+        "production_t": "Table 14",
+        "improved_seed_farmers_pct": "Table 19",
+        "inorganic_fert_farmers_pct": "Table 24",
+        "organic_fert_farmers_pct": "Table 23",
+        "erosion_protection_farmers_pct": "Table 30"
+      },
+      "current": true,
+      "supersedes": null
+    }
+  ],
+  "change": {
+    "release_id": "SAS-2025A",
+    "kind": "new_release"
+  },
+  "gate": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "harvested area exceeds cultivated area in 11 district-crop cells (as published; common for perennial bananas)",
+      "225 cells published as 0 are treated as 'not reported', not as zero"
+    ]
+  },
+  "approval": {
+    "status": "approved",
+    "approved_utc": "2026-10-29T10:32:43Z",
+    "reason": "approved at ingest of SAS-2025A"
+  }
+}

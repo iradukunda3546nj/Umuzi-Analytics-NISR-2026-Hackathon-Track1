@@ -1,0 +1,50 @@
+{
+  "snapshot_id": "snap-20261029T103242Z-3169631c",
+  "created_utc": "2026-10-29T10:32:42Z",
+  "parent_snapshot": null,
+  "ruleset_version": "evidence-rules-1.0",
+  "records_sha256": "3169631c20214fd49bc3876c8aa322262cd74b7547b6388660d831fc242517b0",
+  "n_records": 2421,
+  "releases": [
+    {
+      "release_id": "SAS-2024A",
+      "season_year": 2024,
+      "season": "A",
+      "publisher": "National Institute of Statistics of Rwanda",
+      "source_url": "https://statistics.gov.rw/sites/default/files/documents/2024-10/Tables_2024%20Season%20A%20%281%29.xlsx",
+      "publication_date": "2024-10 (upload folder)",
+      "raw_file": "raw/nisr_sas/SAS-2024A__6848e1b3c8ca.xlsx",
+      "sha256": "6848e1b3c8caadbf68c75916512f435e43a65d07734cbcdb3bcbbef3bb45c358",
+      "retrieved_or_imported_utc": "2026-10-29T10:32:42Z",
+      "tables_used": {
+        "yield_kg_ha": "Table 11",
+        "harvested_ha": "Table 10",
+        "cultivated_ha": "Table 9",
+        "production_t": "Table 13",
+        "improved_seed_farmers_pct": "Table 18",
+        "inorganic_fert_farmers_pct": "Table 23",
+        "organic_fert_farmers_pct": "Table 22",
+        "erosion_protection_farmers_pct": "Table 29"
+      },
+      "current": true,
+      "supersedes": null
+    }
+  ],
+  "change": {
+    "release_id": "SAS-2024A",
+    "kind": "new_release"
+  },
+  "gate": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      "harvested area exceeds cultivated area in 5 district-crop cells (as published; common for perennial bananas)",
+      "198 cells published as 0 are treated as 'not reported', not as zero"
+    ]
+  },
+  "approval": {
+    "status": "approved",
+    "approved_utc": "2026-10-29T10:32:42Z",
+    "reason": "approved at ingest of SAS-2024A"
+  }
+}

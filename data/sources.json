@@ -1,0 +1,22 @@
+[
+  {"release_id": "SAS-2024A", "season_year": 2024, "season": "A", "file": "incoming/nisr_sas/SAS_2024A_Tables.xlsx",
+   "source_url": "https://statistics.gov.rw/sites/default/files/documents/2024-10/Tables_2024%20Season%20A%20%281%29.xlsx",
+   "landing_page": "https://statistics.gov.rw/statistical-publications/agriculture-environment/seasonal-agricultural-survey-A-2024",
+   "publication_date": "2024-10 (upload folder)"},
+  {"release_id": "SAS-2024B", "season_year": 2024, "season": "B", "file": "incoming/nisr_sas/SAS_2024B_Tables.xlsx",
+   "source_url": "https://statistics.gov.rw/sites/default/files/documents/2026-09/Tables_2024%20Season%20B.xlsx",
+   "landing_page": "https://statistics.gov.rw/statistical-publications/agriculture-environment/seasonal-agricultural-survey-season-b-2024",
+   "publication_date": "2026-09 (upload folder; file re-uploaded by NISR)"},
+  {"release_id": "SAS-2025A", "season_year": 2025, "season": "A", "file": "incoming/nisr_sas/SAS_2025A_Tables.xlsx",
+   "source_url": "https://statistics.gov.rw/sites/default/files/documents/2025-05/Tables_2025%20Season%20A.xlsx",
+   "landing_page": "https://statistics.gov.rw/statistical-publications/agriculture-environment/seasonal-agricultural-survey-season-2025",
+   "publication_date": "2025-05 (upload folder)"},
+  {"release_id": "SAS-2026A", "season_year": 2026, "season": "A", "file": "incoming/nisr_sas/SAS_2026A_Tables.xlsx",
+   "source_url": "https://statistics.gov.rw/sites/default/files/documents/2026-04/Tables_2026%20Season%20A.xlsx",
+   "landing_page": "https://statistics.gov.rw/statistical-publications/agriculture-environment/seasonal-agricultural-survey-season-2026",
+   "publication_date": "2026-04 (upload folder)"},
+  {"release_id": "SAS-2026B", "season_year": 2026, "season": "B", "file": "incoming/nisr_sas/SAS_2026B_Tables.xlsx",
+   "source_url": "https://statistics.gov.rw/sites/default/files/documents/2026-09/Tables_2026%20Season%20B.xlsx",
+   "landing_page": "https://statistics.gov.rw/statistical-publications/agriculture-environment/seasonal-agricultural-survey-season-b-2026",
+   "publication_date": "2026-09 (upload folder)"}
+]
