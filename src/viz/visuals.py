@@ -66,12 +66,12 @@ def district_target_svg(f: Finding, gap: float = GAP_THRESHOLD) -> str:
         f"<line x1='{gx:.1f}' y1='{y - 46}' x2='{gx:.1f}' y2='{y + 34}' stroke='{INK_3}' stroke-width='1.4' stroke-dasharray='4 4'/>",
         # key for the dashed line, at the foot of the drawing so it never meets the bullseye labels
         f"<line x1='{x0}' y1='{h - 12}' x2='{x0 + 22}' y2='{h - 12}' stroke='{INK_3}' stroke-width='1.4' stroke-dasharray='4 4'/>",
-        f"<text x='{x0 + 30}' y='{h - 8}' font-size='13' fill='{INK_2}'>shortfall line: {gap:.0%} of the Rwanda average</text>",
+        f"<text x='{x0 + 30}' y='{h - 8}' font-size='13' fill='{INK_2}'>shortfall line: {gap:.0%} of the national average</text>",
         # bullseye = Rwanda
         f"<g class='umz-bull'><circle cx='{bx:.1f}' cy='{y}' r='34' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
         f"<circle cx='{bx:.1f}' cy='{y}' r='23' fill='{RED}'/><circle cx='{bx:.1f}' cy='{y}' r='13' fill='#ffffff'/>",
         f"<circle cx='{bx:.1f}' cy='{y}' r='5' fill='{RED}'/></g>",
-        f"<text x='{bx:.1f}' y='{y + 56}' text-anchor='middle' font-size='16' font-weight='700' fill='{INK}'>Rwanda</text>",
+        f"<text x='{bx:.1f}' y='{y + 56}' text-anchor='middle' font-size='16' font-weight='700' fill='{INK}'>National</text>",
     ]
     if r["national_yield_kg_ha"] == r["national_yield_kg_ha"]:
         parts.append(f"<text x='{bx:.1f}' y='{y + 72}' text-anchor='middle' font-size='14' fill='{INK_2}'>"
@@ -140,7 +140,7 @@ def _input_row(s: InputSignal, ic: str, i: int, here: str = "Here") -> str:
         f"<div class='umz-bar'><span class='umz-bar-lab'>{escape(here)}</span><span class='umz-bar-track'>"
         f"<span class='umz-bar-fill' style='width:{s.district_pct:.1f}%;background:{col};animation-delay:{0.2 * i:.1f}s'></span>"
         f"</span><b>{s.district_pct:.0f}%</b></div>"
-        f"<div class='umz-bar'><span class='umz-bar-lab'>Rwanda</span><span class='umz-bar-track'>"
+        f"<div class='umz-bar'><span class='umz-bar-lab'>National average</span><span class='umz-bar-track'>"
         f"<span class='umz-bar-fill' style='width:{s.national_pct:.1f}%;background:{GREY};animation-delay:{0.2 * i:.1f}s'></span>"
         f"</span><b>{s.national_pct:.0f}%</b></div></div></div>")
 

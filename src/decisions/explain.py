@@ -9,7 +9,7 @@ so the words a user sees are the same everywhere. Nothing is computed here
 that `evidence_table` did not already compute; this module only words it.
 
 Wording rules: plain words a farmer or district officer would use ("harvest",
-"the Rwanda average", "fewer farmers use it here"), not "uptake" or "below the
+"the national average", "fewer farmers use it here"), not "uptake" or "below the
 national mean"; no claim of cause, because the survey records yields and input
 use, not why a yield was low.
 """
@@ -29,7 +29,7 @@ PLAIN_CATEGORY = {
     CATEGORY_REPEATED_INPUTS_OK: "Repeated shortfall, seed and fertilizer use not low",
     CATEGORY_DIP: "One-season dip",
     CATEGORY_INSUFFICIENT: "Too uncertain to judge",
-    CATEGORY_NOT_BELOW: "On par with Rwanda or above",
+    CATEGORY_NOT_BELOW: "At or above the national average",
 }
 
 # (icon, check). Short versions of FIELD_CHECKS in finding.py, for cards and chat.
@@ -107,18 +107,18 @@ def explain(f: Finding) -> Explanation:
 
     if f.is_repeated:
         pattern = ("A repeated shortfall",
-                   f"Under 90% of the Rwanda {c} average in {n_below} of the last {len(reliable)} surveys with enough fields.")
+                   f"Under 90% of the national {c} average in {n_below} of the last {len(reliable)} surveys with enough fields.")
     elif cat == CATEGORY_DIP:
-        pattern = ("A one-season dip", f"Under 90% of the Rwanda average in {latest} only.")
+        pattern = ("A one-season dip", f"Under 90% of the national average in {latest} only.")
     elif cat == CATEGORY_NOT_BELOW:
-        pattern = ("No shortfall", f"{pct(row['latest_ratio'])} of the Rwanda {c} average in {latest}.")
+        pattern = ("No shortfall", f"{pct(row['latest_ratio'])} of the national {c} average in {latest}.")
     else:
         reason = str(row["limited_reason"])
         pattern = ("Can't tell yet", f"{reason[:1].upper()}{reason[1:]}.")   # keeps "Season B" intact
 
     if cat == CATEGORY_REPEATED_LOW_INPUT:
         verdict = ("Seed and fertilizer use are both low here",
-                   "Fewer farmers here use improved seed and fertilizer than across Rwanda. "
+                   "Fewer farmers here use improved seed and fertilizer than across the country. "
                    "Check access to them first.")
     elif cat == CATEGORY_REPEATED_INPUTS_OK:
         if seed.lower and not fert.lower:
@@ -136,7 +136,7 @@ def explain(f: Finding) -> Explanation:
         verdict = ("It could be a one-season shock",
                    "Check weather, pests and planting dates before moving resources.")
     elif cat == CATEGORY_NOT_BELOW:
-        verdict = ("Doing well", "This district harvests as much as the Rwanda average or more. "
+        verdict = ("Doing well", "This district harvests as much as the national average or more. "
                                  "Its practices may help neighbours.")
     else:
         verdict = ("Check the figures first",

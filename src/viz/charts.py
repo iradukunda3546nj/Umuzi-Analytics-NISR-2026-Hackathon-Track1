@@ -42,7 +42,7 @@ CATEGORY_SHORT = {
     CATEGORY_REPEATED_INPUTS_OK: "Repeated shortfall, seed and fertilizer use not low",
     CATEGORY_DIP: "One-season dip",
     CATEGORY_INSUFFICIENT: "Too uncertain to judge",
-    CATEGORY_NOT_BELOW: "On par with Rwanda or above",
+    CATEGORY_NOT_BELOW: "At or above the national average",
 }
 # Cell states in the pattern grid (same hues as the categories they lead to).
 STATE_COLORS = {"below": "#9c3d24", "not below": "#dfe6e1", "thin": "#c2beb4", "missing": "#ffffff"}
@@ -181,7 +181,7 @@ def category_map(ev: pd.DataFrame, snapshot_id: str, crop: str, season: str,
     pattern = [f"Short in {int(b)} of the last {int(r)} surveys with enough fields" if r else
                "No recent survey had enough fields to judge"
                for b, r in zip(ev["below_in_window"], ev["reliable_in_window"])]
-    harvest = [f"Harvest: {v * 100:.0f}% of the Rwanda average" if pd.notna(v) else "No harvest figure published"
+    harvest = [f"Harvest: {v * 100:.0f}% of the national average" if pd.notna(v) else "No harvest figure published"
                for v in ev["latest_ratio"]]
     area = [f"Harvested here: {v:,.0f} ha" if pd.notna(v) else "" for v in ev["latest_harvested_ha"]]
     fig = go.Figure(go.Choropleth(

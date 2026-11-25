@@ -133,8 +133,10 @@ def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params
         if pd.isna(lt["yield_kg_ha"]):
             limited = f"NISR published no Season {season} {latest[4:8]} yield for this district"
         elif not latest_ok:
-            limited = (f"only {lt['harvested_ha']:,.0f} ha were harvested here in Season {season} {latest[4:8]}, "
-                       f"too few fields for a firm average ({params.min_harvested_ha:,.0f} ha needed)")
+            # Harvested area stands in for sample size: NISR publishes no plot counts or error margins.
+            limited = (f"this crop covered only {lt['harvested_ha']:,.0f} ha here in Season {season} {latest[4:8]}. "
+                       "The survey measures a sample of plots, so a crop this small likely appears on very few of them "
+                       f"and the average could be far off. We judge only from {params.min_harvested_ha:,.0f} ha up")
         if limited:
             category = CATEGORY_INSUFFICIENT
         elif not bool(lt["below"]):

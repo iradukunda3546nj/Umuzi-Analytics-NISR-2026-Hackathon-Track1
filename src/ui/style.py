@@ -109,7 +109,7 @@ CSS = """
 .umz-inp-word {font-size:13px; font-weight:700; margin-left:6px;}
 .umz-inp-note {font-size:13px; color:var(--ink-3);}
 .umz-bar {display:flex; align-items:center; gap:8px; font-size:13px; margin:3px 0;}
-.umz-bar-lab {width:52px; color:var(--ink-2);}
+.umz-bar-lab {width:118px; flex:0 0 118px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .umz-bar-track {flex:1; height:12px; background:#efefea; border-radius:6px; overflow:hidden;}
 .umz-bar-fill {display:block; height:100%; border-radius:6px; transform-origin:left; animation: umz-grow 1s ease-out both;}
 .umz-bar b {width:38px; text-align:right;}

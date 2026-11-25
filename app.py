@@ -264,11 +264,11 @@ def page_home() -> None:
         "where to act, when it matters, and what to do first.</p></div>"
         + hook_cards_html([
             ("pin", "WHERE", "Where is the harvest low?",
-             "See which districts harvest less than the Rwanda average, crop by crop."),
+             "See which districts harvest less than the national average, crop by crop."),
             ("repeat", "WHEN", "Bad luck, or a pattern?",
              "One poor season can happen anywhere. We show which districts fall short season after season."),
             ("seed", "WHY", "Enough seed and fertilizer?",
-             "See if fewer farmers here use improved seed and fertilizer than elsewhere in Rwanda."),
+             "See if fewer farmers here use improved seed and fertilizer than the national average."),
             ("megaphone", "WHAT", "What to do first",
              "A short checklist for the district team, in plain words."),
         ])
@@ -296,7 +296,7 @@ def page_explore() -> None:
         n_rep = int(ev["category"].isin(REPEATED).sum())
         st.markdown(f"<div class='umz-kicker'>{escape(crop_name(crop))} &middot; "
                     f"{escape(release_name(f.latest_release))}</div>"
-                    f"<div class='umz-sub'><b>{n_rep} of 30</b> districts harvested under 90% of the Rwanda average "
+                    f"<div class='umz-sub'><b>{n_rep} of 30</b> districts harvested under 90% of the national average "
                     "in at least 2 of the last 3 surveys</div>", unsafe_allow_html=True)
         st.plotly_chart(charts.category_map(ev, SID, crop, season, highlight=district, compact=True),
                         width="stretch", config=PLOT_CONFIG, key="map_click", on_select="rerun",
@@ -312,11 +312,12 @@ def page_explore() -> None:
         elif not r["latest_reliable"]:
             # A number exists but rests on too few fields: say so before showing it.
             big = "Too few fields to be sure"
-            sub = (f"The survey shows {pct(r['latest_ratio'])} of the Rwanda average ({here_t:.2f} vs {rw_t:.2f} tonnes "
-                   f"per hectare), but only {r['latest_harvested_ha']:,.0f} ha were harvested here in {when}.")
+            sub = (f"The survey shows {pct(r['latest_ratio'])} of the national average ({here_t:.2f} vs {rw_t:.2f} tonnes "
+                   f"per hectare), but this crop covered only {r['latest_harvested_ha']:,.0f} ha here in {when}, so the survey likely "
+                   "measured very few plots of it.")
         else:
-            big = f"{pct(r['latest_ratio'])} of the Rwanda average"
-            sub = (f"Farmers here harvested {here_t:.2f} tonnes per hectare; the Rwanda average was "
+            big = f"{pct(r['latest_ratio'])} of the national average"
+            sub = (f"Farmers here harvested {here_t:.2f} tonnes per hectare; the national average was "
                    f"{rw_t:.2f} ({when}).")
             if f.category == CATEGORY_INSUFFICIENT:
                 sub += f" But {r['limited_reason']}, so the pattern is unclear."

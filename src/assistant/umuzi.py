@@ -211,8 +211,8 @@ def _inputs(data: UmuziData, f: Finding, question: str) -> Answer:
     focus = "fertilizer" if re.search(r"fertili[sz]er|npk|dap|urea", question.lower()) else "seed and fertilizer"
     pos = lambda a, b: "fewer than" if a < b else "at least as many as"
     lines = [f"In {release_name(f.latest_release)}, {fert:.1f}% of farmers in {f.district} used inorganic "
-             f"fertilizer ({pos(fert, nfert)} across Rwanda, {nfert:.1f}%) and {seed:.1f}% used improved seed "
-             f"({pos(seed, nseed)} across Rwanda, {nseed:.1f}%). These shares cover all crops, not "
+             f"fertilizer ({pos(fert, nfert)} nationally, {nfert:.1f}%) and {seed:.1f}% used improved seed "
+             f"({pos(seed, nseed)} nationally, {nseed:.1f}%). These shares cover all crops, not "
              f"{crop_name(f.crop).lower()} alone."]
     if f.category == CATEGORY_REPEATED_LOW_INPUT:
         lines.append(f"With a repeated {crop_name(f.crop).lower()} shortfall and both inputs low, "
@@ -257,7 +257,7 @@ def _best(data: UmuziData, sel: Selection) -> Answer:
     ev = data.evidence(sel.crop, sel.season)
     ok = ev[ev["latest_reliable"].astype(bool)].sort_values("latest_ratio", ascending=False).head(5)
     latest = release_name(ev["latest_release"].iloc[0])
-    lines = [f"- {r.district}: {pct(r.latest_ratio)} of the Rwanda average ({r.latest_yield_kg_ha / 1000:.2f} t/ha)"
+    lines = [f"- {r.district}: {pct(r.latest_ratio)} of the national average ({r.latest_yield_kg_ha / 1000:.2f} t/ha)"
              for r in ok.itertuples()]
     text = (f"Highest {crop_name(sel.crop).lower()} yields relative to Rwanda in {latest} "
             f"(reliable estimates only):\n" + "\n".join(lines))
@@ -305,7 +305,7 @@ def _compare(data: UmuziData, sel: Selection, named: list[str]) -> Answer:
     for d in named[:3]:
         f = data.finding(replace(sel, district=d))
         parts.append(f"- **{d}** ({PLAIN_CATEGORY[f.category].lower()}): {pct(f.row['latest_ratio'])} of "
-                     f"the Rwanda average in {release_name(f.latest_release)}")
+                     f"the national average in {release_name(f.latest_release)}")
         ev += [f"{d}, {k}: {v}" for k, v in f.figures if k.startswith("Yield") or k == "Recent pattern"]
     return Answer("\n".join(parts), ev, [YIELD_NOTE], suggestions=[f"Why is {named[0]} below?"])
 
