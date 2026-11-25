@@ -1,4 +1,4 @@
-# Umuzi Analytics
+﻿# Umuzi Analytics
 
 **What Rwanda's agricultural survey says about each district's crop yields, and what to check next.**
 NISR Big Data Hackathon 2026, Track 1: Agricultural Productivity.
@@ -23,10 +23,19 @@ Choose a crop and a district (type to search), then a season. The Rwanda map sho
 
 These are **checks, not prescriptions**. The survey shows where yields are low, not why.
 
-Also in the app:
-- **Rwanda against the PSTA 5 target**: an arrow running to a bullseye at the target, with where Rwanda stands marked on it and the gap still to cover.
-- **Umuzi Assistant** (chatbot): answers questions such as *"Has Ruhango's maize yield stayed below national in Season A?"*, *"What about Nyamagabe?"* and *"What should I verify about fertilizer access?"*. It follows the map's selection, cites the survey releases behind each answer, and states the limitation that changes its meaning, for example that input uptake is pooled across crops.
-- **Details on demand**: every district survey by survey since 2018, the selected district's history, input uptake, the full table, and Data and methods.
+The app has five sections, each answering one question:
+
+| Section | Question it answers | What the user sees |
+|---|---|---|
+| Home | What is this, and who is it for? | Four picture cards, the data in one line, the path Pick a district, See the gap, Ask why, Take action |
+| Your district | How far is it from Rwanda's yield? | Map (click a district), an arrow flying to a bullseye that stands for Rwanda's yield, the last 3 surveys as tick/cross tiles, Rwanda against the PSTA 5 target |
+| Why? | Pattern or one-off? Seed or fertilizer? What to check? | Three numbered cards (survey tiles; seed and fertilizer bars, here vs Rwanda; the verdict), a "Take action" card with 2-4 field checks, the brief download, and the assistant |
+| Ask Umuzi | Anything across districts and crops | The assistant (see below) |
+| Evidence | Can I trust it? | Survey-by-survey grid, district history, seed and fertilizer scatter, full table, data checks, backtest, sensitivity sliders |
+
+Links are shareable: `?view=why&district=Gasabo&crop=cassava&season=A` opens that page. Values are rounded to whole percent except next to the 90% line, where one more decimal keeps the side visible (89.6% below, 90.2% not below).
+
+**Umuzi Assistant** (deterministic, no language model): answers *"How is Musanze doing?"*, *"Why?"*, *"What should we check?"*, *"What about Nyamagabe?"*, *"Which districts do best for beans?"*, *"How has it changed since 2018?"*, *"How far is Rwanda from the maize target?"*. It follows the selected district, tolerates misspelled district names and says how it read them, offers the next question as a button, and opens any district it talks about on the map. Its "why" and "what to check" answers use the same sentences as the Why page (`src/decisions/explain.py`). A question it does not understand gets one line saying so and a few questions it can answer, never a guess.
 
 ### Findings (latest surveys; details in `reports/`)
 - District positions are persistent: rank correlations between consecutive 2024-2026 surveys of 0.70 to 0.99 for seven priority crops (all Holm-adjusted p = 0.004); 60 district-crop pairs were below national in all three Season A surveys of 2024-2026, against 16.9 expected by chance (p = 0.0005). These tests were pre-specified.
@@ -98,17 +107,18 @@ python -m pytest                                    # 57 tests
 ## Repository map
 
 ```
-app.py                      Streamlit application (map overview, finding, assistant, details)
+app.py                      Streamlit application: Home, Your district, Why?, Ask Umuzi, Evidence
 src/ingestion/              NISR SAS adapter (title-based discovery, 2018-2026 layouts)
 src/validation/             schema and quality gates
 src/services/               versioned snapshot store, data status
 src/analytics/              indicators and evidence rules (single source of formulas)
-src/decisions/              the Finding (shared by map, brief and assistant) and the Evidence Brief
+src/decisions/              the Finding, its plain-language explanation (explain.py) and the Evidence Brief
 src/assistant/              Umuzi Assistant (deterministic, answers from the same Finding)
-src/viz/                    charts, map, target arrow, legend
+src/viz/                    charts, map, target arrows, tiles, input bars, icons (hand-drawn SVG)
+src/ui/                     page stylesheet and animations (switched off under reduced motion)
 scripts/                    refresh_data, history_eda, backtest, run_analysis, download_sources
 tests/                      pipeline and historical layouts (synthetic fixtures), rules, real data, assistant, app
-data/                       raw files, snapshots, registry, sources, PSTA 5 targets, assistant icon
+data/                       raw files, snapshots, registry, sources, PSTA 5 targets, assistant icon, landing photo
 docs/  reports/  demo/      methodology and limitations, analysis outputs, demo
 ```
 

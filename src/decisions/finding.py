@@ -15,7 +15,7 @@ import pandas as pd
 from src.analytics.indicators import (CATEGORY_DIP, CATEGORY_INSUFFICIENT, CATEGORY_NOT_BELOW,
                                       CATEGORY_REPEATED_INPUTS_OK, CATEGORY_REPEATED_LOW_INPUT,
                                       Params, load_targets, national_vs_target)
-from src.config import CROP_LABELS
+from src.config import CROP_LABELS, GAP_THRESHOLD
 
 POOLED_NOTE = ("Seed and fertilizer uptake is published per district for all crops together, "
                "not for this crop, so it shows the district's general input use.")
@@ -62,8 +62,18 @@ def release_name(release_id: str) -> str:
     return f"Season {release_id[-1]} {release_id[4:8]}"
 
 
-def pct(v: float) -> str:
-    return "not reported" if v is None or pd.isna(v) else f"{v:.0%}"
+def pct(v: float, near: float | None = GAP_THRESHOLD) -> str:
+    """Whole percent, with extra decimals only where rounding would hide which side
+    of the benchmark a value is on (0.896 -> '89.6%', not '90%' next to a 0.902)."""
+    if v is None or pd.isna(v):
+        return "not reported"
+    if near is None:
+        return f"{v:.0%}"
+    for digits in (0, 1, 2):
+        s = f"{v:.{digits}%}"
+        if s != f"{near:.{digits}%}" or v == near:
+            return s
+    return f"{v:.3%}"
 
 
 @dataclass

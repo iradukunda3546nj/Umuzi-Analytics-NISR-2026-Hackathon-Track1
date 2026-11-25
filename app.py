@@ -1,73 +1,54 @@
 """Umuzi Analytics - what Rwanda's agricultural survey says about each district, and what to check next.
 
 Run locally:  streamlit run app.py
+
+Five sections, one question each:
+  Home           what this is and who it is for
+  Your district  how far the district is from Rwanda's yield (map + target arrow)
+  Why?           pattern, seed and fertilizer, verdict, and what to check first
+  Ask Umuzi      the assistant, for questions across districts and crops
+  Evidence       survey-by-survey tables, data checks, the backtest, sensitivity
+
 All numbers come from the ACTIVE data snapshot (data/snapshots/ACTIVE.json),
 built by scripts/refresh_data.py from published NISR Seasonal Agricultural
-Survey tables. No observation is written into this file; the map panel, the
-evidence brief and the Umuzi Assistant all read the same Finding
-(src/decisions/finding.py).
+Survey tables. No observation is written into this file; every page and the
+assistant read the same Finding (src/decisions/finding.py) and its wording
+(src/decisions/explain.py).
 """
 from __future__ import annotations
 
+import base64
 import json
 from html import escape
 
 import pandas as pd
 import streamlit as st
 
-from src.analytics.indicators import CATEGORY_ORDER, Params
-from src.assistant.umuzi import HELP, Selection, UmuziData, answer
+from src.analytics.indicators import REPEATED, Params
+from src.assistant.umuzi import Selection, UmuziData, answer, suggestions_for
 from src.config import (DATA_DIR, DISTRICTS, GAP_THRESHOLD, MIN_HARVESTED_HA, PRODUCT_NAME,
                         ROOT)
 from src.decisions.brief import brief_csv, build_brief
-from src.decisions.finding import crop_name, release_name, target_position
+from src.decisions.explain import explain
+from src.decisions.finding import crop_name, pct, release_name, target_position
 from src.services.snapshot_store import SnapshotStore
 from src.services.status import missing_releases, release_status
+from src.ui.style import CSS, background_css
 from src.viz import charts
-from src.viz.visuals import legend_html, target_arrow_svg, window_strip_html
+from src.viz.icons import icon
+from src.viz.visuals import (action_card_html, chip_html, district_target_svg, flow_html, hook_cards_html,
+                             inputs_html, legend_chips_html, pattern_tiles_html, stats_html,
+                             target_arrow_svg, verdict_html)
 
 st.set_page_config(page_title=PRODUCT_NAME, layout="wide", initial_sidebar_state="collapsed")
+st.markdown(CSS, unsafe_allow_html=True)
 
 PRIORITY = ["maize", "bean", "irish_potato", "paddy_rice", "cassava", "soybean", "cooking_banana",
             "sweet_potato", "wheat"]
 BOT_ICON = str(DATA_DIR / "chatBOT.png")
+VIEWS = {"home": "Home", "explore": "Your district", "why": "Why?", "ask": "Ask Umuzi", "evidence": "Evidence"}
 PLOT_CONFIG = {"displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d"],
                "toImageButtonOptions": {"format": "png", "scale": 2}}
-
-st.markdown("""
-<style>
-  .block-container {padding-top: 4.5rem; padding-bottom: 2rem; max-width: 1440px;}
-  .umz-header {display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
-               border-bottom:1px solid #d9d9d2; padding-bottom:10px; margin-bottom:14px;}
-  .umz-word {font-size:24px; font-weight:700; color:#24493f;}
-  .umz-sub {font-size:14px; color:#55595a;}
-  .umz-meta {font-size:12px; color:#55595a; text-align:right; line-height:1.5;}
-  .umz-card {border:1px solid #dcdcd5; border-radius:6px; padding:16px 18px; background:#ffffff;}
-  .umz-cat {display:inline-block; padding:3px 10px; border-radius:3px; font-size:13px; font-weight:600;
-            border:1px solid #6b6f6c;}
-  .umz-sel {font-size:13px; color:#55595a; margin:8px 0 4px 0;}
-  .umz-head {font-size:17px; line-height:1.45; color:#1f2421; margin:6px 0 12px 0;}
-  .umz-label {font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#7b7f7f; margin-top:12px;}
-  .umz-fig {font-size:13.5px; color:#1f2421; margin:3px 0;}
-  .umz-fig b {color:#55595a; font-weight:600;}
-  .umz-next {font-size:14px; color:#1f2421; border-left:3px solid #24493f; padding:4px 10px; margin-top:6px;}
-  .umz-keep {font-size:12.5px; color:#55595a; margin:2px 0;}
-  .umz-strip-cap {font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#7b7f7f; margin-top:6px;}
-  .umz-strip {display:flex; gap:6px; margin-top:6px;}
-  .umz-pill {flex:1; border-radius:5px; padding:6px 8px; border:1px solid #c9cec9; text-align:center;}
-  .umz-pill-rel {font-size:11px;} .umz-pill-val {font-size:20px; font-weight:700; line-height:1.2;}
-  .umz-pill-lab {font-size:11px;}
-  .umz-legend {display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:8px 16px; margin-top:6px;}
-  .umz-leg-row {display:flex; gap:9px; align-items:flex-start; font-size:13px; color:#1f2421;}
-  .umz-sw {flex:0 0 16px; height:16px; border:1px solid #6b6f6c; border-radius:2px; margin-top:2px;}
-  .umz-count {display:inline-block; min-width:20px; padding:0 6px; border-radius:9px; background:#eef0ec;
-              font-size:12px; font-weight:600; text-align:center;}
-  .umz-leg-note {font-size:11.5px; color:#7b7f7f; line-height:1.35;}
-  .umz-target {border:1px solid #dcdcd5; border-radius:6px; padding:10px 16px 4px 16px; background:#ffffff;}
-  .umz-target-cap {font-size:13px; color:#55595a;}
-  .umz-warn {font-size:13px; background:#fbf0dc; border:1px solid #e6c88f; padding:6px 10px; border-radius:4px;}
-</style>
-""", unsafe_allow_html=True)
 
 
 # ------------------------------------------------------------------ data access
@@ -94,15 +75,33 @@ def report(name: str) -> dict:
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
+@st.cache_data(show_spinner=False)
+def background_b64() -> str | None:
+    p = DATA_DIR / "BackGD.jpg"
+    return base64.b64encode(p.read_bytes()).decode("ascii") if p.exists() else None
+
+
 store = get_store()
 SID = store.active_id()
 if SID is None:
     st.error("No approved data snapshot is active. Run: python -m scripts.refresh_data bootstrap --approve")
     st.stop()
 
-gap = st.session_state.get("gap", GAP_THRESHOLD)
-min_ha = st.session_state.get("min_ha", MIN_HARVESTED_HA)
-data = get_data(SID, gap, min_ha)
+# ------------------------------------------------------------------ state
+# Persistent keys (district, crop, season, gap, min_ha, view) live outside widgets,
+# because Streamlit drops a widget's key on any run where that widget is not drawn.
+ss = st.session_state
+qp = st.query_params                     # shareable links: ?view=why&district=Gasabo&crop=cassava&season=A
+ss.setdefault("view", qp.get("view") if qp.get("view") in VIEWS else "home")
+ss.setdefault("season", qp.get("season") if qp.get("season") in ("A", "B") else "A")
+ss.setdefault("district", qp.get("district") if qp.get("district") in DISTRICTS else "Ruhango")
+if "crop" not in ss and qp.get("crop"):
+    ss["crop"] = qp.get("crop")
+ss.setdefault("gap", GAP_THRESHOLD)
+ss.setdefault("min_ha", MIN_HARVESTED_HA)
+ss.setdefault("chat", [])
+
+data = get_data(SID, ss["gap"], ss["min_ha"])
 records, manifest = data.records, data.manifest
 releases = sorted(records["release_id"].unique(), key=lambda r: (int(r[4:8]), r[-1]))
 
@@ -114,196 +113,300 @@ def crop_options(season: str) -> list[str]:
             + sorted(c for c in counts.index if counts[c] >= 10 and c not in PRIORITY))
 
 
-# ------------------------------------------------------------------ header and selection
-st.markdown(f"""
-<div class='umz-header'>
-  <div><div class='umz-word'>{PRODUCT_NAME}</div>
-       <div class='umz-sub'>What Rwanda's agricultural survey says about each district's crop yields, and what to check next</div></div>
-  <div class='umz-meta'>NISR Seasonal Agricultural Survey: {len(releases)} surveys, {release_name(releases[0])} to {release_name(releases[-1])}
-       (Season B 2025 not published)<br>Validated snapshot {SID[-8:]}</div>
-</div>""", unsafe_allow_html=True)
+if ss.get("crop") not in crop_options(ss["season"]):
+    ss["crop"] = "maize"
 
-st.session_state.setdefault("season", "A")
-st.session_state.setdefault("district", "Ruhango")
-c1, c2, c3 = st.columns([1.1, 1.1, 0.8])
-season_now = st.session_state["season"]
-copts = crop_options(season_now)
-if st.session_state.get("crop") not in copts:
-    st.session_state["crop"] = "maize" if "maize" in copts else copts[0]
-crop = c1.selectbox("Crop (type to search)", copts, key="crop", format_func=lambda c: crop_name(c))
-district = c2.selectbox("District (type to search)", DISTRICTS, key="district")
-season = c3.radio("Season", ["A", "B"], key="season", horizontal=True,
-                  format_func=lambda s: f"Season {s}",
-                  help="Season A runs September to February, Season B March to June. They are never mixed.")
 
-if gap != GAP_THRESHOLD or min_ha != MIN_HARVESTED_HA:
-    st.markdown(f"<div class='umz-warn'>Testing non-default benchmark settings (below = under {gap:.0%} of national, "
-                f"reliable from {min_ha:,.0f} ha). Reset them in Data and methods.</div>", unsafe_allow_html=True)
+def go(view: str) -> None:
+    ss["view"] = view
 
-ev = data.evidence(crop, season)
-sel = Selection(district, crop, season)
-finding = data.finding(sel)
 
-# ------------------------------------------------------------------ overview: map + finding
-left, right = st.columns([1.35, 1], gap="large")
-with left:
-    n_rep = int(ev["category"].isin(CATEGORY_ORDER[:2]).sum())
-    st.markdown(f"**{crop_name(crop)}, Season {season}: {n_rep} of 30 districts were repeatedly below the national "
-                f"yield benchmark** (latest survey {release_name(ev['latest_release'].iloc[0])})")
-    st.plotly_chart(charts.category_map(ev, SID, crop, season, highlight=district, compact=True),
-                    width="stretch", config=PLOT_CONFIG)
-    st.markdown(legend_html(ev["category"].value_counts().to_dict(), finding.category), unsafe_allow_html=True)
+def sync(name: str) -> None:
+    ss[name] = ss[f"w_{name}"]
 
-with right:
-    color = charts.CATEGORY_COLORS[finding.category]
-    ink = "#ffffff" if finding.category in (CATEGORY_ORDER[0], CATEGORY_ORDER[2]) else "#1f2421"
-    figs = "".join(f"<div class='umz-fig'><b>{escape(k)}:</b> {escape(v)}</div>" for k, v in finding.figures)
-    keep = "".join(f"<div class='umz-keep'>- {escape(x)}</div>" for x in finding.limitations)
-    st.markdown(f"""
-<div class='umz-card'>
-  <span class='umz-cat' style='background:{color};color:{ink}'>{escape(finding.category)}</span>
-  <div class='umz-sel'>{escape(district)} ({escape(finding.row['province'])}) &middot; {escape(crop_name(crop))} &middot; Season {season}</div>
-  <div class='umz-head'>{escape(finding.headline)}</div>
-  {window_strip_html(finding)}
-  <div class='umz-label'>The figures</div>{figs}
-  <div class='umz-label'>Surveys used</div>
-  <div class='umz-fig'>{escape(', '.join(release_name(r) for r in finding.releases))} (NISR, snapshot {SID[-8:]})</div>
-  <div class='umz-label'>What to check next</div><div class='umz-next'>{escape(finding.next_step)}</div>
-  <div class='umz-label'>Keep in mind</div>{keep}
-</div>""", unsafe_allow_html=True)
-    b1, b2 = st.columns(2)
-    b1.download_button("Download brief (Markdown)", build_brief(finding, manifest).encode("utf-8"),
-                       file_name=f"umuzi_brief_{district}_{crop}_season{season}.md", mime="text/markdown")
-    b2.download_button("Download figures (CSV)", brief_csv(finding),
-                       file_name=f"umuzi_{district}_{crop}_season{season}.csv", mime="text/csv")
 
-t = target_position(records, crop)
-if t is not None:
-    gap_t = t.target_t_ha - t.yield_t_ha
-    st.markdown(f"""
-<div class='umz-target'>
-  <div class='umz-label' style='margin-top:0'>Rwanda against the PSTA 5 {escape(crop_name(crop).lower())} target</div>
-  {target_arrow_svg(t)}
-  <div class='umz-target-cap'>National {escape(crop_name(crop).lower())} yield, Season A + B, {t.agricultural_year}:
-  {t.yield_t_ha:.2f} t/ha, {t.attainment:.0%} of the {t.target_t_ha:.2f} t/ha target
-  {f'({gap_t:.2f} t/ha short)' if gap_t > 0 else '(target met)'}. PSTA 5 aims for {t.final_target_t_ha:.2f} t/ha by 2028/29.
-  Targets are national only; districts are compared with the national yield. Source: MINAGRI PSTA 5 results framework p.21; NISR SAS.</div>
-</div>""", unsafe_allow_html=True)
+# A click on the map selects that district (handled before the selectors are drawn).
+_click = ss.get("map_click")
+if _click and _click.get("selection", {}).get("points"):
+    pt = _click["selection"]["points"][0]
+    token = json.dumps(pt, sort_keys=True, default=str)
+    loc = pt.get("location")
+    if loc in DISTRICTS and ss.get("_map_token") != token:
+        ss["_map_token"] = token
+        ss["district"] = loc
+
+# ------------------------------------------------------------------ top bar
+view = ss["view"]
+if view == "home":
+    qp.clear()
+    qp["view"] = "home"
 else:
-    st.caption(f"PSTA 5 sets no national yield target for {crop_name(crop).lower()}.")
-
-st.write("")
-
-# ------------------------------------------------------------------ details on demand
-tab_ask, tab_grid, tab_hist, tab_inp, tab_all, tab_meth = st.tabs(
-    ["Ask the Umuzi Assistant", "Survey by survey, all districts", f"{district} over time",
-     "Input uptake", "All districts table", "Data and methods"])
-
-# ---- Umuzi Assistant: follows the map selection; a named district or crop carries into follow-ups.
-map_key = (district, crop, season)
-if st.session_state.get("asst_map_key") != map_key:
-    st.session_state["asst_map_key"] = map_key
-    st.session_state["asst_sel"] = Selection(district, crop, season)
-st.session_state.setdefault("chat", [])
+    qp.update(view=view, district=ss["district"], crop=ss["crop"], season=ss["season"])
+bar_l, bar_r = st.columns([1, 2.2], vertical_alignment="center")
+bar_l.markdown(f"<div class='umz-brand'>{icon('target', 26, 2)}Umuzi Analytics</div>", unsafe_allow_html=True)
+with bar_r.container(key="nav", horizontal=True, horizontal_alignment="right", gap="small"):
+    for k, label in VIEWS.items():
+        st.button(label, key=f"nav_{k}", on_click=go, args=(k,), width="content",
+                  type="primary" if k == view else "secondary")
 
 
+def selection_bar() -> tuple[str, str, str]:
+    for name in ("crop", "district", "season"):
+        ss[f"w_{name}"] = ss[name]
+    c1, c2, c3 = st.columns([1.1, 1.1, 0.8])
+    c1.selectbox("Crop (type to search)", crop_options(ss["season"]), key="w_crop", on_change=sync, args=("crop",),
+                 format_func=crop_name)
+    c2.selectbox("District (type to search)", DISTRICTS, key="w_district", on_change=sync, args=("district",))
+    c3.radio("Season", ["A", "B"], key="w_season", on_change=sync, args=("season",), horizontal=True,
+             format_func=lambda s: f"Season {s}",
+             help="Season A runs September to February, Season B March to June. They are never mixed.")
+    if ss.get("crop") not in crop_options(ss["season"]):
+        ss["crop"] = "maize"
+    if ss["gap"] != GAP_THRESHOLD or ss["min_ha"] != MIN_HARVESTED_HA:
+        st.markdown(f"<div class='umz-warn'>Testing non-default benchmark settings (below = under {ss['gap']:.0%} of "
+                    f"national, reliable from {ss['min_ha']:,.0f} ha). Reset them in Evidence.</div>",
+                    unsafe_allow_html=True)
+    return ss["crop"], ss["district"], ss["season"]
+
+
+# ------------------------------------------------------------------ assistant
 def ask(question: str) -> None:
-    a = answer(data, question, st.session_state["asst_sel"])
-    st.session_state["asst_sel"] = a.selection
-    st.session_state["chat"].append(dict(role="user", text=question))
-    st.session_state["chat"].append(dict(role="assistant", text=a.text, evidence=a.evidence,
-                                         keep=a.keep_in_mind, sel=a.selection))
+    sel = ss.get("asst_sel") or Selection(ss["district"], ss["crop"], ss["season"])
+    a = answer(data, question, sel)
+    ss["asst_sel"] = a.selection
+    ss["chat"].append(dict(role="user", text=question))
+    ss["chat"].append(dict(role="assistant", text=a.text, evidence=a.evidence, keep=a.keep_in_mind,
+                           sel=a.selection, sugg=a.suggestions))
 
 
 def show_on_map(s: Selection) -> None:
-    st.session_state["district"], st.session_state["crop"], st.session_state["season"] = s.district, s.crop, s.season
+    ss["district"], ss["crop"], ss["season"] = s.district, s.crop, s.season
+    ss["view"] = "explore"
 
 
-with tab_ask:
-    st.caption(f"Answers use the same validated NISR figures and rules as the map. Current focus: "
-               f"{st.session_state['asst_sel'].district}, {crop_name(st.session_state['asst_sel'].crop).lower()}, "
-               f"Season {st.session_state['asst_sel'].season}.")
-    s_ = st.session_state["asst_sel"]
-    examples = [f"Has {s_.district}'s {crop_name(s_.crop).lower()} yield stayed below national in Season {s_.season}?",
-                "What should I verify about fertilizer access?",
-                f"Which other districts are repeatedly below for {crop_name(s_.crop).lower()}?",
-                "How has it changed since 2018?"]
-    ec = st.columns(len(examples))
-    for col, q in zip(ec, examples):
-        col.button(q, on_click=ask, args=(q,), width="stretch")
-    with st.container(height=460):
-        if not st.session_state["chat"]:
+def render_chat(height: int) -> None:
+    key = (ss["district"], ss["crop"], ss["season"])
+    if ss.get("asst_key") != key:                   # follow the page's selection
+        ss["asst_key"] = key
+        ss["asst_sel"] = Selection(*key)
+    s_ = ss["asst_sel"]
+    st.markdown(f"<div class='umz-ask-head'><img src='data:image/png;base64,{bot_b64()}' width='34'>"
+                f"Ask Umuzi<span class='umz-fine' style='margin:0 0 0 6px'>following {escape(s_.district)}, "
+                f"{escape(crop_name(s_.crop).lower())}, Season {s_.season}</span></div>", unsafe_allow_html=True)
+    with st.container(height=height):
+        if not ss["chat"]:
             with st.chat_message("assistant", avatar=BOT_ICON):
-                st.markdown("Muraho. I am the Umuzi Assistant. " + HELP)
-        for i, m in enumerate(st.session_state["chat"]):
+                st.markdown("Muraho! Ask me about any district's crop yields, seed and fertilizer use, "
+                            "or what to check next.")
+            sugg = suggestions_for(s_)
+        else:
+            sugg = []
+        for i, m in enumerate(ss["chat"]):
             if m["role"] == "user":
                 with st.chat_message("user"):
                     st.markdown(m["text"])
                 continue
+            last = i == len(ss["chat"]) - 1
             with st.chat_message("assistant", avatar=BOT_ICON):
                 st.markdown(m["text"])
-                if m["evidence"]:
-                    st.markdown("**Evidence**\n" + "\n".join(f"- {e}" for e in m["evidence"]))
-                if m["keep"]:
-                    st.markdown("**Keep in mind**\n" + "\n".join(f"- {k}" for k in m["keep"]))
+                if m["evidence"] or m["keep"]:
+                    with st.expander("Evidence and limits"):
+                        st.markdown("\n".join(f"- {e}" for e in m["evidence"] + m["keep"]))
                 s = m["sel"]
-                if s and (s.district, s.crop, s.season) != map_key and i == len(st.session_state["chat"]) - 1:
+                if last and s and (s.district, s.crop, s.season) != key:
                     st.button(f"Show {s.district}, {crop_name(s.crop).lower()}, Season {s.season} on the map",
                               key=f"show_{i}", on_click=show_on_map, args=(s,))
+            if last:
+                sugg = m.get("sugg") or []
+        if sugg:
+            with st.container(horizontal=True, gap="small"):
+                for j, q in enumerate(sugg):
+                    st.button(q, key=f"sugg_{len(ss['chat'])}_{j}", on_click=ask, args=(q,), width="content")
     q = st.chat_input("Ask about a district, crop or season")
     if q:
         ask(q)
         st.rerun()
 
-with tab_grid:
-    st.caption("Each cell is the district's yield as % of the national yield in that survey. The outlined block is "
-               "the last 3 surveys, which decide the map colour.")
-    st.plotly_chart(charts.pattern_grid(ev, data.panel, SID, crop, season, highlight=district),
-                    width="stretch", config=PLOT_CONFIG)
 
-with tab_hist:
-    st.plotly_chart(charts.district_history_chart(data.panel, district, crop, season, finding.releases, SID),
-                    width="stretch", config=PLOT_CONFIG)
-    st.caption("District rankings from 2018 and 2019 agree only weakly with later years (see Data and methods), "
-               "so the label uses the last 3 surveys; the earlier years are shown for context.")
+@st.cache_data(show_spinner=False)
+def bot_b64() -> str:
+    return base64.b64encode((DATA_DIR / "chatBOT.png").read_bytes()).decode("ascii")
 
-with tab_inp:
-    st.plotly_chart(charts.input_context_chart(ev, SID, crop, season, highlight=district),
-                    width="stretch", config=PLOT_CONFIG)
-    st.caption("Input uptake is the share of farmers using the input on any crop in the district; NISR does not "
-               "publish it per crop at district level.")
 
-with tab_all:
-    cols = {"district": "District", "province": "Province", "category": "Finding",
-            "latest_ratio": "Yield as % of national (latest)", "below_in_window": "Below in last 3 surveys",
-            "reliable_in_window": "Reliable of last 3", "latest_harvested_ha": "Harvested ha (latest)",
-            "improved_seed_pct": "Improved seed %", "inorganic_fert_pct": "Inorganic fertilizer %"}
-    show = ev[list(cols)].rename(columns=cols)
-    show["Yield as % of national (latest)"] = show["Yield as % of national (latest)"] * 100
-    st.dataframe(show, hide_index=True, width="stretch", column_config={
-        "Yield as % of national (latest)": st.column_config.NumberColumn(format="%.0f%%"),
-        "Harvested ha (latest)": st.column_config.NumberColumn(format="%.0f"),
-        "Improved seed %": st.column_config.NumberColumn(format="%.1f"),
-        "Inorganic fertilizer %": st.column_config.NumberColumn(format="%.1f")})
-    st.download_button("Download table (CSV)", ev.to_csv(index=False).encode("utf-8"),
-                       file_name=f"umuzi_{crop}_season{season}_{SID}.csv", mime="text/csv")
+# ------------------------------------------------------------------ pages
+def page_home() -> None:
+    bg = background_b64()
+    if bg:
+        st.markdown(background_css(bg), unsafe_allow_html=True)
+    n_crops = len(set(crop_options("A")) | set(crop_options("B")))
+    st.markdown(
+        "<div class='umz-hero'><h1>Umuzi <span>Analytics</span></h1>"
+        "<p>Rwanda's crop survey, turned into clear answers for every district.</p></div>"
+        + hook_cards_html([
+            ("target", "How far from Rwanda's yield?", "Each district's harvest against the national average, crop by crop."),
+            ("repeat", "A bad season, or a pattern?", "We read the last three surveys, not just one."),
+            ("seed", "Seed? Fertilizer?", "See if fewer farmers use them here than across Rwanda."),
+            ("megaphone", "What to check next", "A short field list for agronomists and planners."),
+        ])
+        + stats_html([(str(len(releases)), "NISR surveys"), ("30", "districts"), (str(n_crops), "crops"),
+                      (f"{releases[0][4:8]}-{releases[-1][4:8]}", "Seasons A and B")])
+        + flow_html([("pin", "Pick a district"), ("target", "See the gap"), ("question", "Ask why"),
+                     ("megaphone", "Take action")]),
+        unsafe_allow_html=True)
+    _, a, b, _ = st.columns([1.2, 1, 0.8, 1.2])
+    a.button("Find your district", key="cta_explore", on_click=go, args=("explore",), width="stretch")
+    b.button("Ask Umuzi", key="cta_ask", on_click=go, args=("ask",), width="stretch")
+    st.markdown("<div class='umz-who'>Built for district agronomists, MINAGRI and RAB planners, and partners in the "
+                "field. Data: National Institute of Statistics of Rwanda, Seasonal Agricultural Survey "
+                f"({escape(release_name(releases[0]))} to {escape(release_name(releases[-1]))}).</div>",
+                unsafe_allow_html=True)
 
-with tab_meth:
+
+def page_explore() -> None:
+    crop, district, season = selection_bar()
+    ev = data.evidence(crop, season)
+    f = data.finding(Selection(district, crop, season))
+    r = f.row
+    left, right = st.columns([1.05, 1], gap="large")
+    with left:
+        n_rep = int(ev["category"].isin(REPEATED).sum())
+        st.markdown(f"<div class='umz-kicker'>{escape(crop_name(crop))} &middot; "
+                    f"{escape(release_name(f.latest_release))}</div>"
+                    f"<div class='umz-sub'><b>{n_rep} of 30</b> districts below Rwanda's yield in at least "
+                    "2 of the last 3 surveys</div>", unsafe_allow_html=True)
+        st.plotly_chart(charts.category_map(ev, SID, crop, season, highlight=district, compact=True),
+                        width="stretch", config=PLOT_CONFIG, key="map_click", on_select="rerun",
+                        selection_mode="points")
+        st.markdown(legend_chips_html(ev["category"].value_counts().to_dict(), f.category)
+                    + "<div class='umz-fine'>Click a district on the map, or type it above.</div>",
+                    unsafe_allow_html=True)
+    with right:
+        if pd.notna(r["latest_ratio"]):
+            big = f"{pct(r['latest_ratio'])} of Rwanda's yield"
+            sub = (f"{r['latest_yield_kg_ha'] / 1000:.2f} t/ha here, {r['national_yield_kg_ha'] / 1000:.2f} t/ha "
+                   f"in Rwanda, {release_name(f.latest_release)}")
+        else:
+            big, sub = "No yield published", f"{release_name(f.latest_release)}"
+        st.markdown(
+            f"<div class='umz-card'><div class='umz-kicker'>{escape(district)} ({escape(r['province'])}) &middot; "
+            f"{escape(crop_name(crop))} &middot; Season {season}</div>"
+            f"<div class='umz-big'>{escape(big)}</div><div class='umz-sub'>{escape(sub)}</div>"
+            f"<div style='margin:10px 0 2px 0'>{chip_html(f.category)}</div>"
+            f"{district_target_svg(f, ss['gap'])}"
+            f"<div class='umz-kicker' style='margin:4px 0 6px 0'>Last 3 surveys</div>{pattern_tiles_html(f)}</div>",
+            unsafe_allow_html=True)
+        st.write("")
+        st.button("?   Why? See what is behind it", key="why_btn", on_click=go, args=("why",), width="stretch")
+    t = target_position(records, crop)
+    if t is not None:
+        gap_t = t.target_t_ha - t.yield_t_ha
+        st.markdown(
+            f"<div class='umz-card' style='margin-top:18px'><div class='umz-kicker'>Rwanda as a whole against the "
+            f"PSTA 5 {escape(crop_name(crop).lower())} target</div>{target_arrow_svg(t)}"
+            f"<div class='umz-fine'>National Season A + B yield {escape(t.agricultural_year)}: {t.yield_t_ha:.2f} t/ha, "
+            f"{t.attainment:.0%} of the {t.target_t_ha:.2f} t/ha target"
+            f"{f', {gap_t:.2f} t/ha short' if gap_t > 0 else ', target met'}. PSTA 5 sets national targets only. "
+            "Source: MINAGRI PSTA 5 results framework p.21; NISR SAS.</div></div>", unsafe_allow_html=True)
+
+
+def page_why() -> None:
+    crop, district, season = selection_bar()
+    f = data.finding(Selection(district, crop, season))
+    e = explain(f)
+    st.markdown(f"<div class='umz-big' style='margin-top:6px'>Why? {escape(district)}, "
+                f"{escape(crop_name(crop).lower())}, Season {season}</div>"
+                f"<div style='margin:6px 0 14px 0'>{chip_html(f.category)}</div>", unsafe_allow_html=True)
+    c1, c2, c3 = st.columns([1, 1.15, 1], gap="medium")
+    c1.markdown(f"<div class='umz-card'><div class='umz-step'><span class='umz-step-n'>1</span>Is it a pattern?</div>"
+                f"{pattern_tiles_html(f)}<div class='umz-line'><b>{escape(e.pattern_title)}.</b> "
+                f"{escape(e.pattern_line)}</div></div>", unsafe_allow_html=True)
+    c2.markdown(f"<div class='umz-card' style='animation-delay:.12s'><div class='umz-step'><span class='umz-step-n'>2"
+                f"</span>Seed and fertilizer?</div>{inputs_html(e)}</div>", unsafe_allow_html=True)
+    c3.markdown(f"<div class='umz-card' style='animation-delay:.24s'><div class='umz-step'><span class='umz-step-n'>3"
+                f"</span>What it suggests</div>{verdict_html(e, f.category)}"
+                "<div class='umz-fine'>The survey shows where yields are low, not why. Treat this as a lead to check, "
+                "not a proven cause.</div></div>", unsafe_allow_html=True)
+    st.write("")
+    a, b = st.columns([1, 1.15], gap="large")
+    with a:
+        st.markdown(action_card_html(e, f"{district} district team"), unsafe_allow_html=True)
+        d1, d2 = st.columns(2)
+        d1.download_button("Download brief", build_brief(f, manifest).encode("utf-8"),
+                           file_name=f"umuzi_brief_{district}_{crop}_season{season}.md", mime="text/markdown",
+                           width="stretch")
+        d2.download_button("Download figures (CSV)", brief_csv(f),
+                           file_name=f"umuzi_{district}_{crop}_season{season}.csv", mime="text/csv",
+                           width="stretch")
+        with st.expander("The figures and their limits"):
+            st.markdown("\n".join(f"- **{k}:** {v}" for k, v in f.figures)
+                        + f"\n- **Surveys used:** {', '.join(release_name(x) for x in f.releases)} "
+                          f"(NISR, snapshot {SID[-8:]})\n\n"
+                        + "\n".join(f"- {x}" for x in f.limitations))
+    with b:
+        render_chat(height=360)
+
+
+def page_ask() -> None:
+    selection_bar()
+    render_chat(height=520)
+
+
+def page_evidence() -> None:
+    crop, district, season = selection_bar()
+    ev = data.evidence(crop, season)
+    f = data.finding(Selection(district, crop, season))
+    tab_grid, tab_hist, tab_inp, tab_all, tab_meth = st.tabs(
+        ["Survey by survey", f"{district} over time", "Seed and fertilizer", "All districts table",
+         "Data and methods"])
+    with tab_grid:
+        st.caption("Each cell is the district's yield as % of the national yield in that survey. The outlined block "
+                   "is the last 3 surveys, which decide the map colour.")
+        st.plotly_chart(charts.pattern_grid(ev, data.panel, SID, crop, season, highlight=district),
+                        width="stretch", config=PLOT_CONFIG)
+    with tab_hist:
+        st.plotly_chart(charts.district_history_chart(data.panel, district, crop, season, f.releases, SID),
+                        width="stretch", config=PLOT_CONFIG)
+        st.caption("District rankings from 2018 and 2019 agree only weakly with later years (see Data and methods), "
+                   "so the label uses the last 3 surveys; the earlier years are shown for context.")
+    with tab_inp:
+        st.plotly_chart(charts.input_context_chart(ev, SID, crop, season, highlight=district),
+                        width="stretch", config=PLOT_CONFIG)
+        st.caption("Share of farmers using the input on any crop in the district; NISR does not publish it per "
+                   "crop at district level.")
+    with tab_all:
+        cols = {"district": "District", "province": "Province", "category": "Finding",
+                "latest_ratio": "Yield as % of national (latest)", "below_in_window": "Below in last 3 surveys",
+                "reliable_in_window": "Reliable of last 3", "latest_harvested_ha": "Harvested ha (latest)",
+                "improved_seed_pct": "Improved seed %", "inorganic_fert_pct": "Inorganic fertilizer %"}
+        show = ev[list(cols)].rename(columns=cols)
+        show["Yield as % of national (latest)"] = show["Yield as % of national (latest)"] * 100
+        st.dataframe(show, hide_index=True, width="stretch", column_config={
+            "Yield as % of national (latest)": st.column_config.NumberColumn(format="%.1f%%"),
+            "Harvested ha (latest)": st.column_config.NumberColumn(format="%.0f"),
+            "Improved seed %": st.column_config.NumberColumn(format="%.1f"),
+            "Inorganic fertilizer %": st.column_config.NumberColumn(format="%.1f")})
+        st.download_button("Download table (CSV)", ev.to_csv(index=False).encode("utf-8"),
+                           file_name=f"umuzi_{crop}_season{season}_{SID}.csv", mime="text/csv")
+    with tab_meth:
+        methods()
+
+
+def methods() -> None:
     eda, bt = report("history_eda.json"), report("backtest_results.json")
     st.markdown(f"""
 **How a district is labelled.** For the chosen crop and season, each district's yield is divided by the national
 yield of the same survey. It is *below national* when under {GAP_THRESHOLD:.0%} (NISR publishes no district margins
 of error, so smaller gaps are not flagged). An estimate is *reliable* when a yield is reported and at least
 {MIN_HARVESTED_HA:,.0f} ha were harvested. *Repeatedly below* means below in at least 2 of the last 3 surveys of
-that season, with at least 2 reliable. Input uptake is then compared with national: both improved seed and
-inorganic fertilizer below national gives the "low input uptake" label.""")
+that season, with at least 2 reliable. Seed and fertilizer use are then compared with national: both below
+national gives the "seed and fertilizer use low" label.""")
 
     st.markdown("**1. Which survey years can be used.** Every downloaded file was checked for district-level yield tables.")
     if eda.get("source_audit"):
         st.dataframe(pd.DataFrame(eda["source_audit"]).sort_values(["year", "kind"]), hide_index=True, width="stretch")
     st.markdown("2014-2017 report yields only by land-use stratum or province, so district analysis starts in 2018. "
-                "Season B 2025 was not published. 2018 reports input use per plot or without a stated basis, not per farmer, so its input "
-                "figures are not used.")
+                "Season B 2025 was not published. 2018 reports input use per plot or without a stated basis, not per "
+                "farmer, so its input figures are not used.")
 
     st.markdown("**2. Checks on every survey** (run automatically before data can go live).")
     status, missing = cached_status(SID)
@@ -346,7 +449,13 @@ inorganic fertilizer below national gives the "low input uptake" label.""")
             "rule now used.")
 
     with st.expander("Test the benchmark settings (sensitivity)"):
-        st.slider("Below national if yield is under this share of national", 0.70, 0.98, GAP_THRESHOLD, 0.01, key="gap")
+        ss["w_gap"], ss["w_min_ha"] = ss["gap"], ss["min_ha"]
+        st.slider("Below national if yield is under this share of national", 0.70, 0.98, key="w_gap", step=0.01,
+                  on_change=sync, args=("gap",))
         st.select_slider("Reliable from this harvested area (ha)", [100.0, 200.0, 500.0, 1000.0, 2000.0],
-                         MIN_HARVESTED_HA, key="min_ha")
+                         key="w_min_ha", on_change=sync, args=("min_ha",))
         st.caption("Defaults: 90% and 500 ha. Changing them recolours the map and the assistant's answers.")
+
+
+{"home": page_home, "explore": page_explore, "why": page_why, "ask": page_ask,
+ "evidence": page_evidence}[view]()

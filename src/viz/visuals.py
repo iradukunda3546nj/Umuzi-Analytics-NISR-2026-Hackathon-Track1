@@ -1,7 +1,9 @@
-"""Small HTML/SVG visuals for the overview panel: legend, target arrow and survey strip.
+﻿"""HTML/SVG visuals for the app: target arrows, survey tiles, input bars, cards.
 
 Pure functions that return HTML strings, so they are testable without a browser
-and every number they print comes from a Finding or TargetPosition.
+and every number they print comes from a Finding, Explanation or TargetPosition.
+Animations are CSS only (see src/ui/style.py) and switch off under
+prefers-reduced-motion.
 """
 from __future__ import annotations
 
@@ -9,51 +11,182 @@ from html import escape
 
 from src.analytics.indicators import CATEGORY_ORDER
 from src.config import GAP_THRESHOLD
-from src.decisions.finding import Finding, TargetPosition, crop_name, release_name
-from src.viz.charts import ACCENT, CATEGORY_COLORS, CATEGORY_SHORT, INK, INK_2, INK_3, STATE_COLORS
+from src.decisions.explain import PLAIN_CATEGORY, Explanation, InputSignal
+from src.decisions.finding import Finding, TargetPosition, crop_name, pct, release_name
+from src.viz.charts import ACCENT, CATEGORY_COLORS, INK, INK_2, INK_3, STATE_COLORS
+from src.viz.icons import icon
 
-LEGEND_MEANING = {
-    CATEGORY_ORDER[0]: "Below 90% of national in at least 2 of the last 3 surveys, and both seed and fertilizer uptake below national.",
-    CATEGORY_ORDER[1]: "Below 90% of national in at least 2 of the last 3 surveys, but input uptake is not low.",
-    CATEGORY_ORDER[2]: "Below in the latest survey only: watch, it may be a one-season shock.",
-    CATEGORY_ORDER[3]: "Too little reliable data (not reported, or under 500 ha harvested).",
-    CATEGORY_ORDER[4]: "At or above 90% of the national yield in the latest survey.",
-}
+RED = CATEGORY_COLORS[CATEGORY_ORDER[0]]
+GREY = "#c9cec9"
+# Marker colour per category on light cards ("not below" is near-white on the map).
+MARK_COLORS = {**CATEGORY_COLORS, CATEGORY_ORDER[3]: "#8f8a80", CATEGORY_ORDER[4]: ACCENT}
 
 
-def legend_html(counts: dict[str, int], selected_category: str | None = None) -> str:
+def ink_on(category: str) -> str:
+    return "#ffffff" if category in (CATEGORY_ORDER[0], CATEGORY_ORDER[2]) else INK
+
+
+def chip_html(category: str) -> str:
+    return (f"<span class='umz-chip' style='background:{CATEGORY_COLORS[category]};color:{ink_on(category)}'>"
+            f"{escape(PLAIN_CATEGORY[category])}</span>")
+
+
+def legend_chips_html(counts: dict[str, int], selected: str | None = None) -> str:
     rows = []
     for c in CATEGORY_ORDER:
-        mark = "font-weight:700;" if c == selected_category else ""
-        rows.append(
-            f"<div class='umz-leg-row'><span class='umz-sw' style='background:{CATEGORY_COLORS[c]}'></span>"
-            f"<div><div style='{mark}'>{escape(CATEGORY_SHORT[c])} "
-            f"<span class='umz-count'>{counts.get(c, 0)}</span></div>"
-            f"<div class='umz-leg-note'>{escape(LEGEND_MEANING[c])}</div></div></div>")
-    return "<div class='umz-legend'>" + "".join(rows) + "</div>"
+        sel = " umz-leg-sel" if c == selected else ""
+        rows.append(f"<span class='umz-leg{sel}'><span class='umz-sw' style='background:{CATEGORY_COLORS[c]}'></span>"
+                    f"{escape(PLAIN_CATEGORY[c])} <b>{counts.get(c, 0)}</b></span>")
+    return "<div class='umz-legs'>" + "".join(rows) + "</div>"
 
 
-def window_strip_html(f: Finding) -> str:
-    """One pill per survey in the label window: % of national and its state."""
-    pills = []
-    for p in f.window:
+# ------------------------------------------------------------------ district vs Rwanda
+def district_target_svg(f: Finding, gap: float = GAP_THRESHOLD) -> str:
+    """Arrow flying towards a bullseye that stands for Rwanda's yield (100%).
+
+    The arrow stops at the district's yield as a share of Rwanda's; the dashed
+    line is the 90% benchmark under which a survey counts as "below".
+    """
+    r = f.row
+    ratio = r["latest_ratio"]
+    w, h, x0, x1 = 540, 180, 22, 490
+    hi = max(1.15, (ratio if ratio == ratio else 0) + 0.08)
+    lo = 0.4
+    bx = x0 + (1.0 - lo) / (hi - lo) * (x1 - x0)            # bullseye centre
+    sx = lambda v: x0 + (max(min(v, hi), lo) - lo) / (hi - lo) * (x1 - x0)
+    y = 92
+    color = MARK_COLORS[f.category]
+    parts = [f"<svg class='umz-target-svg' viewBox='0 0 {w} {h}' width='100%' role='img' "
+             f"aria-label='{escape(f.district)} {escape(crop_name(f.crop))} yield as a share of Rwanda&#39;s'>"]
+    # benchmark zone and line
+    gx = sx(gap)
+    parts += [
+        f"<line x1='{gx:.1f}' y1='{y - 46}' x2='{gx:.1f}' y2='{y + 34}' stroke='{INK_3}' stroke-width='1.4' stroke-dasharray='4 4'/>",
+        f"<text x='{gx - 6:.1f}' y='{y + 50}' text-anchor='end' font-size='14' fill='{INK_2}'>{gap:.0%} line</text>",
+        # bullseye = Rwanda
+        f"<g class='umz-bull'><circle cx='{bx:.1f}' cy='{y}' r='34' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
+        f"<circle cx='{bx:.1f}' cy='{y}' r='23' fill='{RED}'/><circle cx='{bx:.1f}' cy='{y}' r='13' fill='#ffffff'/>",
+        f"<circle cx='{bx:.1f}' cy='{y}' r='5' fill='{RED}'/></g>",
+        f"<text x='{bx:.1f}' y='{y + 56}' text-anchor='middle' font-size='16' font-weight='700' fill='{INK}'>Rwanda</text>",
+    ]
+    if r["national_yield_kg_ha"] == r["national_yield_kg_ha"]:
+        parts.append(f"<text x='{bx:.1f}' y='{y + 72}' text-anchor='middle' font-size='14' fill='{INK_2}'>"
+                     f"{r['national_yield_kg_ha'] / 1000:.2f} t/ha</text>")
+    if ratio != ratio:                                          # NaN: nothing published
+        parts.append(f"<text x='{x0}' y='{y + 5}' font-size='15' fill='{INK_2}'>No yield published for "
+                     f"{escape(release_name(f.latest_release))}</text></svg>")
+        return "".join(parts)
+    hx = sx(ratio)
+    tail = x0 + 4
+    length = max(hx - tail, 1)
+    parts += [
+        f"<line class='umz-shaft' x1='{tail}' y1='{y}' x2='{hx - 14:.1f}' y2='{y}' stroke='{color}' "
+        f"stroke-width='7' stroke-linecap='round' style='--len:{length:.0f}'/>",
+        f"<g class='umz-head' style='--from:{-length:.0f}px'>"
+        f"<polygon points='{hx - 20:.1f},{y - 12} {hx + 2:.1f},{y} {hx - 20:.1f},{y + 12}' fill='{color}'/>"
+        f"<line x1='{hx - 8:.1f}' y1='{y - 30}' x2='{hx - 8:.1f}' y2='{y - 12}' stroke='{color}' stroke-width='1.5'/>"
+        f"<text x='{min(max(hx - 8, 80), 440):.1f}' y='{y - 36}' text-anchor='middle' font-size='20' font-weight='700' "
+        f"fill='{INK}'>{escape(f.district)} {pct(ratio)}</text></g>",
+        # fletching
+        f"<path d='M{tail + 2} {y} l-10 -10 M{tail + 2} {y} l-10 10 M{tail + 12} {y} l-10 -10 M{tail + 12} {y} l-10 10' "
+        f"stroke='{color}' stroke-width='2.5' stroke-linecap='round'/>",
+    ]
+    short = (r["national_yield_kg_ha"] - r["latest_yield_kg_ha"]) / 1000
+    if short > 0 and hx < bx - 70:
+        mid = (hx + bx - 34) / 2
+        parts.append(f"<text x='{mid:.1f}' y='{y + 30}' text-anchor='middle' font-size='15' font-weight='600' fill='{RED}'>"
+                     f"{short:.2f} t/ha short</text>")
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def pattern_tiles_html(f: Finding) -> str:
+    """The last three surveys as tiles: tick = not below, cross = below, dash = no reliable value."""
+    tiles = []
+    for i, p in enumerate(f.window):
         if p.ratio is None:
-            state, val, label = "missing", "n/r", "not reported"
+            state, ic, val, lab = "missing", "dash", "n/r", "not published"
         elif not p.reliable:
-            state, val, label = "thin", f"{p.ratio:.0%}", "thin coverage"
+            state, ic, val, lab = "thin", "dash", pct(p.ratio), "too few hectares"
         elif p.below:
-            state, val, label = "below", f"{p.ratio:.0%}", "below benchmark"
+            state, ic, val, lab = "below", "cross", pct(p.ratio), "below the line"
         else:
-            state, val, label = "not below", f"{p.ratio:.0%}", "not below"
+            state, ic, val, lab = "not below", "check", pct(p.ratio), "not below"
         ink = "#ffffff" if state == "below" else INK
-        pills.append(
-            f"<div class='umz-pill' style='background:{STATE_COLORS[state]};color:{ink}'>"
-            f"<div class='umz-pill-rel'>{escape(release_name(p.release_id))}</div>"
-            f"<div class='umz-pill-val'>{val}</div><div class='umz-pill-lab'>{label}</div></div>")
-    return ("<div class='umz-strip-cap'>Yield as % of national, last 3 surveys "
-            f"(benchmark {GAP_THRESHOLD:.0%})</div><div class='umz-strip'>" + "".join(pills) + "</div>")
+        tiles.append(
+            f"<div class='umz-tile' style='background:{STATE_COLORS[state]};color:{ink};animation-delay:{0.15 * i:.2f}s'>"
+            f"{icon(ic, 22)}<div class='umz-tile-rel'>{escape(release_name(p.release_id))}</div>"
+            f"<div class='umz-tile-val'>{val}</div><div class='umz-tile-lab'>{lab}</div></div>")
+    return "<div class='umz-tiles'>" + "".join(tiles) + "</div>"
 
 
+def _input_row(s: InputSignal, ic: str, i: int) -> str:
+    if s.lower is None:
+        return (f"<div class='umz-inp'><div class='umz-inp-ic'>{icon(ic, 30)}</div><div class='umz-inp-body'>"
+                f"<div class='umz-inp-name'>{escape(s.name)}</div><div class='umz-inp-note'>Not published per "
+                f"farmer for this survey</div></div></div>")
+    col = RED if s.lower else ACCENT
+    return (
+        f"<div class='umz-inp'><div class='umz-inp-ic' style='color:{col}'>{icon(ic, 30)}</div>"
+        f"<div class='umz-inp-body'><div class='umz-inp-name'>{escape(s.name)} "
+        f"<span class='umz-inp-word' style='color:{col}'>{escape(s.word)}</span></div>"
+        f"<div class='umz-bar'><span class='umz-bar-lab'>Here</span><span class='umz-bar-track'>"
+        f"<span class='umz-bar-fill' style='width:{s.district_pct:.1f}%;background:{col};animation-delay:{0.2 * i:.1f}s'></span>"
+        f"</span><b>{s.district_pct:.0f}%</b></div>"
+        f"<div class='umz-bar'><span class='umz-bar-lab'>Rwanda</span><span class='umz-bar-track'>"
+        f"<span class='umz-bar-fill' style='width:{s.national_pct:.1f}%;background:{GREY};animation-delay:{0.2 * i:.1f}s'></span>"
+        f"</span><b>{s.national_pct:.0f}%</b></div></div></div>")
+
+
+def inputs_html(e: Explanation) -> str:
+    return (_input_row(e.seed, "seed", 0) + _input_row(e.fertilizer, "bag", 1)
+            + "<div class='umz-fine'>Share of farmers using it on any crop, "
+              f"{escape(e.survey)}. NISR does not publish it per crop by district.</div>")
+
+
+def verdict_html(e: Explanation, category: str) -> str:
+    col = MARK_COLORS[category]
+    ic = {CATEGORY_ORDER[0]: "bag", CATEGORY_ORDER[1]: "soil", CATEGORY_ORDER[2]: "rain",
+          CATEGORY_ORDER[3]: "question", CATEGORY_ORDER[4]: "check"}[category]
+    return (f"<div class='umz-verdict'><div class='umz-verdict-ic' style='color:{col}'>{icon(ic, 44, 1.6)}</div>"
+            f"<div><div class='umz-verdict-t'>{escape(e.verdict_title)}</div>"
+            f"<div class='umz-verdict-l'>{escape(e.verdict_line)}</div></div></div>")
+
+
+def action_card_html(e: Explanation, who: str) -> str:
+    items = "".join(f"<li style='animation-delay:{0.12 * i:.2f}s'><span>{icon(ic, 22)}</span>{escape(t)}</li>"
+                    for i, (ic, t) in enumerate(e.checks))
+    return (f"<div class='umz-action'><div class='umz-action-head'><span class='umz-action-ic'>"
+            f"{icon('megaphone', 30, 2)}</span><div><div class='umz-action-t'>Take action</div>"
+            f"<div class='umz-action-s'>{escape(who)}: check these first</div></div></div>"
+            f"<ul class='umz-checks'>{items}</ul></div>")
+
+
+# ------------------------------------------------------------------ landing page
+def hook_cards_html(cards: list[tuple[str, str, str]]) -> str:
+    out = []
+    for i, (ic, title, line) in enumerate(cards):
+        out.append(f"<div class='umz-hook' style='animation-delay:{0.12 * i + 0.1:.2f}s'>"
+                   f"<div class='umz-hook-ic'>{icon(ic, 34, 1.7)}</div><div class='umz-hook-t'>{escape(title)}</div>"
+                   f"<div class='umz-hook-l'>{escape(line)}</div></div>")
+    return "<div class='umz-hooks'>" + "".join(out) + "</div>"
+
+
+def stats_html(stats: list[tuple[str, str]]) -> str:
+    return "<div class='umz-stats'>" + "".join(
+        f"<div><b>{escape(v)}</b><span>{escape(k)}</span></div>" for v, k in stats) + "</div>"
+
+
+def flow_html(steps: list[tuple[str, str]]) -> str:
+    out = []
+    for i, (ic, t) in enumerate(steps):
+        if i:
+            out.append(f"<span class='umz-flow-arrow'>{icon('arrow', 22)}</span>")
+        out.append(f"<span class='umz-flow-step'>{icon(ic, 22)}{escape(t)}</span>")
+    return "<div class='umz-flow'>" + "".join(out) + "</div>"
+
+
+# ------------------------------------------------------------------ Rwanda vs PSTA 5 target
 def target_arrow_svg(t: TargetPosition) -> str:
     """An arrow heading to a bullseye at the PSTA 5 target, with Rwanda's position marked on it."""
     w, h, x0, x1 = 560, 150, 24, 470          # x1: centre of the bullseye
@@ -64,27 +197,23 @@ def target_arrow_svg(t: TargetPosition) -> str:
     cur, base = sx(min(t.yield_t_ha, hi)), sx(t.baseline_t_ha)
     lx = min(max(cur, 95), x1 - 120)          # keep the "now" label inside the frame
     gap = t.target_t_ha - t.yield_t_ha
-    red, grey = CATEGORY_COLORS[CATEGORY_ORDER[0]], "#c9cec9"
     parts = [
         f"<svg viewBox='0 0 {w} {h}' width='100%' style='max-width:760px;display:block' role='img' aria-label='National {escape(crop_name(t.crop))} "
         f"yield {t.yield_t_ha:.2f} t/ha against a target of {t.target_t_ha:.2f} t/ha'>",
-        # road to the target
-        f"<line x1='{x0}' y1='{y}' x2='{x1 - 30}' y2='{y}' stroke='{grey}' stroke-width='6' stroke-linecap='round'/>",
-        f"<line x1='{x0}' y1='{y}' x2='{cur}' y2='{y}' stroke='{ACCENT}' stroke-width='6' stroke-linecap='round'/>",
-        f"<polygon points='{x1 - 32},{y - 9} {x1 - 16},{y} {x1 - 32},{y + 9}' fill='{grey}'/>",
-        # bullseye
-        f"<circle cx='{x1}' cy='{y}' r='26' fill='#ffffff' stroke='{red}' stroke-width='3'/>",
-        f"<circle cx='{x1}' cy='{y}' r='17' fill='{red}'/>",
+        f"<line x1='{x0}' y1='{y}' x2='{x1 - 30}' y2='{y}' stroke='{GREY}' stroke-width='6' stroke-linecap='round'/>",
+        f"<line class='umz-shaft' x1='{x0}' y1='{y}' x2='{cur}' y2='{y}' stroke='{ACCENT}' stroke-width='6' "
+        f"stroke-linecap='round' style='--len:{max(cur - x0, 1):.0f}'/>",
+        f"<polygon points='{x1 - 32},{y - 9} {x1 - 16},{y} {x1 - 32},{y + 9}' fill='{GREY}'/>",
+        f"<circle cx='{x1}' cy='{y}' r='26' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
+        f"<circle cx='{x1}' cy='{y}' r='17' fill='{RED}'/>",
         f"<circle cx='{x1}' cy='{y}' r='9' fill='#ffffff'/>",
-        f"<circle cx='{x1}' cy='{y}' r='4' fill='{red}'/>",
+        f"<circle cx='{x1}' cy='{y}' r='4' fill='{RED}'/>",
         f"<text x='{x1}' y='{y + 46}' text-anchor='middle' font-size='13' font-weight='700' fill='{INK}'>"
         f"Target {t.target_t_ha:.2f} t/ha</text>",
         f"<text x='{x1}' y='{y + 62}' text-anchor='middle' font-size='11' fill='{INK_2}'>{escape(t.agricultural_year)}</text>",
-        # baseline tick
         f"<line x1='{base}' y1='{y + 8}' x2='{base}' y2='{y + 18}' stroke='{INK_3}' stroke-width='1.5'/>",
         f"<text x='{base}' y='{y + 32}' text-anchor='middle' font-size='11' fill='{INK_3}'>"
         f"PSTA baseline {t.baseline_t_ha:.2f}</text>",
-        # where Rwanda is now
         f"<circle cx='{cur}' cy='{y}' r='9' fill='{ACCENT}' stroke='#ffffff' stroke-width='3'/>",
         f"<line x1='{cur}' y1='{y - 12}' x2='{cur}' y2='{y - 30}' stroke='{ACCENT}' stroke-width='1.5'/>",
         f"<text x='{lx}' y='{y - 52}' text-anchor='middle' font-size='13' font-weight='700' fill='{INK}'>"
@@ -94,7 +223,7 @@ def target_arrow_svg(t: TargetPosition) -> str:
     ]
     if gap > 0:
         mid = (cur + x1 - 26) / 2
-        parts.append(f"<text x='{mid}' y='{y - 10}' text-anchor='middle' font-size='11' fill='{red}'>"
+        parts.append(f"<text x='{mid}' y='{y - 10}' text-anchor='middle' font-size='11' fill='{RED}'>"
                      f"{gap:.2f} t/ha to go</text>")
     parts.append("</svg>")
     return "".join(parts)

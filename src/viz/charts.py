@@ -1,4 +1,4 @@
-"""Figure builders for Umuzi Analytics (Plotly).
+﻿"""Figure builders for Umuzi Analytics (Plotly).
 
 Shared by the Streamlit app and scripts/run_analysis.py, so a chart in the
 report and the same chart in the app come from one function and one snapshot.
@@ -38,11 +38,11 @@ CATEGORY_COLORS = {
     CATEGORY_NOT_BELOW: "#f1f3ef",
 }
 CATEGORY_SHORT = {
-    CATEGORY_REPEATED_LOW_INPUT: "Repeatedly below, low input uptake",
-    CATEGORY_REPEATED_INPUTS_OK: "Repeatedly below, input uptake not low",
-    CATEGORY_DIP: "Below in the latest season only",
-    CATEGORY_INSUFFICIENT: "Evidence too limited",
-    CATEGORY_NOT_BELOW: "Not below national",
+    CATEGORY_REPEATED_LOW_INPUT: "Repeated shortfall, seed and fertilizer use low",
+    CATEGORY_REPEATED_INPUTS_OK: "Repeated shortfall, seed and fertilizer use not low",
+    CATEGORY_DIP: "One-season dip",
+    CATEGORY_INSUFFICIENT: "Not enough data",
+    CATEGORY_NOT_BELOW: "On par with Rwanda or above",
 }
 # Cell states in the pattern grid (same hues as the categories they lead to).
 STATE_COLORS = {"below": "#9c3d24", "not below": "#dfe6e1", "thin": "#c2beb4", "missing": "#ffffff"}
@@ -335,7 +335,7 @@ def input_context_chart(ev: pd.DataFrame, snapshot_id: str, crop: str, season: s
                         highlight: str | None = None) -> go.Figure:
     d = ev[ev["inputs_known"].astype(bool)]
     if d.empty:
-        return _base_layout(go.Figure(), "Input uptake is not published per farmer for this survey", "", "")
+        return _base_layout(go.Figure(), "Seed and fertilizer use is not published per farmer for this survey", "", "")
     nseed = d["national_improved_seed_pct"].iloc[0]
     nfert = d["national_inorganic_fert_pct"].iloc[0]
     fig = go.Figure()
@@ -376,9 +376,9 @@ def input_context_chart(ev: pd.DataFrame, snapshot_id: str, crop: str, season: s
     rel = _release_short(d["latest_release"].iloc[0])
     return _base_layout(
         fig, f"{crop_label(crop)}, Season {season}: {n_ok} of {n_ok + n_low} repeatedly-below districts "
-             "do not have low input uptake",
-        f"District input uptake in {rel}, all crops pooled. Occurring together is not proof of cause.",
-        _src(rel, snapshot_id, "Input uptake is published per district for all crops combined, not per crop."),
+             "do not have both seed and fertilizer use low",
+        f"Share of farmers using each input in {rel}, all crops pooled. Occurring together is not proof of cause.",
+        _src(rel, snapshot_id, "Seed and fertilizer use is published per district for all crops combined, not per crop."),
         height=560)
 
 
