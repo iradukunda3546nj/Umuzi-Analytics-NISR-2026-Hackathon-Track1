@@ -23,6 +23,11 @@ def main() -> int:
     rc = 0
     for s in sources:
         dest = DATA_DIR / s["file"]
+        if not s.get("source_url"):
+            # 2018-2023 annual workbooks: downloaded by hand from the landing page.
+            print(f"skipping {s['release_id']}: no direct file URL; place '{dest.name}' in "
+                  f"{dest.parent} from {s.get('landing_page', 'the NISR SAS page')}")
+            continue
         dest.parent.mkdir(parents=True, exist_ok=True)
         print(f"downloading {s['release_id']} ...")
         urllib.request.urlretrieve(s["source_url"], dest)

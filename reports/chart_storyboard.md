@@ -1,47 +1,42 @@
 # Chart Storyboard
 
-Shared palette: three signal hues for evidence categories (brick: persistent with low inputs; ochre: persistent with inputs not low; blue: latest-season dip) plus two neutrals (insufficient evidence; not below national). Validated with the dataviz validator in light mode, all pairs (worst CVD dE 15.9, normal-vision dE 16.0). Ochre and the neutrals fall below 3:1 contrast, so every chart has a legend, direct labels or hover text, and a table view. Light theme only.
+Shared palette: three signal hues for evidence categories (brick: repeatedly below with low input uptake; ochre: repeatedly below with input uptake not low; blue: below in the latest season only) plus two neutrals (evidence too limited; not below national). Validated with the dataviz validator in light mode, all pairs (worst CVD dE 15.9, normal-vision dE 16.0). Ochre and the neutrals fall below 3:1 contrast, so every view has a legend with plain-language meanings and counts, hover text or labels, and a table. Light theme only.
 
-## 1. National target attainment (Overview)
-- **Audience decision**: does the national gap justify district-level prioritisation?
-- **Question**: how far is each priority crop from its PSTA 5 2025/26 target?
-- **Calculation**: (A+B production) / (A+B harvested area) per SAS year, divided by the target (`national_vs_target`).
-- **Encoding**: dot plot on a percentage-of-target axis with a 100% reference line; two dots per crop (SAS 2024, SAS 2026), dark for latest. A dot plot avoids a bar baseline at zero that would hide differences between 80% and 97%.
-- **Insight (after computation)**: all 8 crops are below target, soybean lowest at 52%.
-- **Limitations**: aggregation approximates PSTA 5's method; Season C excluded.
-- **Product link**: leads to the district views.
+The app is map first: the overview answers the question in one screen, and every chart below is on demand.
 
-## 2. Evidence map (Evidence Map)
-- **Audience decision**: where are the shortfalls, geographically?
-- **Calculation**: `evidence_table` category per district.
-- **Encoding**: choropleth with real NISR-derived boundaries; categorical fill; focus district outlined; legend counts. A map is justified because geographic clustering (for example western maize) is part of the interpretation.
-- **Insight**: maize Season A persistent shortfalls include all 3 Kigali City districts and 5 of the 7 Western Province districts; the other 4 (Ruhango, Nyamagabe, Gicumbi, Rwamagana) are scattered.
-- **Limitations**: area dominates perception; small districts (Kigali) are hard to see, so the table is always shown.
-- **Product link**: click-through via focus district to the evidence panel and brief.
+## 1. Rwanda map with the selected district (overview)
+- **Decision it supports**: where are this crop's shortfalls, and where does my district sit?
+- **Calculation**: `evidence_table` category per district (rules 2.0: below 90% of national in at least 2 of the last 3 surveys; input split on pooled uptake).
+- **Encoding**: choropleth on NISR-derived boundaries; the selected district is outlined in black and labelled. The legend sits under the map and states each category's meaning and count, so colour is never the only carrier of meaning.
+- **Insight**: maize Season A, 14 districts repeatedly below national, concentrated in Western Province and Kigali; only 3 of the 14 have low input uptake.
+- **Limitations**: area dominates perception; small Kigali districts are hard to see, so the table is one click away.
 
-## 3. Persistence dot plot (Persistence; signature chart)
-- **Audience decision**: recurring problem or one-off?
-- **Calculation**: yield ratio per matched release; persistence flag.
-- **Encoding**: ranked dot plot, one dot per release shaded old to new, grey range bar, reference lines at 1.0 and the threshold; brick square marks persistent districts.
-- **Insight**: 12 maize Season A districts below 0.9 x national in all three releases; median range 0.06.
-- **Limitations**: thin-coverage ratios are plotted but excluded from persistence.
-- **Product link**: defines the "persistent" input to the category.
+## 2. Finding card and last-3-surveys strip (overview, beside the map)
+- **Decision**: what is the pattern here, and what do I check first?
+- **Encoding**: one sentence from `build_finding`; three pills (one per survey in the window) showing % of national, coloured below / not below / thin; then the figures, the survey releases used, the next check and the limitations.
+- **Product link**: identical text in the evidence brief and the Umuzi Assistant.
 
-## 4. Input context scatter (Input Context)
-- **Audience decision**: input access, or another constraint?
-- **Calculation**: district improved-seed % vs inorganic-fertilizer %, national reference lines, category colour.
-- **Encoding**: scatter with quadrant reference lines; direct labels only for persistent districts.
-- **Insight**: 9 of 12 persistent maize districts are not in the low-low quadrant; a western cluster is high-fertilizer, low-seed.
+## 3. Target arrow (overview)
+- **Decision**: how far is Rwanda from the PSTA 5 target for this crop?
+- **Calculation**: national (A+B production) / (A+B harvested area) for the latest year with a target (`target_position`).
+- **Encoding**: a road from the PSTA baseline to a bullseye at the target; a marker for where Rwanda stands, with its % of target, and the remaining gap in t/ha written on the road. One number in context beats a gauge.
+- **Insight**: maize 1.80 t/ha in 2025/26, 87% of the 2.06 t/ha target, 0.26 t/ha to go.
+- **Limitations**: aggregation approximates PSTA 5's method; Season C excluded; targets are national only.
+
+## 4. Survey-by-survey grid (details)
+- **Decision**: is this a recurring problem or a one-off, and since when?
+- **Encoding**: districts x surveys since 2018, each cell the % of national, coloured by state; the 3-survey window is outlined and the selected district boxed. Rows follow the map's category order.
+- **Limitations**: 2018-2019 positions are weakly comparable with later years (shown for context only).
+
+## 5. District history (details)
+- **Encoding**: the selected district's % of national in every survey of the season, with lines at national and at the 90% benchmark; open markers for thin coverage; the window shaded.
+
+## 6. Input uptake scatter (details)
+- **Decision**: input access, or another constraint?
+- **Encoding**: improved-seed % vs inorganic-fertilizer % with national reference lines and category colour; labels on repeatedly-below districts; the selected district ringed.
+- **Insight**: 11 of 14 repeatedly-below maize districts are not in the low-low quadrant; a western cluster combines above-national fertilizer with below-national seed uptake.
 - **Limitations**: inputs pooled across crops; association, not effect.
-- **Product link**: drives the two persistent categories and their next steps.
 
-## 5. Triage matrix (Triage Matrix)
-- **Audience decision**: district-wide constraint or crop-specific?
-- **Calculation**: category per district for each priority crop.
-- **Encoding**: heatmap grid with 2px gaps, categorical fills, legend proxies.
-- **Insight**: 10 districts have persistent shortfalls in three or more crops in Season A.
-- **Limitations**: sparse crops (wheat, rice) are mostly insufficient evidence.
-
-## 6. District comparison (Compare Districts)
-- **Audience decision**: which peer district to compare or learn from?
-- **Encoding**: line chart of yields per release with a dotted national line; open markers for thin coverage; comparability warning above the chart.
+## 7. Triage matrix (report figure)
+- **Encoding**: district x priority crop grid of categories (`reports/figures/triage_matrix_season_*.html`).
+- **Insight**: 11 districts are repeatedly below national in three or more priority crops in Season A, 8 in Season B.

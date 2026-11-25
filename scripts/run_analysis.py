@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-from src.analytics.indicators import (CATEGORY_ORDER, Params, crop_panel, evidence_table,
+from src.analytics.indicators import (CATEGORY_ORDER, REPEATED, Params, crop_panel, evidence_table,
                                       input_panel, load_targets, national_vs_target)
 from src.config import MIN_HARVESTED_HA, ROOT
 from src.services.snapshot_store import SnapshotStore
@@ -23,6 +23,7 @@ from src.viz import charts
 
 PRIORITY = ["maize", "bean", "irish_potato", "paddy_rice", "cassava", "soybean",
             "cooking_banana", "sweet_potato"]
+PRESPECIFIED_RELEASES = ["SAS-2024A", "SAS-2024B", "SAS-2025A", "SAS-2026A", "SAS-2026B"]
 RNG = np.random.default_rng(20261029)
 OUT = ROOT / "reports"
 FIG = OUT / "figures"
@@ -107,10 +108,13 @@ def h2(panel: pd.DataFrame, threshold: float = 0.9, n_perm: int = 2000) -> dict:
 
 
 def h3(records: pd.DataFrame, panel: pd.DataFrame) -> list[dict]:
+    """Pre-specified on the five 2024-2026 releases (20 tests). The snapshot now also holds
+    2018-2023; running H3 on every release would change the Holm family after the fact."""
     inp = input_panel(records)
     out = []
     for crop in ["maize", "bean"]:
-        c = panel[(panel["crop"] == crop) & (panel["harvested_ha"] >= MIN_HARVESTED_HA)]
+        c = panel[(panel["crop"] == crop) & (panel["harvested_ha"] >= MIN_HARVESTED_HA)
+                  & panel["release_id"].isin(PRESPECIFIED_RELEASES)]
         for rel in sorted(c["release_id"].unique()):
             d = c[c["release_id"] == rel].merge(inp[inp["release_id"] == rel], on=["release_id", "district"])
             for var in ["improved_seed_farmers_pct", "inorganic_fert_farmers_pct"]:
@@ -159,8 +163,8 @@ def main() -> None:
             wide[crop] = ev.set_index("district")["category"]
             cats[f"{crop}_{season}"] = ev["category"].value_counts().to_dict()
         cat_wide = pd.DataFrame(wide)
-        results[f"districts_persistent_3plus_crops_{season}"] = sorted(
-            cat_wide.index[(cat_wide.apply(lambda c: c.str.startswith("Persistent")).sum(axis=1) >= 3)].tolist())
+        results[f"districts_repeated_3plus_crops_{season}"] = sorted(
+            cat_wide.index[cat_wide.isin(REPEATED).sum(axis=1) >= 3].tolist())
         charts.triage_matrix(cat_wide, sid, season).write_html(FIG / f"triage_matrix_season_{season}.html",
                                                                include_plotlyjs="cdn")
     results["category_counts"] = cats
@@ -169,8 +173,8 @@ def main() -> None:
                                                         include_plotlyjs="cdn")
     for crop, season in [("maize", "A"), ("bean", "A"), ("irish_potato", "A")]:
         ev = evidence_table(records, crop, season)
-        charts.persistence_chart(ev, sid, crop, season).write_html(
-            FIG / f"persistence_{crop}_{season}.html", include_plotlyjs="cdn")
+        charts.pattern_grid(ev, panel, sid, crop, season).write_html(
+            FIG / f"pattern_{crop}_{season}.html", include_plotlyjs="cdn")
         charts.category_map(ev, sid, crop, season).write_html(
             FIG / f"map_{crop}_{season}.html", include_plotlyjs="cdn")
         charts.input_context_chart(ev, sid, crop, season).write_html(
@@ -184,8 +188,8 @@ def main() -> None:
     print("H3:")
     for r in results["H3_input_association"]:
         print(" ", r)
-    print("persistent in 3+ crops:", results["districts_persistent_3plus_crops_A"],
-          results["districts_persistent_3plus_crops_B"])
+    print("repeatedly below in 3+ crops:", results["districts_repeated_3plus_crops_A"],
+          results["districts_repeated_3plus_crops_B"])
     print("sensitivity:")
     for r in results["sensitivity"]:
         print(" ", r)

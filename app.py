@@ -1,57 +1,71 @@
-"""Umuzi Analytics - district crop productivity evidence for agricultural planners.
+"""Umuzi Analytics - what Rwanda's agricultural survey says about each district, and what to check next.
 
 Run locally:  streamlit run app.py
 All numbers come from the ACTIVE data snapshot (data/snapshots/ACTIVE.json),
 built by scripts/refresh_data.py from published NISR Seasonal Agricultural
-Survey tables. No observation is written into this file.
+Survey tables. No observation is written into this file; the map panel, the
+evidence brief and the Umuzi Assistant all read the same Finding
+(src/decisions/finding.py).
 """
 from __future__ import annotations
 
-import html
+import json
+from html import escape
 
 import pandas as pd
 import streamlit as st
 
-from src.analytics.indicators import (CATEGORY_DIP, CATEGORY_INSUFFICIENT, CATEGORY_NOT_BELOW,
-                                      CATEGORY_ORDER, CATEGORY_PERSISTENT_INPUTS_OK,
-                                      CATEGORY_PERSISTENT_LOW_INPUT, Params, crop_panel,
-                                      evidence_table, input_association, load_targets,
-                                      national_vs_target)
-from src.config import (CROP_LABELS, DISTRICTS, GAP_THRESHOLD, MIN_HARVESTED_HA, PRODUCT_NAME)
+from src.analytics.indicators import CATEGORY_ORDER, Params
+from src.assistant.umuzi import HELP, Selection, UmuziData, answer
+from src.config import (DATA_DIR, DISTRICTS, GAP_THRESHOLD, MIN_HARVESTED_HA, PRODUCT_NAME,
+                        ROOT)
 from src.decisions.brief import brief_csv, build_brief
+from src.decisions.finding import crop_name, release_name, target_position
 from src.services.snapshot_store import SnapshotStore
 from src.services.status import missing_releases, release_status
 from src.viz import charts
+from src.viz.visuals import legend_html, target_arrow_svg, window_strip_html
 
-st.set_page_config(page_title=PRODUCT_NAME, layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title=PRODUCT_NAME, layout="wide", initial_sidebar_state="collapsed")
 
 PRIORITY = ["maize", "bean", "irish_potato", "paddy_rice", "cassava", "soybean", "cooking_banana",
             "sweet_potato", "wheat"]
-VIEWS = ["Overview", "Evidence Map", "Persistence", "Input Context", "Triage Matrix",
-         "Compare Districts", "Evidence Brief", "Data and Methods"]
+BOT_ICON = str(DATA_DIR / "chatBOT.png")
 PLOT_CONFIG = {"displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d"],
                "toImageButtonOptions": {"format": "png", "scale": 2}}
 
 st.markdown("""
 <style>
   .block-container {padding-top: 4.5rem; padding-bottom: 2rem; max-width: 1440px;}
-  [data-testid="stSidebar"] {border-right: 1px solid #e4e4df;}
-  [data-testid="stSidebar"] .block-container {padding-top: 1rem;}
-  .umz-header {display:flex; justify-content:space-between; align-items:flex-end;
-               border-bottom: 1px solid #d9d9d2; padding-bottom: 10px; margin-bottom: 16px;}
-  .umz-word {font-size: 22px; font-weight: 700; color:#24493f; letter-spacing: .2px;}
-  .umz-sub {font-size: 13px; color:#55595a;}
-  .umz-meta {font-size: 12px; color:#55595a; text-align:right; line-height:1.5;}
-  .umz-panel {border:1px solid #dcdcd5; border-radius:4px; padding:14px 16px; background:#ffffff;}
-  .umz-label {font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#7b7f7f; margin-top:10px;}
-  .umz-value {font-size:15px; color:#1f2421;}
-  .umz-cat {display:inline-block; padding:2px 8px; border-radius:3px; font-size:13px; font-weight:600;
+  .umz-header {display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+               border-bottom:1px solid #d9d9d2; padding-bottom:10px; margin-bottom:14px;}
+  .umz-word {font-size:24px; font-weight:700; color:#24493f;}
+  .umz-sub {font-size:14px; color:#55595a;}
+  .umz-meta {font-size:12px; color:#55595a; text-align:right; line-height:1.5;}
+  .umz-card {border:1px solid #dcdcd5; border-radius:6px; padding:16px 18px; background:#ffffff;}
+  .umz-cat {display:inline-block; padding:3px 10px; border-radius:3px; font-size:13px; font-weight:600;
             border:1px solid #6b6f6c;}
-  .umz-note {font-size:13px; color:#55595a; border-left:3px solid #c2beb4; padding:4px 10px; margin:8px 0;}
-  .umz-fact {border-top:2px solid #24493f; padding-top:8px;}
-  .umz-fact b {font-size:26px; color:#1f2421; display:block; line-height:1.2;}
-  .umz-fact span {font-size:13px; color:#55595a;}
-  h2, h3 {color:#1f2421;}
+  .umz-sel {font-size:13px; color:#55595a; margin:8px 0 4px 0;}
+  .umz-head {font-size:17px; line-height:1.45; color:#1f2421; margin:6px 0 12px 0;}
+  .umz-label {font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#7b7f7f; margin-top:12px;}
+  .umz-fig {font-size:13.5px; color:#1f2421; margin:3px 0;}
+  .umz-fig b {color:#55595a; font-weight:600;}
+  .umz-next {font-size:14px; color:#1f2421; border-left:3px solid #24493f; padding:4px 10px; margin-top:6px;}
+  .umz-keep {font-size:12.5px; color:#55595a; margin:2px 0;}
+  .umz-strip-cap {font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#7b7f7f; margin-top:6px;}
+  .umz-strip {display:flex; gap:6px; margin-top:6px;}
+  .umz-pill {flex:1; border-radius:5px; padding:6px 8px; border:1px solid #c9cec9; text-align:center;}
+  .umz-pill-rel {font-size:11px;} .umz-pill-val {font-size:20px; font-weight:700; line-height:1.2;}
+  .umz-pill-lab {font-size:11px;}
+  .umz-legend {display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:8px 16px; margin-top:6px;}
+  .umz-leg-row {display:flex; gap:9px; align-items:flex-start; font-size:13px; color:#1f2421;}
+  .umz-sw {flex:0 0 16px; height:16px; border:1px solid #6b6f6c; border-radius:2px; margin-top:2px;}
+  .umz-count {display:inline-block; min-width:20px; padding:0 6px; border-radius:9px; background:#eef0ec;
+              font-size:12px; font-weight:600; text-align:center;}
+  .umz-leg-note {font-size:11.5px; color:#7b7f7f; line-height:1.35;}
+  .umz-target {border:1px solid #dcdcd5; border-radius:6px; padding:10px 16px 4px 16px; background:#ffffff;}
+  .umz-target-cap {font-size:13px; color:#55595a;}
+  .umz-warn {font-size:13px; background:#fbf0dc; border:1px solid #e6c88f; padding:6px 10px; border-radius:4px;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,26 +76,22 @@ def get_store() -> SnapshotStore:
     return SnapshotStore()
 
 
-@st.cache_data(show_spinner=False)
-def load_snapshot(snapshot_id: str):
-    return get_store().load(snapshot_id)
-
-
-@st.cache_data(show_spinner=False)
-def cached_evidence(snapshot_id: str, crop: str, season: str, gap: float, min_ha: float) -> pd.DataFrame:
-    records, _ = load_snapshot(snapshot_id)
-    return evidence_table(records, crop, season, Params(gap_threshold=gap, min_harvested_ha=min_ha))
-
-
-@st.cache_data(show_spinner=False)
-def cached_panel(snapshot_id: str) -> pd.DataFrame:
-    return crop_panel(load_snapshot(snapshot_id)[0])
+@st.cache_resource(show_spinner=False)
+def get_data(snapshot_id: str, gap: float, min_ha: float) -> UmuziData:
+    records, manifest = get_store().load(snapshot_id)
+    return UmuziData(records, manifest, Params(gap_threshold=gap, min_harvested_ha=min_ha))
 
 
 @st.cache_data(show_spinner=False)
 def cached_status(snapshot_id: str):
-    records, manifest = load_snapshot(snapshot_id)
+    records, manifest = get_store().load(snapshot_id)
     return release_status(records, manifest), missing_releases(records)
+
+
+@st.cache_data(show_spinner=False)
+def report(name: str) -> dict:
+    p = ROOT / "reports" / name
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
 store = get_store()
@@ -89,316 +99,254 @@ SID = store.active_id()
 if SID is None:
     st.error("No approved data snapshot is active. Run: python -m scripts.refresh_data bootstrap --approve")
     st.stop()
-records, manifest = load_snapshot(SID)
-release_ids = sorted(records["release_id"].unique())
+
+gap = st.session_state.get("gap", GAP_THRESHOLD)
+min_ha = st.session_state.get("min_ha", MIN_HARVESTED_HA)
+data = get_data(SID, gap, min_ha)
+records, manifest = data.records, data.manifest
+releases = sorted(records["release_id"].unique(), key=lambda r: (int(r[4:8]), r[-1]))
 
 
 def crop_options(season: str) -> list[str]:
-    panel = cached_panel(SID)
-    p = panel[(panel["season"] == season) & panel["yield_kg_ha"].notna()]
+    p = data.panel[(data.panel["season"] == season) & data.panel["yield_kg_ha"].notna()]
     counts = p.groupby("crop")["district"].nunique()
-    available = [c for c in PRIORITY if counts.get(c, 0) >= 10]
-    others = sorted(c for c in counts.index if counts[c] >= 10 and c not in PRIORITY)
-    return available + others
+    return ([c for c in PRIORITY if counts.get(c, 0) >= 10]
+            + sorted(c for c in counts.index if counts[c] >= 10 and c not in PRIORITY))
 
 
-# ------------------------------------------------------------------ sidebar: navigation + global scope
-with st.sidebar:
-    st.markdown(f"<div class='umz-word'>{PRODUCT_NAME}</div>"
-                "<div class='umz-sub'>District crop productivity evidence</div>", unsafe_allow_html=True)
-    st.write("")
-    view = st.radio("View", VIEWS, key="view", label_visibility="collapsed")
-    st.divider()
-    st.markdown("<div class='umz-label'>Analysis scope</div>", unsafe_allow_html=True)
-    season = st.radio("Season type", ["A", "B"], horizontal=True, key="season",
-                      help="Season A (September to February) and Season B (March to June) are never pooled.")
-    copts = crop_options(season)
-    if st.session_state.get("crop") not in copts:
-        st.session_state["crop"] = copts[0]
-    crop = st.selectbox("Crop", copts, format_func=lambda c: CROP_LABELS.get(c, c), key="crop")
-    district = st.selectbox("Focus district", DISTRICTS, key="district",
-                            index=DISTRICTS.index("Ruhango"))
-    with st.expander("Thresholds (sensitivity)"):
-        gap = st.slider("Below national if yield ratio under", 0.70, 0.98, GAP_THRESHOLD, 0.01, key="gap",
-                        help="Pre-specified default 0.90. Change to test how sensitive categories are.")
-        min_ha = st.select_slider("Minimum harvested area (ha)", [100.0, 200.0, 500.0, 1000.0, 2000.0],
-                                  MIN_HARVESTED_HA, key="min_ha",
-                                  help="District-crop estimates below this area are treated as thin coverage.")
-        if gap != GAP_THRESHOLD or min_ha != MIN_HARVESTED_HA:
-            st.caption("Non-default thresholds in use. Results differ from the pre-specified analysis.")
-    st.divider()
-    st.caption(f"Snapshot {SID}")
-    st.caption("Source: NISR Seasonal Agricultural Survey, CC BY 4.0")
-
-ev = cached_evidence(SID, crop, season, gap, min_ha)
-latest = ev["latest_release"].iloc[0]
-crop_name = CROP_LABELS.get(crop, crop)
-season_releases = [r for r in release_ids if r.endswith(season)]
-
+# ------------------------------------------------------------------ header and selection
 st.markdown(f"""
 <div class='umz-header'>
   <div><div class='umz-word'>{PRODUCT_NAME}</div>
-       <div class='umz-sub'>Where are district crop yields persistently below national, and what should be checked first?</div></div>
-  <div class='umz-meta'>Releases: {', '.join(release_ids)}<br>
-       Snapshot {SID[-8:]} &middot; approved {html.escape(manifest.get('approval', {}).get('approved_utc', 'n/a')[:10])}<br>
-       Scope: {crop_name}, Season {season} ({', '.join(season_releases)})</div>
+       <div class='umz-sub'>What Rwanda's agricultural survey says about each district's crop yields, and what to check next</div></div>
+  <div class='umz-meta'>NISR Seasonal Agricultural Survey: {len(releases)} surveys, {release_name(releases[0])} to {release_name(releases[-1])}
+       (Season B 2025 not published)<br>Validated snapshot {SID[-8:]}</div>
 </div>""", unsafe_allow_html=True)
 
+st.session_state.setdefault("season", "A")
+st.session_state.setdefault("district", "Ruhango")
+c1, c2, c3 = st.columns([1.1, 1.1, 0.8])
+season_now = st.session_state["season"]
+copts = crop_options(season_now)
+if st.session_state.get("crop") not in copts:
+    st.session_state["crop"] = "maize" if "maize" in copts else copts[0]
+crop = c1.selectbox("Crop (type to search)", copts, key="crop", format_func=lambda c: crop_name(c))
+district = c2.selectbox("District (type to search)", DISTRICTS, key="district")
+season = c3.radio("Season", ["A", "B"], key="season", horizontal=True,
+                  format_func=lambda s: f"Season {s}",
+                  help="Season A runs September to February, Season B March to June. They are never mixed.")
 
-def caption_block(question: str, pattern: str, implication: str, caveat: str) -> None:
-    st.markdown(
-        f"<div class='umz-note'><b>Question.</b> {question}<br><b>Pattern.</b> {pattern}<br>"
-        f"<b>Implication.</b> {implication}<br><b>Caveat.</b> {caveat}</div>", unsafe_allow_html=True)
+if gap != GAP_THRESHOLD or min_ha != MIN_HARVESTED_HA:
+    st.markdown(f"<div class='umz-warn'>Testing non-default benchmark settings (below = under {gap:.0%} of national, "
+                f"reliable from {min_ha:,.0f} ha). Reset them in Data and methods.</div>", unsafe_allow_html=True)
 
+ev = data.evidence(crop, season)
+sel = Selection(district, crop, season)
+finding = data.finding(sel)
 
-def category_badge(cat: str) -> str:
-    col = charts.CATEGORY_COLORS[cat]
-    ink = "#ffffff" if cat in (CATEGORY_PERSISTENT_LOW_INPUT, CATEGORY_DIP) else "#1f2421"
-    return f"<span class='umz-cat' style='background:{col};color:{ink}'>{html.escape(cat)}</span>"
+# ------------------------------------------------------------------ overview: map + finding
+left, right = st.columns([1.35, 1], gap="large")
+with left:
+    n_rep = int(ev["category"].isin(CATEGORY_ORDER[:2]).sum())
+    st.markdown(f"**{crop_name(crop)}, Season {season}: {n_rep} of 30 districts were repeatedly below the national "
+                f"yield benchmark** (latest survey {release_name(ev['latest_release'].iloc[0])})")
+    st.plotly_chart(charts.category_map(ev, SID, crop, season, highlight=district, compact=True),
+                    width="stretch", config=PLOT_CONFIG)
+    st.markdown(legend_html(ev["category"].value_counts().to_dict(), finding.category), unsafe_allow_html=True)
 
-
-def evidence_panel(row: pd.Series) -> None:
-    def f(v, nd=2, s=""):
-        return "not reported" if pd.isna(v) else f"{v:,.{nd}f}{s}"
+with right:
+    color = charts.CATEGORY_COLORS[finding.category]
+    ink = "#ffffff" if finding.category in (CATEGORY_ORDER[0], CATEGORY_ORDER[2]) else "#1f2421"
+    figs = "".join(f"<div class='umz-fig'><b>{escape(k)}:</b> {escape(v)}</div>" for k, v in finding.figures)
+    keep = "".join(f"<div class='umz-keep'>- {escape(x)}</div>" for x in finding.limitations)
     st.markdown(f"""
-<div class='umz-panel'>
-  <div class='umz-label'>Selected</div>
-  <div class='umz-value'><b>{row['district']}</b> ({row['province']}) &middot; {crop_name} &middot; Season {season}</div>
-  <div class='umz-label'>Evidence category</div>{category_badge(row['category'])}
-  <div class='umz-label'>Latest yield ({row['latest_release']})</div>
-  <div class='umz-value'>{f(row['latest_yield_kg_ha'] / 1000)} t/ha vs national {f(row['national_yield_kg_ha'] / 1000)} t/ha
-       (ratio {f(row['latest_ratio'])})</div>
-  <div class='umz-label'>Persistence</div>
-  <div class='umz-value'>Below {gap:.0%} of national in {int(row['seasons_below'])} of {int(row['matched_seasons_adequate'])} adequate Season {season} releases</div>
-  <div class='umz-label'>Coverage</div>
-  <div class='umz-value'>{f(row['latest_harvested_ha'], 0)} ha harvested (threshold {min_ha:,.0f} ha)</div>
-  <div class='umz-label'>Input uptake, all crops (district / national)</div>
-  <div class='umz-value'>Improved seed {f(row['improved_seed_pct'], 1, '%')} / {f(row['national_improved_seed_pct'], 1, '%')}<br>
-       Inorganic fertilizer {f(row['inorganic_fert_pct'], 1, '%')} / {f(row['national_inorganic_fert_pct'], 1, '%')}</div>
-  <div class='umz-label'>Next step</div>
-  <div class='umz-value'>{html.escape(row['next_step'])}</div>
+<div class='umz-card'>
+  <span class='umz-cat' style='background:{color};color:{ink}'>{escape(finding.category)}</span>
+  <div class='umz-sel'>{escape(district)} ({escape(finding.row['province'])}) &middot; {escape(crop_name(crop))} &middot; Season {season}</div>
+  <div class='umz-head'>{escape(finding.headline)}</div>
+  {window_strip_html(finding)}
+  <div class='umz-label'>The figures</div>{figs}
+  <div class='umz-label'>Surveys used</div>
+  <div class='umz-fig'>{escape(', '.join(release_name(r) for r in finding.releases))} (NISR, snapshot {SID[-8:]})</div>
+  <div class='umz-label'>What to check next</div><div class='umz-next'>{escape(finding.next_step)}</div>
+  <div class='umz-label'>Keep in mind</div>{keep}
 </div>""", unsafe_allow_html=True)
-    if view != "Evidence Brief":
-        st.caption("Open the Evidence Brief view to export this as a shareable brief.")
+    b1, b2 = st.columns(2)
+    b1.download_button("Download brief (Markdown)", build_brief(finding, manifest).encode("utf-8"),
+                       file_name=f"umuzi_brief_{district}_{crop}_season{season}.md", mime="text/markdown")
+    b2.download_button("Download figures (CSV)", brief_csv(finding),
+                       file_name=f"umuzi_{district}_{crop}_season{season}.csv", mime="text/csv")
+
+t = target_position(records, crop)
+if t is not None:
+    gap_t = t.target_t_ha - t.yield_t_ha
+    st.markdown(f"""
+<div class='umz-target'>
+  <div class='umz-label' style='margin-top:0'>Rwanda against the PSTA 5 {escape(crop_name(crop).lower())} target</div>
+  {target_arrow_svg(t)}
+  <div class='umz-target-cap'>National {escape(crop_name(crop).lower())} yield, Season A + B, {t.agricultural_year}:
+  {t.yield_t_ha:.2f} t/ha, {t.attainment:.0%} of the {t.target_t_ha:.2f} t/ha target
+  {f'({gap_t:.2f} t/ha short)' if gap_t > 0 else '(target met)'}. PSTA 5 aims for {t.final_target_t_ha:.2f} t/ha by 2028/29.
+  Targets are national only; districts are compared with the national yield. Source: MINAGRI PSTA 5 results framework p.21; NISR SAS.</div>
+</div>""", unsafe_allow_html=True)
+else:
+    st.caption(f"PSTA 5 sets no national yield target for {crop_name(crop).lower()}.")
+
+st.write("")
+
+# ------------------------------------------------------------------ details on demand
+tab_ask, tab_grid, tab_hist, tab_inp, tab_all, tab_meth = st.tabs(
+    ["Ask the Umuzi Assistant", "Survey by survey, all districts", f"{district} over time",
+     "Input uptake", "All districts table", "Data and methods"])
+
+# ---- Umuzi Assistant: follows the map selection; a named district or crop carries into follow-ups.
+map_key = (district, crop, season)
+if st.session_state.get("asst_map_key") != map_key:
+    st.session_state["asst_map_key"] = map_key
+    st.session_state["asst_sel"] = Selection(district, crop, season)
+st.session_state.setdefault("chat", [])
 
 
-def focus_row() -> pd.Series:
-    return ev[ev["district"] == district].iloc[0]
+def ask(question: str) -> None:
+    a = answer(data, question, st.session_state["asst_sel"])
+    st.session_state["asst_sel"] = a.selection
+    st.session_state["chat"].append(dict(role="user", text=question))
+    st.session_state["chat"].append(dict(role="assistant", text=a.text, evidence=a.evidence,
+                                         keep=a.keep_in_mind, sel=a.selection))
 
 
-TABLE_COLS = {"district": "District", "province": "Province", "category": "Evidence category",
-              "latest_ratio": "Yield / national (latest)", "seasons_below": "Seasons below",
-              "matched_seasons_adequate": "Seasons with adequate coverage",
-              "latest_harvested_ha": "Harvested ha (latest)", "improved_seed_pct": "Improved seed %",
-              "inorganic_fert_pct": "Inorganic fertilizer %"}
+def show_on_map(s: Selection) -> None:
+    st.session_state["district"], st.session_state["crop"], st.session_state["season"] = s.district, s.crop, s.season
 
 
-def evidence_dataframe(df: pd.DataFrame) -> None:
-    show = df[list(TABLE_COLS)].rename(columns=TABLE_COLS)
+with tab_ask:
+    st.caption(f"Answers use the same validated NISR figures and rules as the map. Current focus: "
+               f"{st.session_state['asst_sel'].district}, {crop_name(st.session_state['asst_sel'].crop).lower()}, "
+               f"Season {st.session_state['asst_sel'].season}.")
+    s_ = st.session_state["asst_sel"]
+    examples = [f"Has {s_.district}'s {crop_name(s_.crop).lower()} yield stayed below national in Season {s_.season}?",
+                "What should I verify about fertilizer access?",
+                f"Which other districts are repeatedly below for {crop_name(s_.crop).lower()}?",
+                "How has it changed since 2018?"]
+    ec = st.columns(len(examples))
+    for col, q in zip(ec, examples):
+        col.button(q, on_click=ask, args=(q,), width="stretch")
+    with st.container(height=460):
+        if not st.session_state["chat"]:
+            with st.chat_message("assistant", avatar=BOT_ICON):
+                st.markdown("Muraho. I am the Umuzi Assistant. " + HELP)
+        for i, m in enumerate(st.session_state["chat"]):
+            if m["role"] == "user":
+                with st.chat_message("user"):
+                    st.markdown(m["text"])
+                continue
+            with st.chat_message("assistant", avatar=BOT_ICON):
+                st.markdown(m["text"])
+                if m["evidence"]:
+                    st.markdown("**Evidence**\n" + "\n".join(f"- {e}" for e in m["evidence"]))
+                if m["keep"]:
+                    st.markdown("**Keep in mind**\n" + "\n".join(f"- {k}" for k in m["keep"]))
+                s = m["sel"]
+                if s and (s.district, s.crop, s.season) != map_key and i == len(st.session_state["chat"]) - 1:
+                    st.button(f"Show {s.district}, {crop_name(s.crop).lower()}, Season {s.season} on the map",
+                              key=f"show_{i}", on_click=show_on_map, args=(s,))
+    q = st.chat_input("Ask about a district, crop or season")
+    if q:
+        ask(q)
+        st.rerun()
+
+with tab_grid:
+    st.caption("Each cell is the district's yield as % of the national yield in that survey. The outlined block is "
+               "the last 3 surveys, which decide the map colour.")
+    st.plotly_chart(charts.pattern_grid(ev, data.panel, SID, crop, season, highlight=district),
+                    width="stretch", config=PLOT_CONFIG)
+
+with tab_hist:
+    st.plotly_chart(charts.district_history_chart(data.panel, district, crop, season, finding.releases, SID),
+                    width="stretch", config=PLOT_CONFIG)
+    st.caption("District rankings from 2018 and 2019 agree only weakly with later years (see Data and methods), "
+               "so the label uses the last 3 surveys; the earlier years are shown for context.")
+
+with tab_inp:
+    st.plotly_chart(charts.input_context_chart(ev, SID, crop, season, highlight=district),
+                    width="stretch", config=PLOT_CONFIG)
+    st.caption("Input uptake is the share of farmers using the input on any crop in the district; NISR does not "
+               "publish it per crop at district level.")
+
+with tab_all:
+    cols = {"district": "District", "province": "Province", "category": "Finding",
+            "latest_ratio": "Yield as % of national (latest)", "below_in_window": "Below in last 3 surveys",
+            "reliable_in_window": "Reliable of last 3", "latest_harvested_ha": "Harvested ha (latest)",
+            "improved_seed_pct": "Improved seed %", "inorganic_fert_pct": "Inorganic fertilizer %"}
+    show = ev[list(cols)].rename(columns=cols)
+    show["Yield as % of national (latest)"] = show["Yield as % of national (latest)"] * 100
     st.dataframe(show, hide_index=True, width="stretch", column_config={
-        "Yield / national (latest)": st.column_config.NumberColumn(format="%.2f"),
+        "Yield as % of national (latest)": st.column_config.NumberColumn(format="%.0f%%"),
         "Harvested ha (latest)": st.column_config.NumberColumn(format="%.0f"),
         "Improved seed %": st.column_config.NumberColumn(format="%.1f"),
         "Inorganic fertilizer %": st.column_config.NumberColumn(format="%.1f")})
-    st.download_button("Download table (CSV)", df.to_csv(index=False).encode("utf-8"),
+    st.download_button("Download table (CSV)", ev.to_csv(index=False).encode("utf-8"),
                        file_name=f"umuzi_{crop}_season{season}_{SID}.csv", mime="text/csv")
 
-
-# ------------------------------------------------------------------ views
-if view == "Overview":
-    nvt = national_vs_target(records, load_targets())
-    cur = nvt.dropna(subset=["target_t_ha"])
-    n_below_target = int((cur["attainment"] < 1).sum()) if len(cur) else 0
-    persist_pairs, crops_checked = 0, 0
-    for c in crop_options(season):
-        if c in PRIORITY:
-            e = cached_evidence(SID, c, season, gap, min_ha)
-            persist_pairs += int(e["persistent_shortfall"].sum())
-            crops_checked += 1
-    insufficient = int((ev["category"] == CATEGORY_INSUFFICIENT).sum())
-
-    c1, c2, c3 = st.columns(3)
-    c1.markdown(f"<div class='umz-fact'><b>{n_below_target} of {len(cur)}</b><span>PSTA 5 priority crops below "
-                f"their 2025/26 national yield target (Season A+B)</span></div>", unsafe_allow_html=True)
-    c2.markdown(f"<div class='umz-fact'><b>{persist_pairs}</b><span>district-crop pairs below national in every "
-                f"matched Season {season} release ({crops_checked} priority crops)</span></div>",
-                unsafe_allow_html=True)
-    c3.markdown(f"<div class='umz-fact'><b>{insufficient}</b><span>districts where {crop_name} Season {season} "
-                f"evidence is too thin to classify</span></div>", unsafe_allow_html=True)
-    st.write("")
-    if len(cur):
-        st.plotly_chart(charts.target_attainment_chart(nvt, SID), width="stretch", config=PLOT_CONFIG, theme=None)
-        lo = cur.sort_values("attainment").iloc[0]
-        caption_block(
-            "Is national productivity on the PSTA 5 trajectory for priority crops?",
-            f"In {cur['agricultural_year'].iloc[0]}, national yields ranged from "
-            f"{cur['attainment'].min():.0%} ({CROP_LABELS.get(lo['crop'])}) to {cur['attainment'].max():.0%} of target.",
-            "A national gap is delivered or closed in districts. The next views show which district-crop gaps recur.",
-            "Approximation: A+B production over A+B harvested area; Season C and PSTA 5's own aggregation method are not reproduced.")
-    st.markdown("#### How to use this workspace")
-    st.markdown(
-        "1. Choose a **season type** and **crop** in the left rail. Every view, table and export follows that scope.\n"
-        "2. **Evidence Map** shows where shortfalls sit; **Persistence** shows whether they recur or are one-off dips.\n"
-        "3. **Input Context** separates shortfalls with low input uptake from those where inputs are not low.\n"
-        "4. **Compare Districts** checks two districts on the same basis; **Evidence Brief** exports a shareable note "
-        "with field-check questions and limits.")
-
-elif view == "Evidence Map":
-    left, right = st.columns([0.66, 0.34], gap="medium")
-    with left:
-        st.plotly_chart(charts.category_map(ev, SID, crop, season, highlight=district, threshold=gap),
-                        width="stretch", config=PLOT_CONFIG, theme=None)
-    with right:
-        evidence_panel(focus_row())
-    counts = ev["category"].value_counts()
-    caption_block(
-        f"Where are {crop_name} Season {season} yields below national, and is that position stable?",
-        f"{int(counts.get(CATEGORY_PERSISTENT_LOW_INPUT, 0) + counts.get(CATEGORY_PERSISTENT_INPUTS_OK, 0))} districts "
-        f"are below national in every adequately covered Season {season} release; "
-        f"{int(counts.get(CATEGORY_DIP, 0))} are below in the latest release only.",
-        "Persistent shortfalls are candidates for diagnosis before the next season; latest-season dips call for monitoring.",
-        "District estimates rely on farmer-reported yields; district standard errors are not published by NISR.")
-    evidence_dataframe(ev)
-
-elif view == "Persistence":
-    st.plotly_chart(charts.persistence_chart(ev, SID, crop, season, gap, highlight=district),
-                    width="stretch", config=PLOT_CONFIG, theme=None)
-    n_p = int(ev["persistent_shortfall"].sum())
-    wide = ev.dropna(subset=["range_ratio"])
-    caption_block(
-        "Is a low yield a recurring pattern or a single bad season?",
-        f"{n_p} districts sit below {gap:.2f} x national in every adequately covered Season {season} release. "
-        f"Median spread of a district's position across releases: {wide['range_ratio'].median():.2f}.",
-        "A recurring shortfall justifies a field diagnosis; a one-off dip should first be checked against season shocks.",
-        "Consistency across releases may partly reflect repeated sampling of similar areas; it is not independent replication.")
-    st.dataframe(ev[["district", "category", "mean_ratio", "range_ratio"] +
-                    [c for c in ev.columns if c.startswith("ratio_")]].round(2),
-                 hide_index=True, width="stretch")
-
-elif view == "Input Context":
-    st.plotly_chart(charts.input_context_chart(ev, SID, crop, season), width="stretch", config=PLOT_CONFIG, theme=None)
-    assoc = input_association(records, crop, latest, Params(gap_threshold=gap, min_harvested_ha=min_ha))
-    a = assoc.set_index("input")
-
-    def describe(var, label):
-        r = a.loc[var]
-        if pd.isna(r["rho"]):
-            return f"{label}: not computed (fewer than 12 districts with adequate coverage)."
-        return f"{label}: Spearman rho {r['rho']:+.2f} (n = {int(r['n'])}, nominal p = {r['p']:.3f})."
-    st.markdown(f"<div class='umz-note'><b>Association across districts in {latest}</b> (descriptive, not causal)<br>"
-                f"{describe('improved_seed_farmers_pct', 'Improved seed uptake vs yield ratio')}<br>"
-                f"{describe('inorganic_fert_farmers_pct', 'Inorganic fertilizer uptake vs yield ratio')}</div>",
-                unsafe_allow_html=True)
-    n_ok = int((ev["category"] == CATEGORY_PERSISTENT_INPUTS_OK).sum())
-    caption_block(
-        "Do persistent shortfalls coincide with low input uptake?",
-        f"{n_ok} persistent-shortfall districts have improved-seed or fertilizer uptake at or above national.",
-        "Where inputs are not low, sending more inputs is not the obvious first response; soils, erosion, varieties "
-        "and water deserve a field check.",
-        "Uptake is published for all crops pooled; crop-specific use may differ. n = 30 districts.")
-
-elif view == "Triage Matrix":
-    crops_here = [c for c in crop_options(season) if c in PRIORITY]
-    wide = pd.DataFrame({c: cached_evidence(SID, c, season, gap, min_ha).set_index("district")["category"]
-                         for c in crops_here}).reindex(DISTRICTS)
-    st.plotly_chart(charts.triage_matrix(wide, SID, season), width="stretch", config=PLOT_CONFIG, theme=None)
-    multi = wide.apply(lambda c: c.str.startswith("Persistent")).sum(axis=1).sort_values(ascending=False)
-    top = multi[multi >= 3]
-    caption_block(
-        "Are shortfalls crop-specific or district-wide?",
-        (f"{len(top)} districts show persistent shortfalls in three or more priority crops: "
-         f"{', '.join(top.index)}." if len(top) else "No district has persistent shortfalls in three or more crops."),
-        "District-wide patterns point to shared constraints (soils, terrain, services); single-crop patterns point to "
-        "crop-specific constraints.",
-        "Each cell is classified independently; crops with sparse district coverage show more insufficient-evidence cells.")
-
-elif view == "Compare Districts":
-    c1, c2 = st.columns(2)
-    d1 = c1.selectbox("District 1", DISTRICTS, index=DISTRICTS.index(district), key="cmp1")
-    alt = [d for d in DISTRICTS if d != d1]
-    d2 = c2.selectbox("District 2", alt, index=0, key="cmp2")
-    panel = cached_panel(SID)
-    sub = panel[(panel["crop"] == crop) & (panel["season"] == season) & panel["district"].isin([d1, d2])]
-    thin = sub[(sub["harvested_ha"] < min_ha) | sub["yield_kg_ha"].isna()]
-    if len(thin):
-        st.warning("Comparability limit: " + "; ".join(
-            f"{r.district} {r.release_id} " + ("not reported" if pd.isna(r.yield_kg_ha) else f"{r.harvested_ha:,.0f} ha")
-            for r in thin.itertuples()) + f". Estimates under {min_ha:,.0f} ha are thin.")
-    else:
-        st.caption(f"Comparable basis: same crop ({crop_name}), same season type ({season}), "
-                   f"same releases, both above the {min_ha:,.0f} ha coverage threshold.")
-    st.plotly_chart(charts.district_trend_chart(panel, [d1, d2], crop, season, SID),
-                    width="stretch", config=PLOT_CONFIG, theme=None)
-    e2 = ev.set_index("district").loc[[d1, d2]]
-    cols = st.columns(2)
-    for col, d in zip(cols, [d1, d2]):
-        r = e2.loc[d]
-        col.markdown(category_badge(r["category"]), unsafe_allow_html=True)
-        col.markdown(f"Ratio latest **{r['latest_ratio']:.2f}**, mean **{r['mean_ratio']:.2f}**, "
-                     f"range **{r['range_ratio']:.2f}** across releases; improved seed "
-                     f"{r['improved_seed_pct']:.1f}%, inorganic fertilizer {r['inorganic_fert_pct']:.1f}%.")
-    diff = e2["latest_ratio"].diff().iloc[-1]
-    caption_block(
-        f"How do {d1} and {d2} differ on the same basis?",
-        f"Latest yield ratios differ by {abs(diff):.2f} x national.",
-        "Use the comparison to pick a reference district for peer learning or field-team exchange.",
-        "Differences of a few hundredths are within plausible survey noise; district standard errors are not published.")
-
-elif view == "Evidence Brief":
-    row = focus_row()
-    left, right = st.columns([0.62, 0.38], gap="medium")
-    text = build_brief(row, manifest, Params(gap_threshold=gap, min_harvested_ha=min_ha))
-    with left:
-        # Demote headings for on-screen reading; the downloaded file keeps its structure.
-        st.markdown(text.replace("\n## ", "\n##### ").replace("# ", "#### ", 1))
-    with right:
-        evidence_panel(row)
-        st.download_button("Download brief (Markdown)", text.encode("utf-8"),
-                           file_name=f"umuzi_brief_{district}_{crop}_{season}.md", mime="text/markdown")
-        st.download_button("Download evidence row (CSV)", brief_csv(row),
-                           file_name=f"umuzi_brief_{district}_{crop}_{season}.csv", mime="text/csv")
-        st.caption("Change the focus district or crop in the left rail to regenerate the brief.")
-
-elif view == "Data and Methods":
-    status, missing = cached_status(SID)
-    st.markdown("#### Data status")
-    st.markdown(f"Active snapshot **{SID}** (ruleset {manifest['ruleset_version']}), "
-                f"{manifest['n_records']:,} canonical records, approved "
-                f"{manifest.get('approval', {}).get('approved_utc', 'n/a')}.")
-    if missing:
-        st.warning("Releases not in the snapshot (not located on the NISR website at import): "
-                   + ", ".join(missing) + ". They are treated as missing, never as zero.")
-    st.dataframe(status, hide_index=True, width="stretch")
-    st.markdown("#### Definitions")
+with tab_meth:
+    eda, bt = report("history_eda.json"), report("backtest_results.json")
     st.markdown(f"""
-- **Yield ratio**: district yield divided by the national yield of the same crop in the same release.
-- **Below national**: yield ratio under {gap:.2f} (default {GAP_THRESHOLD:.2f}).
-- **Adequate coverage**: yield reported and harvested area at least {min_ha:,.0f} ha (default {MIN_HARVESTED_HA:,.0f}).
-- **Persistent shortfall**: below national in every adequately covered release of the same season type, at least 2 releases, including the latest.
-- **Low input uptake**: improved-seed and inorganic-fertilizer uptake (farmers, all crops) both below national in the latest release.
-- Cells NISR printed as 0 or left blank are shown as **not reported**, never as a zero yield.""")
-    st.markdown("#### Evidence categories and their meaning")
-    st.dataframe(pd.DataFrame({"Category": CATEGORY_ORDER,
-                               "Route": [cached_evidence(SID, crop, season, gap, min_ha)
-                                         .query("category == @c")["next_step"].iloc[0]
-                                         if (ev["category"] == c).any() else "" for c in CATEGORY_ORDER]}),
+**How a district is labelled.** For the chosen crop and season, each district's yield is divided by the national
+yield of the same survey. It is *below national* when under {GAP_THRESHOLD:.0%} (NISR publishes no district margins
+of error, so smaller gaps are not flagged). An estimate is *reliable* when a yield is reported and at least
+{MIN_HARVESTED_HA:,.0f} ha were harvested. *Repeatedly below* means below in at least 2 of the last 3 surveys of
+that season, with at least 2 reliable. Input uptake is then compared with national: both improved seed and
+inorganic fertilizer below national gives the "low input uptake" label.""")
+
+    st.markdown("**1. Which survey years can be used.** Every downloaded file was checked for district-level yield tables.")
+    if eda.get("source_audit"):
+        st.dataframe(pd.DataFrame(eda["source_audit"]).sort_values(["year", "kind"]), hide_index=True, width="stretch")
+    st.markdown("2014-2017 report yields only by land-use stratum or province, so district analysis starts in 2018. "
+                "Season B 2025 was not published. 2018 reports input use per plot or without a stated basis, not per farmer, so its input "
+                "figures are not used.")
+
+    st.markdown("**2. Checks on every survey** (run automatically before data can go live).")
+    status, missing = cached_status(SID)
+    st.dataframe(status[["release", "gate", "yield_cells_observed", "yield_cells_not_reported", "warnings", "notes"]],
                  hide_index=True, width="stretch")
-    st.markdown("#### Refreshing data")
-    st.code("python -m scripts.refresh_data ingest --file <NISR tables.xlsx> --release-id SAS-2027A "
-            "--season-year 2027 --season A --source-url <url>\n"
-            "python -m scripts.refresh_data approve --snapshot <snapshot id>\n"
-            "python -m scripts.refresh_data rollback --snapshot <earlier snapshot id>", language="bash")
-    st.markdown("New releases are validated (districts, crops, units, national reference rows, production = "
-                "yield x area) before they can be approved. A failed release is quarantined and the active "
-                "snapshot is unchanged. Refresh is analyst-initiated; there is no scheduled retrieval.")
-    with st.expander("Snapshot history"):
-        st.dataframe(pd.DataFrame([{"snapshot": s["snapshot_id"], "created": s["created_utc"],
-                                    "change": f"{s['change']['kind']} {s['change']['release_id']}",
-                                    "approval": s.get("approval", {}).get("status")}
-                                   for s in store.list_snapshots()]), hide_index=True, width="stretch")
-    st.markdown("#### Sources and licences")
-    st.markdown(
-        "- National Institute of Statistics of Rwanda, Seasonal Agricultural Survey tables, 2024A to 2026B, CC BY 4.0.\n"
-        "- MINAGRI, Strategic Plan for Agriculture Transformation 5 (abridged), results framework p.21 (targets).\n"
-        "- District boundaries: geoBoundaries RWA ADM2 (derived from NISR geodata), CC BY 4.0.\n"
-        "- Full methodology and limitations: `docs/methodology.md`, `docs/limitations.md` in the repository.")
+    if missing:
+        st.caption("Missing between first and last survey: " + ", ".join(missing))
+    if eda.get("reprinted_national_check"):
+        d = pd.DataFrame(eda["reprinted_national_check"])
+        st.markdown(f"Duplicates and revisions: {len(d)} national production values that later workbooks re-print "
+                    f"for the previous year match the original survey with a largest difference of "
+                    f"{d['diff_pct'].abs().max():.2f}%. The 2024 annual workbook matches the separate 2024 Season A and "
+                    "B files cell for cell.")
+
+    st.markdown("**3. Do districts keep their position over time?** Median rank agreement (Spearman) of district "
+                "yield ratios between consecutive surveys of the same season, across six priority crops.")
+    if eda.get("rank_agreement"):
+        ra = [dict(season=s, surveys=k.replace("SAS-", "").replace("|", " to "), median_rho=v)
+              for s in "AB" for k, v in eda["rank_agreement"][s]["consecutive"].items()]
+        st.dataframe(pd.DataFrame(ra), hide_index=True, width="stretch")
+        early = [r["median_rho"] for r in ra if r["season"] == "A" and r["surveys"][:4] in ("2018", "2019")]
+        later = [r["median_rho"] for r in ra if r["season"] == "A" and r["surveys"][:4] >= "2020"]
+        st.markdown(f"Season A agreement is weak from 2018 to 2020 ({', '.join(f'{v:.2f}' for v in early)}) and "
+                    f"{min(later):.2f} to {max(later):.2f} since, so the label uses the most recent three surveys "
+                    "rather than all history.")
+
+    st.markdown("**4. Would a statistical model flag next season's shortfalls better than the rules?**")
+    if bt:
+        rows = [dict(method=k.replace("_", " "), balanced_accuracy=v["balanced_accuracy"],
+                     shortfalls_caught=v["recall"], precision=v["precision"], brier_score=v["brier"])
+                for k, v in bt["test"].items()]
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        ci = bt["model_vs_best_rule_test"]["balanced_accuracy_diff_ci"]
+        st.markdown(
+            f"Tested on the {bt['n_units']['test']} district-crop cases of 2024-2026, using only earlier surveys to "
+            f"predict each one. The logistic model was no more accurate than the best rule (difference "
+            f"{ci[0]:+.3f} to {ci[1]:+.3f}, 95% interval), so **the rules were kept** ({bt['decision']}). The old rule "
+            f"'below in every survey' caught only {bt['test']['all_history']['recall']:.0%} of next-season shortfalls; "
+            f"'below in 2 of the last 3' catches {bt['test']['last_3_two']['recall']:.0%}, which is why it is the "
+            "rule now used.")
+
+    with st.expander("Test the benchmark settings (sensitivity)"):
+        st.slider("Below national if yield is under this share of national", 0.70, 0.98, GAP_THRESHOLD, 0.01, key="gap")
+        st.select_slider("Reliable from this harvested area (ha)", [100.0, 200.0, 500.0, 1000.0, 2000.0],
+                         MIN_HARVESTED_HA, key="min_ha")
+        st.caption("Defaults: 90% and 500 ha. Changing them recolours the map and the assistant's answers.")

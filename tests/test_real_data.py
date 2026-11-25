@@ -1,5 +1,4 @@
 """Integrity tests on the ACTIVE snapshot built from real NISR SAS releases."""
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -8,6 +7,7 @@ import pytest
 from src.analytics.indicators import crop_panel, evidence_table, load_targets, national_vs_target
 from src.config import DATA_DIR, DISTRICTS
 from src.decisions.brief import brief_csv, build_brief
+from src.decisions.finding import build_finding
 from src.ingestion.sas_adapter import parse_workbook
 from src.services.snapshot_store import SnapshotStore
 
@@ -39,8 +39,12 @@ def test_production_equals_yield_times_area(snap):
     rec, _ = snap
     p = crop_panel(rec)
     p = p.dropna(subset=["yield_kg_ha", "harvested_ha", "production_t"])
-    ratio = p["production_t"] / (p["yield_kg_ha"] * p["harvested_ha"] / 1000)
-    assert ((ratio - 1).abs() < 0.02).mean() > 0.99
+    ok = ((p["production_t"] / (p["yield_kg_ha"] * p["harvested_ha"] / 1000) - 1).abs() < 0.02)
+    share = ok.groupby(p["release_id"]).mean()
+    # Current releases are internally exact; older annual workbooks are published with small
+    # rounding differences (2018B: 93% of cells within 2%), which the gates report as warnings.
+    assert share[[r for r in share.index if r >= "SAS-2024"]].min() > 0.99
+    assert share.min() > 0.90
 
 
 def test_no_reported_zero_became_a_number(snap):
@@ -86,10 +90,33 @@ def test_brief_and_exports_match_evidence_table(snap):
     rec, manifest = snap
     ev = evidence_table(rec, "bean", "A")
     row = ev[ev["district"] == "Ruhango"].iloc[0]
-    text = build_brief(row, manifest)
-    assert row["category"] in text
-    assert f"ratio {row['latest_ratio']:,.2f}" in text
+    f = build_finding(ev, crop_panel(rec), "Ruhango")
+    text = build_brief(f, manifest)
+    assert row["category"] in text and f.headline in text
+    assert f"({row['latest_ratio']:.0%} of national)" in text
     assert manifest["snapshot_id"] in text
-    exported = pd.read_csv(pd.io.common.BytesIO(brief_csv(row)))
+    exported = pd.read_csv(pd.io.common.BytesIO(brief_csv(f)))
     assert exported.loc[0, "category"] == row["category"]
     assert np.isclose(exported.loc[0, "latest_ratio"], row["latest_ratio"])
+
+
+def test_historical_releases_present_and_2018_inputs_excluded(snap):
+    rec, manifest = snap
+    rels = set(rec["release_id"])
+    assert {f"SAS-{y}{s}" for y in range(2018, 2024) for s in "AB"} <= rels
+    assert "SAS-2025B" not in rels                      # not published: never imputed
+    inputs_2018 = rec[(rec["release_id"].str.startswith("SAS-2018")) & (rec["crop"] == "all")]
+    assert inputs_2018.empty                             # per-plot basis, not comparable
+    meta = {r["release_id"]: r for r in manifest["releases"]}
+    assert meta["SAS-2018B"]["sheet_overrides"] == {"harvested_ha": "Appendix 5"}
+
+
+def test_historical_values_trace_to_source(snap):
+    """Cells read directly from the annual workbooks (yield tables, kg/ha)."""
+    rec, _ = snap
+    y = rec[(rec["crop"] == "maize") & (rec["metric"] == "yield_kg_ha")].set_index(["release_id", "district"])["value"]
+    assert abs(y[("SAS-2018A", "Nyarugenge")] - 942.1188) < 1e-6      # 2018 Appendix 9 (transposed)
+    assert abs(y[("SAS-2018A", "National")] - 1524.757683757732) < 1e-6  # "Overall Yield 2018 A" column
+    assert abs(y[("SAS-2019A", "Nyarugenge")] - 733) < 1e-9            # 2019 Table 13
+    assert abs(y[("SAS-2019A", "National")] - 1539) < 1e-9
+    assert abs(y[("SAS-2020A", "National")] - 1598.0345770309802) < 1e-6  # "National", not "National 2019 A"

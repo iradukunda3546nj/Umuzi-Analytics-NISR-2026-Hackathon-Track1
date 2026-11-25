@@ -4,7 +4,7 @@
 
 | Column | Type | Description |
 |---|---|---|
-| `release_id` | text | e.g. `SAS-2026A`; one per NISR season release |
+| `release_id` | text | e.g. `SAS-2026A`; one per NISR season release, 2018 A to 2026 B |
 | `season_year` | int | SAS year (2026 = agricultural year 2025/26) |
 | `season` | A or B | Season type |
 | `district` | text | One of the 30 districts (spelling as in NISR tables and boundaries) or `National` |
@@ -20,11 +20,11 @@ Join key: (`release_id`, `district`, `crop`, `metric`). District names join to t
 
 | Metric | Unit | NISR table (title pattern) | Notes |
 |---|---|---|---|
-| `yield_kg_ha` | kg per harvested ha | "Average yield by crop type and district (Kg/Ha)" | Excludes the large-scale-farmer-only table. Farmer-estimated. |
+| `yield_kg_ha` | kg per harvested ha | "Average yield by crop type and/per district (Kg/Ha)"; 2018: "Yield of main crops by District (Kg/Ha)", transposed | Excludes large-scale-farmer, CIP-crop and Season C site tables. A title without kg/ha is rejected. Farmer-estimated. |
 | `harvested_ha` | ha | "Harvested area by crop type and district (Ha)" | Coverage denominator |
 | `cultivated_ha` | ha | "Cultivated area by crop type and district (Ha)" | |
 | `production_t` | metric tonnes | "Crop production by crop type and district (MT)" | National row printed as "S/Total" |
-| `improved_seed_farmers_pct` | % of farmers | "Use of seeds by farmer type per district", Overall column | All crops pooled |
+| `improved_seed_farmers_pct` | % of farmers | "Use of (improved) seeds by farmer type/categories per district", farmers Overall column | All crops pooled; 2018 not comparable (not loaded) |
 | `inorganic_fert_farmers_pct` | % of farmers | "Use of Inorganic fertilizer by farmer type per district", Overall | National row sometimes "Total" |
 | `organic_fert_farmers_pct` | % of farmers | "Use of organic fertilizer by farmer type per district", Overall | Context only |
 | `erosion_protection_farmers_pct` | % of farmers | "Percentage of farmers who practiced agricultural practices", erosion column | Optional; context only |
@@ -38,9 +38,12 @@ Join key: (`release_id`, `district`, `crop`, `metric`). District names join to t
 | Indicator | Formula |
 |---|---|
 | `yield_ratio` | district `yield_kg_ha` / national `yield_kg_ha`, same crop and release |
-| `adequate` | yield observed and `harvested_ha` >= 500 (configurable) |
+| `reliable` | yield observed and `harvested_ha` >= 500 (configurable) |
 | `below` | `yield_ratio` < 0.90 (configurable) |
-| `persistent_shortfall` | latest release adequate, at least 2 adequate releases of the same season type, below in all of them |
+| `window_releases` | the last 3 releases of the season type, ending at the latest |
+| `reliable_in_window`, `below_in_window` | counts over the window, reliable releases only |
+| `repeated_below` | latest release reliable, at least 2 reliable and at least 2 below in the window |
+| `limited_reason` | plain-language reason when the category is "Evidence too limited to judge" |
 | `inputs_low` | district improved-seed and inorganic-fertilizer uptake both below national, latest release; unknown if any value is missing |
 | `category` | see `docs/methodology.md` |
 | National A+B yield | (A production + B production) / (A harvested + B harvested), same SAS year, both seasons required |

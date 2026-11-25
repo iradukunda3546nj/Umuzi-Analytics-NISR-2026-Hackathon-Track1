@@ -1,6 +1,18 @@
 {
-  "snapshot_id": "snap-20261029T103445Z-e435e56c",
+  "snapshot_id": "snap-20261125T044618Z-3e5a0b09",
   "releases": [
+    "SAS-2018A",
+    "SAS-2018B",
+    "SAS-2019A",
+    "SAS-2019B",
+    "SAS-2020A",
+    "SAS-2020B",
+    "SAS-2021A",
+    "SAS-2021B",
+    "SAS-2022A",
+    "SAS-2022B",
+    "SAS-2023A",
+    "SAS-2023B",
     "SAS-2024A",
     "SAS-2024B",
     "SAS-2025A",
@@ -8,6 +20,951 @@
     "SAS-2026B"
   ],
   "national_vs_target": [
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "bean",
+      "yield_t_ha": 0.8713,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.6,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "beer_banana",
+      "yield_t_ha": 10.9316,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "bush_bean",
+      "yield_t_ha": 0.8059,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "cassava",
+      "yield_t_ha": 12.2372,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "climbing_bean",
+      "yield_t_ha": 1.015,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "cooking_banana",
+      "yield_t_ha": 18.4521,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 14.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "dessert_banana",
+      "yield_t_ha": 18.3018,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "fruits",
+      "yield_t_ha": 6.0998,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "groundnut",
+      "yield_t_ha": 0.5374,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "irish_potato",
+      "yield_t_ha": 7.4953,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "maize",
+      "yield_t_ha": 1.4315,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "paddy_rice",
+      "yield_t_ha": 3.4741,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "pea",
+      "yield_t_ha": 0.5709,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "sorghum",
+      "yield_t_ha": 1.0732,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "soybean",
+      "yield_t_ha": 0.4148,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "sweet_potato",
+      "yield_t_ha": 6.9301,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "vegetables",
+      "yield_t_ha": 11.7966,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "wheat",
+      "yield_t_ha": 1.1022,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2018,
+      "agricultural_year": "2017/18",
+      "crop": "yams_taro",
+      "yield_t_ha": 5.4723,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "bean",
+      "yield_t_ha": 0.8311,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.6,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "cassava",
+      "yield_t_ha": 14.4784,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "fruits",
+      "yield_t_ha": 5.9065,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "groundnut",
+      "yield_t_ha": 0.4454,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "irish_potato",
+      "yield_t_ha": 9.0045,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "maize",
+      "yield_t_ha": 1.4611,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "paddy_rice",
+      "yield_t_ha": 3.9998,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "sorghum",
+      "yield_t_ha": 0.9863,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "soybean",
+      "yield_t_ha": 0.5251,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "sweet_potato",
+      "yield_t_ha": 6.8384,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "vegetables",
+      "yield_t_ha": 10.561,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2019,
+      "agricultural_year": "2018/19",
+      "crop": "wheat",
+      "yield_t_ha": 1.1854,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "bean",
+      "yield_t_ha": 0.6756,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.6,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "beer_banana",
+      "yield_t_ha": 9.0665,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "bush_bean",
+      "yield_t_ha": 0.6247,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "cassava",
+      "yield_t_ha": 14.5956,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "climbing_bean",
+      "yield_t_ha": 0.7769,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "cooking_banana",
+      "yield_t_ha": 15.7933,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 14.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "dessert_banana",
+      "yield_t_ha": 9.8399,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "fruits",
+      "yield_t_ha": 4.9579,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "groundnut",
+      "yield_t_ha": 0.4541,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "irish_potato",
+      "yield_t_ha": 8.1695,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "maize",
+      "yield_t_ha": 1.5237,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "paddy_rice",
+      "yield_t_ha": 3.9381,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "pea",
+      "yield_t_ha": 0.8116,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "sorghum",
+      "yield_t_ha": 1.0063,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "soybean",
+      "yield_t_ha": 0.4877,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "sweet_potato",
+      "yield_t_ha": 7.1646,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "vegetables",
+      "yield_t_ha": 9.5459,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "wheat",
+      "yield_t_ha": 1.0408,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2020,
+      "agricultural_year": "2019/20",
+      "crop": "yams_taro",
+      "yield_t_ha": 6.4809,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "beer_banana",
+      "yield_t_ha": 9.3588,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "cassava",
+      "yield_t_ha": 14.6455,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "climbing_bean",
+      "yield_t_ha": 0.8203,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "cooking_banana",
+      "yield_t_ha": 15.3574,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 14.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "dessert_banana",
+      "yield_t_ha": 9.7035,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "fruits",
+      "yield_t_ha": 5.6059,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "groundnut",
+      "yield_t_ha": 0.4552,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "irish_potato",
+      "yield_t_ha": 8.2563,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "maize",
+      "yield_t_ha": 1.5216,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "paddy_rice",
+      "yield_t_ha": 4.1596,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "pea",
+      "yield_t_ha": 0.8137,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "sorghum",
+      "yield_t_ha": 1.0702,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "soybean",
+      "yield_t_ha": 0.4981,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "sweet_potato",
+      "yield_t_ha": 6.9421,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "vegetables",
+      "yield_t_ha": 9.3024,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "wheat",
+      "yield_t_ha": 1.0393,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2021,
+      "agricultural_year": "2020/21",
+      "crop": "yams_taro",
+      "yield_t_ha": 6.5576,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "bean",
+      "yield_t_ha": 0.7069,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.6,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "beer_banana",
+      "yield_t_ha": 9.4883,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "bush_bean",
+      "yield_t_ha": 0.6311,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "cassava",
+      "yield_t_ha": 14.6428,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "climbing_bean",
+      "yield_t_ha": 0.8477,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "cooking_banana",
+      "yield_t_ha": 15.4914,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 14.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "dessert_banana",
+      "yield_t_ha": 9.5849,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "fruits",
+      "yield_t_ha": 6.3211,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "groundnut",
+      "yield_t_ha": 0.4505,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "irish_potato",
+      "yield_t_ha": 7.4766,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "maize",
+      "yield_t_ha": 1.5286,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "paddy_rice",
+      "yield_t_ha": 4.1879,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "pea",
+      "yield_t_ha": 0.7607,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "sorghum",
+      "yield_t_ha": 1.0856,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "soybean",
+      "yield_t_ha": 0.518,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "sweet_potato",
+      "yield_t_ha": 7.289,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "vegetables",
+      "yield_t_ha": 9.3267,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "wheat",
+      "yield_t_ha": 1.1587,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2022,
+      "agricultural_year": "2021/22",
+      "crop": "yams_taro",
+      "yield_t_ha": 6.958,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "bean",
+      "yield_t_ha": 0.7101,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.6,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "beer_banana",
+      "yield_t_ha": 9.831,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "bush_bean",
+      "yield_t_ha": 0.6215,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "cassava",
+      "yield_t_ha": 14.1862,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 13.5,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "climbing_bean",
+      "yield_t_ha": 0.867,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "cooking_banana",
+      "yield_t_ha": 15.5467,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 14.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "dessert_banana",
+      "yield_t_ha": 9.7675,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "fruits",
+      "yield_t_ha": 5.9288,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "groundnut",
+      "yield_t_ha": 0.456,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "irish_potato",
+      "yield_t_ha": 7.5253,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 8.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "maize",
+      "yield_t_ha": 1.5951,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.7,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "paddy_rice",
+      "yield_t_ha": 4.0899,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 4.0,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "pea",
+      "yield_t_ha": 0.6182,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "sorghum",
+      "yield_t_ha": 1.1608,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "soybean",
+      "yield_t_ha": 0.4155,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 0.4,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "sweet_potato",
+      "yield_t_ha": 7.4066,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "vegetables",
+      "yield_t_ha": 8.8862,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "wheat",
+      "yield_t_ha": 1.2555,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": 1.2,
+      "attainment": NaN
+    },
+    {
+      "season_year": 2023,
+      "agricultural_year": "2022/23",
+      "crop": "yams_taro",
+      "yield_t_ha": 7.1104,
+      "target_t_ha": NaN,
+      "baseline_2023_t_ha": NaN,
+      "attainment": NaN
+    },
     {
       "season_year": 2024,
       "agricultural_year": "2023/24",
@@ -851,11 +1808,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 200.0,
-      "agreement_with_default": 0.633,
-      "Persistent shortfall, low input uptake": 2,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 4,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.767,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 5,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 22
     },
     {
@@ -863,11 +1820,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 500.0,
-      "agreement_with_default": 0.633,
-      "Persistent shortfall, low input uptake": 2,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 4,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.767,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 5,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 22
     },
     {
@@ -875,11 +1832,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 1000.0,
-      "agreement_with_default": 0.6,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 4,
-      "Insufficient evidence - field verification required": 1,
+      "agreement_with_default": 0.733,
+      "Repeatedly below national, low input uptake": 2,
+      "Repeatedly below national, input uptake not low": 5,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 1,
       "Not below national": 22
     },
     {
@@ -888,10 +1845,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 9,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 11,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 0,
       "Not below national": 15
     },
     {
@@ -900,10 +1857,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 9,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 11,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 0,
       "Not below national": 15
     },
     {
@@ -912,10 +1869,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.967,
-      "Persistent shortfall, low input uptake": 2,
-      "Persistent shortfall, inputs at or above national": 9,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 1,
+      "Repeatedly below national, low input uptake": 2,
+      "Repeatedly below national, input uptake not low": 11,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 1,
       "Not below national": 15
     },
     {
@@ -923,11 +1880,11 @@
       "season": "A",
       "gap_threshold": 0.95,
       "min_harvested_ha": 200.0,
-      "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 16,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.833,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 16,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 11
     },
     {
@@ -935,11 +1892,11 @@
       "season": "A",
       "gap_threshold": 0.95,
       "min_harvested_ha": 500.0,
-      "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 16,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.833,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 16,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 11
     },
     {
@@ -947,11 +1904,11 @@
       "season": "A",
       "gap_threshold": 0.95,
       "min_harvested_ha": 1000.0,
-      "agreement_with_default": 0.733,
-      "Persistent shortfall, low input uptake": 2,
-      "Persistent shortfall, inputs at or above national": 16,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 1,
+      "agreement_with_default": 0.8,
+      "Repeatedly below national, low input uptake": 2,
+      "Repeatedly below national, input uptake not low": 16,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 1,
       "Not below national": 11
     },
     {
@@ -959,11 +1916,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 200.0,
-      "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.8,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 3,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 24
     },
     {
@@ -971,11 +1928,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 500.0,
-      "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.8,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 3,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 24
     },
     {
@@ -983,11 +1940,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 1000.0,
-      "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 0,
+      "agreement_with_default": 0.8,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 3,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 24
     },
     {
@@ -996,10 +1953,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 7,
-      "Latest-season dip": 2,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 7,
+      "Below national in the latest season only": 2,
+      "Evidence too limited to judge": 0,
       "Not below national": 18
     },
     {
@@ -1008,10 +1965,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 7,
-      "Latest-season dip": 2,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 7,
+      "Below national in the latest season only": 2,
+      "Evidence too limited to judge": 0,
       "Not below national": 18
     },
     {
@@ -1020,10 +1977,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 7,
-      "Latest-season dip": 2,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 7,
+      "Below national in the latest season only": 2,
+      "Evidence too limited to judge": 0,
       "Not below national": 18
     },
     {
@@ -1032,10 +1989,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.933,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 8,
+      "Below national in the latest season only": 3,
+      "Evidence too limited to judge": 0,
       "Not below national": 16
     },
     {
@@ -1044,10 +2001,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 0.933,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 8,
+      "Below national in the latest season only": 3,
+      "Evidence too limited to judge": 0,
       "Not below national": 16
     },
     {
@@ -1056,10 +2013,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.933,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 8,
+      "Below national in the latest season only": 3,
+      "Evidence too limited to judge": 0,
       "Not below national": 16
     },
     {
@@ -1067,11 +2024,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 200.0,
-      "agreement_with_default": 0.667,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 17,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 4,
+      "agreement_with_default": 0.7,
+      "Repeatedly below national, low input uptake": 1,
+      "Repeatedly below national, input uptake not low": 18,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 4,
       "Not below national": 7
     },
     {
@@ -1079,11 +2036,11 @@
       "season": "A",
       "gap_threshold": 0.8,
       "min_harvested_ha": 500.0,
-      "agreement_with_default": 0.9,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 11,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 11,
+      "agreement_with_default": 0.933,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 12,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 11,
       "Not below national": 7
     },
     {
@@ -1092,10 +2049,10 @@
       "gap_threshold": 0.8,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.833,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 9,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 14,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 9,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 14,
       "Not below national": 7
     },
     {
@@ -1104,10 +2061,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 20,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 4,
+      "Repeatedly below national, low input uptake": 1,
+      "Repeatedly below national, input uptake not low": 20,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 4,
       "Not below national": 5
     },
     {
@@ -1116,10 +2073,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 14,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 11,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 14,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 11,
       "Not below national": 5
     },
     {
@@ -1128,10 +2085,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.9,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 11,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 14,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 11,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 14,
       "Not below national": 5
     },
     {
@@ -1140,10 +2097,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.767,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 20,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 4,
+      "Repeatedly below national, low input uptake": 1,
+      "Repeatedly below national, input uptake not low": 20,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 4,
       "Not below national": 5
     },
     {
@@ -1152,10 +2109,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 14,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 11,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 14,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 11,
       "Not below national": 5
     },
     {
@@ -1164,10 +2121,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.9,
-      "Persistent shortfall, low input uptake": 0,
-      "Persistent shortfall, inputs at or above national": 11,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 14,
+      "Repeatedly below national, low input uptake": 0,
+      "Repeatedly below national, input uptake not low": 11,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 14,
       "Not below national": 5
     },
     {
@@ -1176,10 +2133,10 @@
       "gap_threshold": 0.8,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.6,
-      "Persistent shortfall, low input uptake": 2,
-      "Persistent shortfall, inputs at or above national": 4,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 2,
+      "Repeatedly below national, input uptake not low": 4,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 0,
       "Not below national": 23
     },
     {
@@ -1188,10 +2145,10 @@
       "gap_threshold": 0.8,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 0.7,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 3,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 3,
+      "Repeatedly below national, low input uptake": 1,
+      "Repeatedly below national, input uptake not low": 3,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 3,
       "Not below national": 22
     },
     {
@@ -1200,10 +2157,10 @@
       "gap_threshold": 0.8,
       "min_harvested_ha": 1000.0,
       "agreement_with_default": 0.6,
-      "Persistent shortfall, low input uptake": 1,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 8,
+      "Repeatedly below national, low input uptake": 1,
+      "Repeatedly below national, input uptake not low": 2,
+      "Below national in the latest season only": 2,
+      "Evidence too limited to judge": 7,
       "Not below national": 18
     },
     {
@@ -1212,10 +2169,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.9,
-      "Persistent shortfall, low input uptake": 5,
-      "Persistent shortfall, inputs at or above national": 10,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 5,
+      "Repeatedly below national, input uptake not low": 10,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 0,
       "Not below national": 14
     },
     {
@@ -1224,10 +2181,10 @@
       "gap_threshold": 0.9,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 1.0,
-      "Persistent shortfall, low input uptake": 4,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 3,
+      "Repeatedly below national, low input uptake": 4,
+      "Repeatedly below national, input uptake not low": 8,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 3,
       "Not below national": 14
     },
     {
@@ -1235,11 +2192,11 @@
       "season": "B",
       "gap_threshold": 0.9,
       "min_harvested_ha": 1000.0,
-      "agreement_with_default": 0.833,
-      "Persistent shortfall, low input uptake": 3,
-      "Persistent shortfall, inputs at or above national": 6,
-      "Latest-season dip": 1,
-      "Insufficient evidence - field verification required": 8,
+      "agreement_with_default": 0.867,
+      "Repeatedly below national, low input uptake": 3,
+      "Repeatedly below national, input uptake not low": 7,
+      "Below national in the latest season only": 1,
+      "Evidence too limited to judge": 7,
       "Not below national": 12
     },
     {
@@ -1248,10 +2205,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 200.0,
       "agreement_with_default": 0.733,
-      "Persistent shortfall, low input uptake": 7,
-      "Persistent shortfall, inputs at or above national": 13,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 0,
+      "Repeatedly below national, low input uptake": 7,
+      "Repeatedly below national, input uptake not low": 13,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 0,
       "Not below national": 10
     },
     {
@@ -1260,10 +2217,10 @@
       "gap_threshold": 0.95,
       "min_harvested_ha": 500.0,
       "agreement_with_default": 0.833,
-      "Persistent shortfall, low input uptake": 6,
-      "Persistent shortfall, inputs at or above national": 10,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 4,
+      "Repeatedly below national, low input uptake": 6,
+      "Repeatedly below national, input uptake not low": 10,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 4,
       "Not below national": 10
     },
     {
@@ -1271,19 +2228,20 @@
       "season": "B",
       "gap_threshold": 0.95,
       "min_harvested_ha": 1000.0,
-      "agreement_with_default": 0.733,
-      "Persistent shortfall, low input uptake": 4,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Latest-season dip": 0,
-      "Insufficient evidence - field verification required": 8,
+      "agreement_with_default": 0.767,
+      "Repeatedly below national, low input uptake": 4,
+      "Repeatedly below national, input uptake not low": 9,
+      "Below national in the latest season only": 0,
+      "Evidence too limited to judge": 7,
       "Not below national": 10
     }
   ],
-  "districts_persistent_3plus_crops_A": [
+  "districts_repeated_3plus_crops_A": [
     "Gasabo",
     "Gisagara",
     "Karongi",
     "Kayonza",
+    "Muhanga",
     "Ngororero",
     "Nyamagabe",
     "Nyamasheke",
@@ -1291,112 +2249,112 @@
     "Ruhango",
     "Rwamagana"
   ],
-  "districts_persistent_3plus_crops_B": [
+  "districts_repeated_3plus_crops_B": [
     "Bugesera",
     "Kamonyi",
     "Kayonza",
     "Muhanga",
+    "Ngoma",
+    "Ngororero",
     "Ruhango",
     "Rwamagana"
   ],
   "category_counts": {
     "maize_A": {
       "Not below national": 15,
-      "Persistent shortfall, inputs at or above national": 9,
-      "Persistent shortfall, low input uptake": 3,
-      "Latest-season dip": 3
+      "Repeatedly below national, input uptake not low": 11,
+      "Repeatedly below national, low input uptake": 3,
+      "Below national in the latest season only": 1
     },
     "bean_A": {
       "Not below national": 18,
-      "Persistent shortfall, inputs at or above national": 7,
-      "Persistent shortfall, low input uptake": 3,
-      "Latest-season dip": 2
+      "Repeatedly below national, input uptake not low": 7,
+      "Repeatedly below national, low input uptake": 3,
+      "Below national in the latest season only": 2
     },
     "irish_potato_A": {
-      "Persistent shortfall, inputs at or above national": 14,
-      "Insufficient evidence - field verification required": 11,
+      "Repeatedly below national, input uptake not low": 14,
+      "Evidence too limited to judge": 11,
       "Not below national": 5
     },
     "paddy_rice_A": {
-      "Insufficient evidence - field verification required": 19,
+      "Evidence too limited to judge": 19,
       "Not below national": 9,
-      "Persistent shortfall, inputs at or above national": 1,
-      "Latest-season dip": 1
+      "Repeatedly below national, input uptake not low": 1,
+      "Below national in the latest season only": 1
     },
     "cassava_A": {
       "Not below national": 21,
-      "Insufficient evidence - field verification required": 7,
-      "Persistent shortfall, inputs at or above national": 1,
-      "Latest-season dip": 1
+      "Evidence too limited to judge": 7,
+      "Repeatedly below national, input uptake not low": 1,
+      "Below national in the latest season only": 1
     },
     "soybean_A": {
       "Not below national": 13,
-      "Insufficient evidence - field verification required": 10,
-      "Persistent shortfall, inputs at or above national": 4,
-      "Persistent shortfall, low input uptake": 2,
-      "Latest-season dip": 1
+      "Evidence too limited to judge": 10,
+      "Repeatedly below national, input uptake not low": 4,
+      "Repeatedly below national, low input uptake": 2,
+      "Below national in the latest season only": 1
     },
     "cooking_banana_A": {
       "Not below national": 12,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Insufficient evidence - field verification required": 7,
-      "Latest-season dip": 2,
-      "Persistent shortfall, low input uptake": 1
+      "Repeatedly below national, input uptake not low": 8,
+      "Evidence too limited to judge": 7,
+      "Repeatedly below national, low input uptake": 2,
+      "Below national in the latest season only": 1
     },
     "sweet_potato_A": {
       "Not below national": 18,
-      "Persistent shortfall, inputs at or above national": 7,
-      "Latest-season dip": 3,
-      "Insufficient evidence - field verification required": 2
+      "Repeatedly below national, input uptake not low": 8,
+      "Below national in the latest season only": 2,
+      "Evidence too limited to judge": 2
     },
     "maize_B": {
       "Not below national": 14,
-      "Persistent shortfall, inputs at or above national": 8,
-      "Persistent shortfall, low input uptake": 4,
-      "Insufficient evidence - field verification required": 3,
-      "Latest-season dip": 1
+      "Repeatedly below national, input uptake not low": 8,
+      "Repeatedly below national, low input uptake": 4,
+      "Evidence too limited to judge": 3,
+      "Below national in the latest season only": 1
     },
     "bean_B": {
       "Not below national": 18,
-      "Persistent shortfall, inputs at or above national": 5,
-      "Persistent shortfall, low input uptake": 4,
-      "Latest-season dip": 3
+      "Repeatedly below national, low input uptake": 5,
+      "Repeatedly below national, input uptake not low": 5,
+      "Below national in the latest season only": 2
     },
     "irish_potato_B": {
-      "Insufficient evidence - field verification required": 13,
-      "Persistent shortfall, inputs at or above national": 8,
+      "Evidence too limited to judge": 13,
+      "Repeatedly below national, input uptake not low": 8,
       "Not below national": 7,
-      "Persistent shortfall, low input uptake": 2
+      "Repeatedly below national, low input uptake": 2
     },
     "paddy_rice_B": {
-      "Insufficient evidence - field verification required": 18,
+      "Evidence too limited to judge": 18,
       "Not below national": 10,
-      "Persistent shortfall, low input uptake": 1,
-      "Latest-season dip": 1
+      "Repeatedly below national, low input uptake": 2
     },
     "cassava_B": {
       "Not below national": 20,
-      "Insufficient evidence - field verification required": 6,
-      "Persistent shortfall, inputs at or above national": 4
+      "Evidence too limited to judge": 6,
+      "Repeatedly below national, input uptake not low": 4
     },
     "soybean_B": {
       "Not below national": 17,
-      "Insufficient evidence - field verification required": 9,
-      "Persistent shortfall, inputs at or above national": 2,
-      "Persistent shortfall, low input uptake": 1,
-      "Latest-season dip": 1
+      "Evidence too limited to judge": 9,
+      "Repeatedly below national, input uptake not low": 2,
+      "Repeatedly below national, low input uptake": 1,
+      "Below national in the latest season only": 1
     },
     "cooking_banana_B": {
-      "Insufficient evidence - field verification required": 14,
+      "Evidence too limited to judge": 14,
       "Not below national": 14,
-      "Persistent shortfall, low input uptake": 2
+      "Repeatedly below national, low input uptake": 2
     },
     "sweet_potato_B": {
       "Not below national": 19,
-      "Persistent shortfall, inputs at or above national": 4,
-      "Persistent shortfall, low input uptake": 3,
-      "Latest-season dip": 2,
-      "Insufficient evidence - field verification required": 2
+      "Repeatedly below national, input uptake not low": 6,
+      "Repeatedly below national, low input uptake": 3,
+      "Evidence too limited to judge": 2
     }
   }
 }

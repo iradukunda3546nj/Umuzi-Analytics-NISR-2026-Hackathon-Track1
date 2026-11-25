@@ -10,7 +10,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
-STAGING_DIR = DATA_DIR / "staging"
 SNAPSHOT_DIR = DATA_DIR / "snapshots"
 QUARANTINE_DIR = DATA_DIR / "quarantine"
 REGISTRY_PATH = DATA_DIR / "release_registry.json"
@@ -41,12 +40,15 @@ CROP_ALIASES: dict[str, str] = {
     "maize": "maize", "sorghum": "sorghum", "paddy rice": "paddy_rice", "rice": "paddy_rice",
     "wheat": "wheat", "cassava": "cassava", "sweet potato": "sweet_potato",
     "sweet potatoes": "sweet_potato", "irish potato": "irish_potato",
-    "irish potatoes": "irish_potato", "yams & taro": "yams_taro",
+    "irish potatoes": "irish_potato", "yams & taro": "yams_taro", "yams &taro": "yams_taro",
+    "taro & yams": "yams_taro", "taro &yams": "yams_taro", "taro&yams": "yams_taro",
+    "yarms & taro": "yams_taro",
     "cooking banana": "cooking_banana", "dessert banana": "dessert_banana",
     "banana for beer": "beer_banana", "bean": "bean", "beans": "bean",
     "bush bean": "bush_bean", "climbing bean": "climbing_bean", "pea": "pea", "peas": "pea",
-    "groundnuts": "groundnut", "groundnut": "groundnut", "soybean": "soybean",
-    "soybeans": "soybean", "vegetables": "vegetables", "fruits": "fruits",
+    "groundnuts": "groundnut", "groundnut": "groundnut", "ground nuts": "groundnut",
+    "soybean": "soybean", "soybeans": "soybean", "soya beans": "soybean",
+    "vegetables": "vegetables", "fruits": "fruits",
 }
 CROP_LABELS: dict[str, str] = {
     "maize": "Maize", "sorghum": "Sorghum", "paddy_rice": "Paddy rice", "wheat": "Wheat",
@@ -69,4 +71,11 @@ INPUT_LABELS: dict[str, str] = {
 # exercised by the sensitivity analysis in scripts/run_analysis.py.
 MIN_HARVESTED_HA = 500.0        # below this, a district-crop yield is flagged "thin coverage"
 GAP_THRESHOLD = 0.90            # yield ratio below 0.90 of national = "below national"
-MIN_MATCHED_SEASONS = 2         # seasons of the same type required for a persistence call
+# Evidence rules 2.0: "repeatedly below" = below national in at least 2 of the last
+# 3 releases of the same season type, with at least 2 of them reliable. Chosen by
+# the backtest in scripts/backtest.py (reports/backtest_results.json): rule 1.0
+# ("below in every release") caught 40% of next-season shortfalls on 2024-2026,
+# this window catches 81%, and it stays within the recent, comparable years.
+WINDOW_RELEASES = 3
+MIN_BELOW_IN_WINDOW = 2
+MIN_RELIABLE_IN_WINDOW = 2

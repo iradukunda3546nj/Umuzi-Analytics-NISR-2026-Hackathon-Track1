@@ -18,7 +18,7 @@ Deadline: **30 October 2026, 11:59 PM** ([C] p.3; no timezone stated).
 | Item | Status | Action |
 |---|---|---|
 | README | Done | Add the deployed URL after deployment |
-| Scripts that work on any machine | Done locally (38 tests pass) | Optional: repeat install on a second machine |
+| Scripts that work on any machine | Done locally (57 tests pass) | Optional: repeat install on a second machine |
 | Video (.webm/.gif, at most 3 min, not a phone) | **TEAM** | Record from `demo/demo_script.md`; save as `demo/demo.webm` |
 | Data and link | Done | - |
 | Student cards for both members | **TEAM / FLAG** | Keep in `submission_private/` (git-ignored). Ask organisers before publishing ID documents publicly |

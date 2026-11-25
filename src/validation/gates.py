@@ -16,8 +16,9 @@ from src.config import DISTRICTS
 
 REQUIRED_COLUMNS = ["release_id", "season_year", "season", "district", "crop", "metric",
                     "value", "value_status", "source_table"]
-REQUIRED_METRICS = ["yield_kg_ha", "harvested_ha", "cultivated_ha", "production_t",
-                    "improved_seed_farmers_pct", "inorganic_fert_farmers_pct"]
+CROP_METRICS = ["yield_kg_ha", "harvested_ha", "cultivated_ha", "production_t"]
+INPUT_METRICS = ["improved_seed_farmers_pct", "inorganic_fert_farmers_pct"]
+REQUIRED_METRICS = CROP_METRICS + INPUT_METRICS
 REQUIRED_CROPS = ["maize", "bean", "irish_potato", "paddy_rice", "cassava"]
 VALID_STATUS = {"observed", "reported_zero", "blank", "invalid_negative", "invalid_range"}
 
@@ -35,8 +36,11 @@ class GateReport:
         return {"passed": self.passed, "errors": self.errors, "warnings": self.warnings}
 
 
-def validate_release(df: pd.DataFrame) -> GateReport:
+def validate_release(df: pd.DataFrame, inputs_expected: bool = True) -> GateReport:
+    """`inputs_expected=False` only for a release whose entry in data/sources.json
+    documents that input use is not published per farmer (2018)."""
     rep = GateReport()
+    required = REQUIRED_METRICS if inputs_expected else CROP_METRICS
     missing_cols = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing_cols:
         rep.errors.append(f"missing columns: {missing_cols}")
@@ -60,7 +64,7 @@ def validate_release(df: pd.DataFrame) -> GateReport:
         rep.errors.append("national reference row missing")
 
     metrics = set(df["metric"].unique())
-    for m in REQUIRED_METRICS:
+    for m in required:
         if m not in metrics:
             rep.errors.append(f"required metric missing: {m}")
     crops = set(df["crop"].unique())

@@ -10,9 +10,9 @@ def release_status(records: pd.DataFrame, manifest: dict) -> pd.DataFrame:
     rows = []
     meta = {r["release_id"]: r for r in manifest["releases"]}
     for rel, g in records.groupby("release_id"):
-        rep = validate_release(g)
-        crops = g[(g["crop"] != "all") & (g["metric"] == "yield_kg_ha") & (g["district"] != "National")]
         m = meta.get(rel, {})
+        rep = validate_release(g, inputs_expected=m.get("inputs_comparable", True))
+        crops = g[(g["crop"] != "all") & (g["metric"] == "yield_kg_ha") & (g["district"] != "National")]
         rows.append(dict(
             release=rel, season_year=int(g["season_year"].iloc[0]), season=g["season"].iloc[0],
             yield_cells_observed=int((crops["value_status"] == "observed").sum()),
@@ -20,7 +20,8 @@ def release_status(records: pd.DataFrame, manifest: dict) -> pd.DataFrame:
             gate="passed" if rep.passed else "failed", warnings=" | ".join(rep.warnings),
             sha256=m.get("sha256", "")[:12], adapter=m.get("adapter_version", ""),
             imported_utc=m.get("retrieved_or_imported_utc", ""), published=m.get("publication_date", ""),
-            source_url=m.get("source_url", "")))
+            source_url=m.get("source_url", "") or m.get("landing_page", ""),
+            notes=m.get("notes", "")))
     return pd.DataFrame(rows).sort_values(["season", "season_year"])
 
 

@@ -10,24 +10,25 @@ Which district-crop combinations should receive field diagnosis first, and which
 
 | ID | Requirement | Where |
 |---|---|---|
-| F1 | Global scope (season type, crop, focus district) propagates to every view, table and export | Sidebar; `tests/test_app.py::test_filters_propagate_to_header_brief_and_exports` |
-| F2 | Classify every district into one evidence category for the chosen crop and season | Evidence Map, table |
-| F3 | Show persistence across all matched releases | Persistence |
-| F4 | Show district input uptake against national with category | Input Context |
-| F5 | Cross-crop overview per district | Triage Matrix |
-| F6 | Compare two districts on the same basis, warning when coverage is thin or a value is not reported | Compare Districts |
-| F7 | Export a brief (Markdown) and evidence row (CSV); export the full table (CSV) | Evidence Brief, Evidence Map |
-| F8 | National context against PSTA 5 targets | Overview |
-| F9 | Data status: releases, checksums, gates, warnings, missing releases, snapshot history | Data and Methods |
-| F10 | Adjustable thresholds with a visible non-default label | Sidebar expander |
+| F1 | Type to select crop and district, then season; the selection drives the map, finding, charts, exports and assistant | Top of page; `tests/test_app.py` |
+| F2 | Rwanda map: every district's category for the chosen crop and season, selected district outlined, legend with meanings and counts | Overview |
+| F3 | One short finding beside the map with its figures, the last 3 surveys and the survey releases used | Overview finding card |
+| F4 | District input uptake against national, with category | Input uptake tab |
+| F5 | Survey-by-survey pattern since 2018, all districts and the selected district | Detail tabs |
+| F6 | Practical questions answered from the same data and rules as the map, including comparisons of districts | Umuzi Assistant; `tests/test_assistant.py` |
+| F7 | Export a brief (Markdown) and figures (CSV); export the full table (CSV) | Overview, All districts table |
+| F8 | National position against the PSTA 5 target | Target arrow (overview) |
+| F9 | Data status: usable years, gates and warnings per survey, missing surveys, duplicate checks, backtest | Data and methods tab |
+| F10 | Adjustable thresholds with a visible non-default label | Data and methods tab |
 | F11 | New validated releases appear without UI code changes | Refresh pipeline |
+| F12 | Cross-crop overview per district | Report figure `reports/figures/triage_matrix_season_*.html` (not an app view) |
 
 ## Non-functional requirements
 
 - No login; publicly readable once deployed.
-- Loads within the Streamlit Community Cloud free tier (about 2.7 GB memory): snapshot is 12,400 rows; boundaries 289 KB.
+- Loads within the Streamlit Community Cloud free tier (about 2.7 GB memory): snapshot is 40,052 rows (6.7 MB); boundaries 289 KB.
 - No emojis, no decorative imagery; light theme with a validated chart palette.
 - Every number traceable to a release, table and snapshot.
 
 ## Out of scope
-Forecasting, intervention effect estimates, input allocation, sector-level analysis, user accounts, uploads from the browser.
+Forecasting (tested and not adopted, see docs/methodology.md section 7), intervention effect estimates, input allocation, sector-level analysis, user accounts, uploads from the browser.

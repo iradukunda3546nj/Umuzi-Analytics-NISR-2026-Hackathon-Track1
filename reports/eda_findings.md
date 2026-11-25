@@ -1,6 +1,25 @@
 # EDA Findings and Visual Evidence Report
 
-Snapshot `snap-20261029T103445Z-e435e56c` (releases SAS-2024A, 2024B, 2025A, 2026A, 2026B). All numbers are reproduced by `python -m scripts.run_analysis` (output `reports/analysis_results.json`, log `reports/analysis_run_log.txt`). Interactive figures are in `reports/figures/` and in the app, built by the same functions in `src/viz/charts.py`.
+## Part 0. Full history, 2018-2026 (added after the historical backfill)
+
+Snapshot `snap-20261125T044618Z-3e5a0b09`, 17 releases (2018 A to 2026 B; 2025 B not published). Reproduced by `python -m scripts.history_eda` (`reports/history_eda.json`) and `python -m scripts.backtest` (`reports/backtest_results.json`).
+
+| Question | Finding |
+|---|---|
+| Which years have district yields? | 2018-2026 only. 2014-2016 publish yields by land-use stratum; the 2017 table titled "by district" has province columns. |
+| Units and consistency | Every yield table states kg/ha. Production = yield x area within 2% in 93% (2018 B) to 100% of cells; current releases 100%. |
+| Duplicates and revisions | 36 previous-year national values re-printed in the 2020-2022 workbooks match the original release exactly. The 2024 annual workbook equals the 2024 A and B files cell for cell. |
+| Definition changes | 2018: districts as columns; input tables per plot or without a stated basis (not used); Season B harvested-area sheet untitled (named in `data/sources.json`). 2019: one banana column (no cooking banana). 2021 A: no all-bean yield; two different "Bush bean" production columns (dropped). |
+| Inputs crop-specific? | No. District seed and fertilizer uptake is for all crops together in every year; crop-specific seed use is national only. |
+| Level shifts | National inorganic-fertilizer uptake 39% (2022 A) to 60% (2023 A); bean national yield -26% from 2019 A to 2020 A. The files do not explain these, so districts are always compared with the national value of the same release. |
+| Comparability over time | Consecutive Season A rank agreement 0.29 (2018-2019), 0.39 (2019-2020), then 0.64 to 0.92. |
+| Modelling decision | A logistic model did not flag next-season shortfalls better than the rules on 2024-2026 (balanced accuracy 0.867 vs 0.868), so the rules were kept, with a 3-release window (`reports/analytical_methods.md`). |
+
+Under rules 2.0, maize Season A has 14 districts repeatedly below national: 3 with both inputs below national (Gicumbi, Nyarugenge, Ruhango) and 11 without. Parts 1-4 below are the original, pre-specified analysis of the five 2024-2026 releases under rules 1.0 and are kept as the record of that analysis.
+
+---
+
+Snapshot `snap-20261029T103445Z-e435e56c` (releases SAS-2024A, 2024B, 2025A, 2026A, 2026B). The pre-specified tests (H1-H3) are reproduced by `python -m scripts.run_analysis` (output `reports/analysis_results.json`); category counts in this part are under rules 1.0. Interactive figures are in `reports/figures/` and in the app, built by the same functions in `src/viz/charts.py`.
 
 Pre-specified tests are labelled **[H1] [H2] [H3]**; anything else is **[exploratory]**.
 
@@ -19,7 +38,7 @@ Pre-specified tests are labelled **[H1] [H2] [H3]**; anything else is **[explora
 | Publication inconsistency | 2026A Table 5, Fruits: estimate 8,183 ha outside its own 95% CI (9,050 to 17,975) |
 | Missing release | 2025 Season B not found on the NISR site at retrieval |
 
-Two pipeline defects were found and fixed during this diagnostic (documented in `docs/EXECUTION_LOG.md`). The national fertilizer row labelled "Total" was first dropped, which silently classified every district as "inputs at or above national". The fix added a gate so a missing national reference now blocks publication.
+Two pipeline defects were found and fixed during this diagnostic (documented in the git history). The national fertilizer row labelled "Total" was first dropped, which silently classified every district as "inputs at or above national". The fix added a gate so a missing national reference now blocks publication.
 
 ## Part 2. Findings (story arc)
 

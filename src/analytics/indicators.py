@@ -10,34 +10,33 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from src.config import (DISTRICT_PROVINCE, DISTRICTS, GAP_THRESHOLD, MIN_HARVESTED_HA,
-                        MIN_MATCHED_SEASONS)
+from src.config import (DISTRICT_PROVINCE, DISTRICTS, GAP_THRESHOLD, MIN_BELOW_IN_WINDOW,
+                        MIN_HARVESTED_HA, MIN_RELIABLE_IN_WINDOW, WINDOW_RELEASES)
 
-CATEGORY_INSUFFICIENT = "Insufficient evidence - field verification required"
-CATEGORY_PERSISTENT_LOW_INPUT = "Persistent shortfall, low input uptake"
-CATEGORY_PERSISTENT_INPUTS_OK = "Persistent shortfall, inputs at or above national"
-CATEGORY_DIP = "Latest-season dip"
+CATEGORY_REPEATED_LOW_INPUT = "Repeatedly below national, low input uptake"
+CATEGORY_REPEATED_INPUTS_OK = "Repeatedly below national, input uptake not low"
+CATEGORY_DIP = "Below national in the latest season only"
+CATEGORY_INSUFFICIENT = "Evidence too limited to judge"
 CATEGORY_NOT_BELOW = "Not below national"
 
-CATEGORY_ORDER = [CATEGORY_PERSISTENT_LOW_INPUT, CATEGORY_PERSISTENT_INPUTS_OK, CATEGORY_DIP,
+CATEGORY_ORDER = [CATEGORY_REPEATED_LOW_INPUT, CATEGORY_REPEATED_INPUTS_OK, CATEGORY_DIP,
                   CATEGORY_INSUFFICIENT, CATEGORY_NOT_BELOW]
+REPEATED = (CATEGORY_REPEATED_LOW_INPUT, CATEGORY_REPEATED_INPUTS_OK)
 
 CATEGORY_ACTION = {
-    CATEGORY_PERSISTENT_LOW_INPUT: (
-        "Investigate input access first: verify improved-seed and fertilizer availability, "
-        "affordability and delivery timing for this crop with the district agronomist and "
-        "Farm Service Centre before the next season."),
-    CATEGORY_PERSISTENT_INPUTS_OK: (
+    CATEGORY_REPEATED_LOW_INPUT: (
+        "Check input access first: with the district agronomist and the Farm Service Centre, "
+        "verify whether improved seed and fertilizer for this crop were available, affordable "
+        "and delivered before planting."),
+    CATEGORY_REPEATED_INPUTS_OK: (
         "Input uptake is not low here, so input access alone is unlikely to explain the gap. "
-        "Commission a field diagnosis of soil fertility and acidity, erosion, variety "
-        "suitability and water constraints for this crop."),
+        "Check soil fertility and acidity, erosion, the varieties planted and water for this crop."),
     CATEGORY_DIP: (
-        "Below national in the latest season only. Check for a season-specific shock "
-        "(rainfall, pest or disease outbreak, late sowing) before reallocating resources; "
-        "re-check after the next release."),
+        "Below national in the latest season only. Check for a one-season shock (rainfall, "
+        "pests or disease, late planting) before moving resources, and re-check after the next release."),
     CATEGORY_INSUFFICIENT: (
-        "Published estimates are too thin or too few to support a conclusion. "
-        "Field verification is required before any planning decision."),
+        "The published estimates are too thin or too few to support a conclusion. "
+        "Verify in the field before any planning decision."),
     CATEGORY_NOT_BELOW: "No shortfall against the national yield in the latest season.",
 }
 
@@ -46,11 +45,9 @@ CATEGORY_ACTION = {
 class Params:
     gap_threshold: float = GAP_THRESHOLD
     min_harvested_ha: float = MIN_HARVESTED_HA
-    min_matched: int = MIN_MATCHED_SEASONS
-
-
-def release_label(season_year: int, season: str) -> str:
-    return f"{season_year} Season {season}"
+    window: int = WINDOW_RELEASES
+    min_below: int = MIN_BELOW_IN_WINDOW
+    min_reliable: int = MIN_RELIABLE_IN_WINDOW
 
 
 def crop_panel(records: pd.DataFrame) -> pd.DataFrame:
@@ -89,9 +86,13 @@ def input_panel(records: pd.DataFrame) -> pd.DataFrame:
 
 def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params = Params(),
                    releases: list[str] | None = None) -> pd.DataFrame:
-    """One row per district: latest-season position, persistence and evidence category.
+    """One row per district: latest position, the recent pattern and the evidence category.
 
     Only releases of the selected season type are compared (A with A, B with B).
+    The pattern uses the last `params.window` releases of that type, ending at the
+    latest one; a release with no yield or under `min_harvested_ha` counts as a gap,
+    never as a value. `releases` restricts the history (used to evaluate an earlier
+    point in time).
     """
     panel = crop_panel(records)
     panel = panel[(panel["crop"] == crop) & (panel["season"] == season)]
@@ -102,8 +103,9 @@ def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params
     if not rel_order:
         return pd.DataFrame()
     latest = rel_order[-1]
+    window = rel_order[-params.window:]
     panel = panel.copy()
-    panel["adequate"] = panel["yield_kg_ha"].notna() & (panel["harvested_ha"] >= params.min_harvested_ha)
+    panel["reliable"] = panel["yield_kg_ha"].notna() & (panel["harvested_ha"] >= params.min_harvested_ha)
     panel["below"] = panel["yield_ratio"] < params.gap_threshold
 
     inputs = input_panel(records)
@@ -112,12 +114,13 @@ def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params
     rows = []
     for d in DISTRICTS:
         sub = panel[panel["district"] == d].set_index("release_id").reindex(rel_order)
-        ok = sub[sub["adequate"].fillna(False).astype(bool)]
+        win = sub.loc[window]
+        rel = win[win["reliable"].fillna(False).astype(bool)]
         lt = sub.loc[latest]
-        n_ok = len(ok)
-        n_below = int(ok["below"].sum())
-        latest_ok = bool(lt["adequate"]) if pd.notna(lt["adequate"]) else False
-        persistent = latest_ok and n_ok >= params.min_matched and n_below == n_ok
+        n_rel = len(rel)
+        n_below = int(rel["below"].sum())
+        latest_ok = bool(lt["reliable"]) if pd.notna(lt["reliable"]) else False
+        repeated = latest_ok and n_rel >= params.min_reliable and n_below >= params.min_below
         inp = inputs[inputs["district"] == d]
         seed = inp["improved_seed_farmers_pct"].iloc[0] if len(inp) else np.nan
         fert = inp["inorganic_fert_farmers_pct"].iloc[0] if len(inp) else np.nan
@@ -126,33 +129,42 @@ def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params
         inputs_known = all(pd.notna(v) for v in (seed, fert, nseed, nfert))
         inputs_low = inputs_known and seed < nseed and fert < nfert
 
-        if not latest_ok or (persistent and not inputs_known):
+        limited = ""
+        if pd.isna(lt["yield_kg_ha"]):
+            limited = f"no {season} {latest[4:8]} yield was published for this district"
+        elif not latest_ok:
+            limited = (f"only {lt['harvested_ha']:,.0f} ha were harvested in {latest[4:]}, "
+                       f"under the {params.min_harvested_ha:,.0f} ha reliability minimum")
+        if limited:
             category = CATEGORY_INSUFFICIENT
         elif not bool(lt["below"]):
             category = CATEGORY_NOT_BELOW
-        elif n_ok < params.min_matched:
+        elif n_rel < params.min_reliable:
             category = CATEGORY_INSUFFICIENT
-        elif persistent:
-            category = CATEGORY_PERSISTENT_LOW_INPUT if inputs_low else CATEGORY_PERSISTENT_INPUTS_OK
+            limited = f"only {n_rel} of the last {len(window)} releases are reliable"
+        elif repeated and not inputs_known:
+            category = CATEGORY_INSUFFICIENT
+            limited = "input uptake is not published per farmer for this release"
+        elif repeated:
+            category = CATEGORY_REPEATED_LOW_INPUT if inputs_low else CATEGORY_REPEATED_INPUTS_OK
         else:
             category = CATEGORY_DIP
 
         hist = {f"ratio_{r}": sub.loc[r, "yield_ratio"] for r in rel_order}
         rows.append(dict(
             district=d, province=DISTRICT_PROVINCE[d], crop=crop, season=season,
-            latest_release=latest,
+            latest_release=latest, window_releases=",".join(window),
             latest_yield_kg_ha=lt["yield_kg_ha"], national_yield_kg_ha=lt["national_yield_kg_ha"],
             latest_ratio=lt["yield_ratio"], latest_harvested_ha=lt["harvested_ha"],
-            latest_yield_status=lt["yield_status"],
-            matched_seasons_adequate=n_ok, seasons_below=n_below, persistent_shortfall=persistent,
+            latest_yield_status=lt["yield_status"], latest_reliable=latest_ok,
+            reliable_in_window=n_rel, below_in_window=n_below, repeated_below=repeated,
+            window_mean_ratio=rel["yield_ratio"].mean() if n_rel else np.nan,
             improved_seed_pct=seed, national_improved_seed_pct=nseed,
             inorganic_fert_pct=fert, national_inorganic_fert_pct=nfert,
-            category=category, next_step=CATEGORY_ACTION[category], **hist,
+            inputs_known=inputs_known, inputs_low=inputs_low,
+            category=category, limited_reason=limited, next_step=CATEGORY_ACTION[category], **hist,
         ))
     out = pd.DataFrame(rows)
-    out["mean_ratio"] = out[[c for c in out.columns if c.startswith("ratio_")]].mean(axis=1)
-    out["range_ratio"] = (out[[c for c in out.columns if c.startswith("ratio_")]].max(axis=1)
-                          - out[[c for c in out.columns if c.startswith("ratio_")]].min(axis=1))
     out["category_rank"] = out["category"].map({c: i for i, c in enumerate(CATEGORY_ORDER)})
     return out.sort_values(["category_rank", "latest_ratio"]).reset_index(drop=True)
 
@@ -193,34 +205,3 @@ def national_vs_target(records: pd.DataFrame, targets: pd.DataFrame) -> pd.DataF
                          baseline_2023_t_ha=baseline, attainment=(prod / ha) / target
                          if pd.notna(target) else np.nan))
     return pd.DataFrame(rows)
-
-
-def input_association(records: pd.DataFrame, crop: str, release_id: str,
-                      params: Params = Params()) -> pd.DataFrame:
-    """Spearman association between district input uptake and yield ratio (one release).
-
-    Descriptive only: n <= 30 districts, inputs pooled over all crops.
-    """
-    from scipy.stats import spearmanr
-
-    panel = crop_panel(records)
-    p = panel[(panel["crop"] == crop) & (panel["release_id"] == release_id)
-              & (panel["harvested_ha"] >= params.min_harvested_ha)]
-    inp = input_panel(records)
-    d = p.merge(inp[inp["release_id"] == release_id], on=["release_id", "district"])
-    rows = []
-    for var in ["improved_seed_farmers_pct", "inorganic_fert_farmers_pct"]:
-        dd = d[["yield_ratio", var]].dropna()
-        if len(dd) < 12:
-            rows.append(dict(input=var, n=len(dd), rho=np.nan, p=np.nan))
-            continue
-        res = spearmanr(dd[var], dd["yield_ratio"])
-        rows.append(dict(input=var, n=len(dd), rho=float(res.statistic), p=float(res.pvalue)))
-    return pd.DataFrame(rows)
-
-
-def national_series(records: pd.DataFrame, crop: str) -> pd.DataFrame:
-    p = records[(records["district"] == "National") & (records["crop"] == crop)]
-    p = p.pivot_table(index=["release_id", "season_year", "season"], columns="metric",
-                      values="value", aggfunc="first").reset_index()
-    return p.sort_values(["season", "season_year"])

@@ -50,7 +50,7 @@ def test_new_valid_release_updates_outputs_without_code_change(store, tmp_path):
     ev_after = evidence_table(rec_after, "maize", "A")
     assert ev_after["latest_release"].iloc[0] == "SAS-2026A"
     assert "ratio_SAS-2026A" in ev_after.columns
-    assert ev_after.set_index("district").loc["Ruhango", "matched_seasons_adequate"] == 3
+    assert ev_after.set_index("district").loc["Ruhango", "reliable_in_window"] == 3
     assert manifest["parent_snapshot"] is not None
 
 
@@ -91,7 +91,7 @@ def test_late_correction_preserves_lineage_and_rollback(store, tmp_path):
     assert versions[0]["current"] is False and versions[1]["current"] is True
     assert versions[1]["supersedes"].startswith(versions[0]["sha256"][:12])
     _, m = store.load()
-    assert m["change"]["kind"] == "correction"
+    assert m["change"]["kinds"]["SAS-2024A"] == "correction"
     # Both raw files are kept immutably.
     assert len(list((store.data_dir / "raw" / "nisr_sas").iterdir())) == 3
     store.rollback(first_active)

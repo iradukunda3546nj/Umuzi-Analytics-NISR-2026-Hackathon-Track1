@@ -1,0 +1,1134 @@
+{
+  "snapshot_id": "snap-20261125T044618Z-3e5a0b09",
+  "releases": [
+    "SAS-2018A",
+    "SAS-2019A",
+    "SAS-2020A",
+    "SAS-2021A",
+    "SAS-2022A",
+    "SAS-2023A",
+    "SAS-2024A",
+    "SAS-2025A",
+    "SAS-2026A",
+    "SAS-2018B",
+    "SAS-2019B",
+    "SAS-2020B",
+    "SAS-2021B",
+    "SAS-2022B",
+    "SAS-2023B",
+    "SAS-2024B",
+    "SAS-2026B"
+  ],
+  "missing_releases": [
+    "SAS-2025B (not published on the NISR site when downloaded)"
+  ],
+  "source_audit": [
+    {
+      "file": "2015_Tables _ABC.xls",
+      "year": 2015,
+      "kind": "xls",
+      "yield_level": "stratum or province only"
+    },
+    {
+      "file": "2016_Seasonal_A_Report.pdf",
+      "year": 2016,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "2018 Annual Tables_Final (1).xlsx",
+      "year": 2018,
+      "kind": "xlsx",
+      "yield_level": "district"
+    },
+    {
+      "file": "Final_SAS 2014_Report_15_June_2015.pdf",
+      "year": 2014,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS 2019 _Annual report _Tables.xlsx",
+      "year": 2019,
+      "kind": "xlsx",
+      "yield_level": "district"
+    },
+    {
+      "file": "SAS 2021_Season A report_Final_compressed.pdf",
+      "year": 2021,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS 2021_Tables.xlsx",
+      "year": 2021,
+      "kind": "xlsx",
+      "yield_level": "district"
+    },
+    {
+      "file": "SAS 2022_Tables_0.xlsx",
+      "year": 2022,
+      "kind": "xlsx",
+      "yield_level": "district"
+    },
+    {
+      "file": "SAS 2023_Annual Tables (3).xlsx",
+      "year": 2023,
+      "kind": "xlsx",
+      "yield_level": "district"
+    },
+    {
+      "file": "SAS-2016 Final Report.xlsx",
+      "year": 2016,
+      "kind": "xlsx",
+      "yield_level": "stratum or province only"
+    },
+    {
+      "file": "SAS_2015_Season_A_publication.pdf",
+      "year": 2015,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2015_Season_B publication.pdf",
+      "year": 2015,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2020 Season A  report (1)_compressed.pdf",
+      "year": 2020,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2021 B_Report_Final.pdf",
+      "year": 2021,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2022 A_Final Report (1).pdf",
+      "year": 2022,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2022 Season B Final Report.pdf",
+      "year": 2022,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2023 Season A Final Report.pdf",
+      "year": 2023,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_2023 Season B Final Report_compressed.pdf",
+      "year": 2023,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "SAS_Season B 2020 final report_compressed.pdf",
+      "year": 2020,
+      "kind": "pdf",
+      "yield_level": "report (narrative and tables; not parsed - its workbook is used where one exists)"
+    },
+    {
+      "file": "USAS 2017 Tables.xls",
+      "year": 2017,
+      "kind": "xls",
+      "yield_level": "stratum or province only"
+    },
+    {
+      "file": "USAS 2020 _Final_Tables.xlsx",
+      "year": 2020,
+      "kind": "xlsx",
+      "yield_level": "district"
+    }
+  ],
+  "input_basis": {
+    "SAS-2018A": "per plot or unstated basis: not comparable, not used",
+    "SAS-2019A": "per farmer, all crops pooled",
+    "SAS-2020A": "per farmer, all crops pooled",
+    "SAS-2021A": "per farmer, all crops pooled",
+    "SAS-2022A": "per farmer, all crops pooled",
+    "SAS-2023A": "per farmer, all crops pooled",
+    "SAS-2024A": "per farmer, all crops pooled",
+    "SAS-2025A": "per farmer, all crops pooled",
+    "SAS-2026A": "per farmer, all crops pooled",
+    "SAS-2018B": "per plot or unstated basis: not comparable, not used",
+    "SAS-2019B": "per farmer, all crops pooled",
+    "SAS-2020B": "per farmer, all crops pooled",
+    "SAS-2021B": "per farmer, all crops pooled",
+    "SAS-2022B": "per farmer, all crops pooled",
+    "SAS-2023B": "per farmer, all crops pooled",
+    "SAS-2024B": "per farmer, all crops pooled",
+    "SAS-2026B": "per farmer, all crops pooled"
+  },
+  "release_notes": {
+    "SAS-2018A": "Input tables report shares of plots (Tables 14.1-14.2) or do not state their basis (Table 13.1), with no per-farmer column, so they are not comparable with the 2019-2026 per-farmer shares.",
+    "SAS-2019A": "Banana is published as one total (no cooking banana).",
+    "SAS-2021A": "The yield table has bush and climbing bean but no all-bean column, so bean yield is not reported for 2021A.",
+    "SAS-2018B": "Appendix 5 is titled 'Harvested area by crop type by district' with no season; it sits between Appendix 4 (Season A) and Appendix 6, and its national column is '2018 B Total'. The production = yield x area gate confirms it. Input tables not comparable (see 2018A).",
+    "SAS-2019B": "Banana is published as one total (no cooking banana)."
+  },
+  "coverage_reliable_districts": {
+    "SAS-2018A": {
+      "bean": 30,
+      "cassava": 15,
+      "cooking_banana": 10,
+      "irish_potato": 19,
+      "maize": 29,
+      "paddy_rice": 11,
+      "soybean": 16,
+      "wheat": 3
+    },
+    "SAS-2019A": {
+      "bean": 30,
+      "cassava": 21,
+      "cooking_banana": 0,
+      "irish_potato": 20,
+      "maize": 30,
+      "paddy_rice": 10,
+      "soybean": 15,
+      "wheat": 3
+    },
+    "SAS-2020A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 24,
+      "irish_potato": 19,
+      "maize": 30,
+      "paddy_rice": 10,
+      "soybean": 17,
+      "wheat": 3
+    },
+    "SAS-2021A": {
+      "bean": 0,
+      "cassava": 22,
+      "cooking_banana": 24,
+      "irish_potato": 21,
+      "maize": 30,
+      "paddy_rice": 10,
+      "soybean": 18,
+      "wheat": 4
+    },
+    "SAS-2022A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 24,
+      "irish_potato": 21,
+      "maize": 30,
+      "paddy_rice": 11,
+      "soybean": 17,
+      "wheat": 3
+    },
+    "SAS-2023A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 23,
+      "irish_potato": 21,
+      "maize": 30,
+      "paddy_rice": 10,
+      "soybean": 21,
+      "wheat": 2
+    },
+    "SAS-2024A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 24,
+      "irish_potato": 20,
+      "maize": 30,
+      "paddy_rice": 11,
+      "soybean": 22,
+      "wheat": 2
+    },
+    "SAS-2025A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 23,
+      "irish_potato": 19,
+      "maize": 30,
+      "paddy_rice": 11,
+      "soybean": 20,
+      "wheat": 2
+    },
+    "SAS-2026A": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 23,
+      "irish_potato": 19,
+      "maize": 30,
+      "paddy_rice": 11,
+      "soybean": 20,
+      "wheat": 2
+    },
+    "SAS-2018B": {
+      "bean": 30,
+      "cassava": 23,
+      "cooking_banana": 8,
+      "irish_potato": 22,
+      "maize": 27,
+      "paddy_rice": 11,
+      "soybean": 17,
+      "wheat": 6
+    },
+    "SAS-2019B": {
+      "bean": 30,
+      "cassava": 20,
+      "cooking_banana": 0,
+      "irish_potato": 18,
+      "maize": 24,
+      "paddy_rice": 12,
+      "soybean": 15,
+      "wheat": 4
+    },
+    "SAS-2020B": {
+      "bean": 30,
+      "cassava": 21,
+      "cooking_banana": 8,
+      "irish_potato": 18,
+      "maize": 24,
+      "paddy_rice": 11,
+      "soybean": 15,
+      "wheat": 5
+    },
+    "SAS-2021B": {
+      "bean": 30,
+      "cassava": 22,
+      "cooking_banana": 9,
+      "irish_potato": 21,
+      "maize": 28,
+      "paddy_rice": 11,
+      "soybean": 19,
+      "wheat": 7
+    },
+    "SAS-2022B": {
+      "bean": 30,
+      "cassava": 22,
+      "cooking_banana": 9,
+      "irish_potato": 21,
+      "maize": 27,
+      "paddy_rice": 11,
+      "soybean": 19,
+      "wheat": 5
+    },
+    "SAS-2023B": {
+      "bean": 30,
+      "cassava": 22,
+      "cooking_banana": 13,
+      "irish_potato": 18,
+      "maize": 28,
+      "paddy_rice": 11,
+      "soybean": 24,
+      "wheat": 5
+    },
+    "SAS-2024B": {
+      "bean": 30,
+      "cassava": 24,
+      "cooking_banana": 13,
+      "irish_potato": 17,
+      "maize": 28,
+      "paddy_rice": 11,
+      "soybean": 23,
+      "wheat": 6
+    },
+    "SAS-2026B": {
+      "bean": 30,
+      "cassava": 24,
+      "cooking_banana": 20,
+      "irish_potato": 17,
+      "maize": 27,
+      "paddy_rice": 12,
+      "soybean": 21,
+      "wheat": 6
+    }
+  },
+  "production_consistency": {
+    "SAS-2018A": {
+      "cells": 531,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2019A": {
+      "cells": 344,
+      "share_within_2pct": 0.956
+    },
+    "SAS-2020A": {
+      "cells": 509,
+      "share_within_2pct": 0.998
+    },
+    "SAS-2021A": {
+      "cells": 478,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2022A": {
+      "cells": 532,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2023A": {
+      "cells": 533,
+      "share_within_2pct": 0.97
+    },
+    "SAS-2024A": {
+      "cells": 527,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2025A": {
+      "cells": 531,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2026A": {
+      "cells": 534,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2018B": {
+      "cells": 531,
+      "share_within_2pct": 0.932
+    },
+    "SAS-2019B": {
+      "cells": 328,
+      "share_within_2pct": 0.963
+    },
+    "SAS-2020B": {
+      "cells": 531,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2021B": {
+      "cells": 548,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2022B": {
+      "cells": 545,
+      "share_within_2pct": 0.996
+    },
+    "SAS-2023B": {
+      "cells": 545,
+      "share_within_2pct": 0.989
+    },
+    "SAS-2024B": {
+      "cells": 547,
+      "share_within_2pct": 1.0
+    },
+    "SAS-2026B": {
+      "cells": 543,
+      "share_within_2pct": 1.0
+    }
+  },
+  "reprinted_national_check": [
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "maize",
+      "reprinted": 353998.6,
+      "as_published": 353998.6,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "paddy_rice",
+      "reprinted": 52224.8,
+      "as_published": 52224.8,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "wheat",
+      "reprinted": 4137.6,
+      "as_published": 4137.6,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "cassava",
+      "reprinted": 578544.6,
+      "as_published": 578544.6,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "irish_potato",
+      "reprinted": 427471.2,
+      "as_published": 427471.2,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "cooking_banana",
+      "reprinted": 502972.1,
+      "as_published": 502972.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2021_Tables.xlsx",
+      "release": "SAS-2020A",
+      "crop": "soybean",
+      "reprinted": 12284.1,
+      "as_published": 12284.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "maize",
+      "reprinted": 378640.7,
+      "as_published": 378640.7,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "paddy_rice",
+      "reprinted": 63950.5,
+      "as_published": 63950.5,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "wheat",
+      "reprinted": 4499.7,
+      "as_published": 4499.7,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "cassava",
+      "reprinted": 601291.1,
+      "as_published": 601291.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "irish_potato",
+      "reprinted": 463561.6,
+      "as_published": 463561.6,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "cooking_banana",
+      "reprinted": 529788.2,
+      "as_published": 529788.2,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021A",
+      "crop": "soybean",
+      "reprinted": 14237.2,
+      "as_published": 14237.2,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "maize",
+      "reprinted": 104041.1,
+      "as_published": 104041.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "paddy_rice",
+      "reprinted": 67808.1,
+      "as_published": 67808.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "wheat",
+      "reprinted": 9184.1,
+      "as_published": 9184.1,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "cassava",
+      "reprinted": 718583.9,
+      "as_published": 718583.9,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "irish_potato",
+      "reprinted": 393370.7,
+      "as_published": 393370.7,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "cooking_banana",
+      "reprinted": 439404.9,
+      "as_published": 439404.9,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "bean",
+      "reprinted": 229558.9,
+      "as_published": 229558.9,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "SAS 2022_Tables_0.xlsx",
+      "release": "SAS-2021B",
+      "crop": "soybean",
+      "reprinted": 12194.0,
+      "as_published": 12194.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "maize",
+      "reprinted": 331090.4,
+      "as_published": 331090.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "paddy_rice",
+      "reprinted": 59286.2,
+      "as_published": 59286.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "wheat",
+      "reprinted": 7081.7,
+      "as_published": 7082.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "cassava",
+      "reprinted": 523117.0,
+      "as_published": 523117.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "irish_potato",
+      "reprinted": 468930.8,
+      "as_published": 468931.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "bean",
+      "reprinted": 252569.1,
+      "as_published": 252569.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019A",
+      "crop": "soybean",
+      "reprinted": 13638.0,
+      "as_published": 13638.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "maize",
+      "reprinted": 90127.8,
+      "as_published": 90128.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "paddy_rice",
+      "reprinted": 72290.7,
+      "as_published": 72291.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "wheat",
+      "reprinted": 8604.6,
+      "as_published": 8605.0,
+      "diff_pct": -0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "cassava",
+      "reprinted": 658708.3,
+      "as_published": 658708.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "irish_potato",
+      "reprinted": 422266.1,
+      "as_published": 422266.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "bean",
+      "reprinted": 230744.5,
+      "as_published": 230744.0,
+      "diff_pct": 0.0
+    },
+    {
+      "workbook": "USAS 2020 _Final_Tables.xlsx",
+      "release": "SAS-2019B",
+      "crop": "soybean",
+      "reprinted": 10588.4,
+      "as_published": 10588.0,
+      "diff_pct": 0.0
+    }
+  ],
+  "annual_2024_vs_releases": {
+    "SAS-2024A": {
+      "cells_compared": 2237,
+      "identical": 2237
+    },
+    "SAS-2024B": {
+      "cells_compared": 2314,
+      "identical": 2314
+    }
+  },
+  "rank_agreement": {
+    "A": {
+      "pairs": {
+        "SAS-2018A|SAS-2019A": 0.29,
+        "SAS-2018A|SAS-2020A": 0.32,
+        "SAS-2018A|SAS-2021A": 0.42,
+        "SAS-2018A|SAS-2022A": 0.26,
+        "SAS-2018A|SAS-2023A": 0.35,
+        "SAS-2018A|SAS-2024A": 0.25,
+        "SAS-2018A|SAS-2025A": 0.24,
+        "SAS-2018A|SAS-2026A": 0.27,
+        "SAS-2019A|SAS-2020A": 0.39,
+        "SAS-2019A|SAS-2021A": 0.35,
+        "SAS-2019A|SAS-2022A": 0.2,
+        "SAS-2019A|SAS-2023A": 0.53,
+        "SAS-2019A|SAS-2024A": 0.54,
+        "SAS-2019A|SAS-2025A": 0.49,
+        "SAS-2019A|SAS-2026A": 0.45,
+        "SAS-2020A|SAS-2021A": 0.7,
+        "SAS-2020A|SAS-2022A": 0.51,
+        "SAS-2020A|SAS-2023A": 0.57,
+        "SAS-2020A|SAS-2024A": 0.47,
+        "SAS-2020A|SAS-2025A": 0.38,
+        "SAS-2020A|SAS-2026A": 0.33,
+        "SAS-2021A|SAS-2022A": 0.87,
+        "SAS-2021A|SAS-2023A": 0.68,
+        "SAS-2021A|SAS-2024A": 0.65,
+        "SAS-2021A|SAS-2025A": 0.58,
+        "SAS-2021A|SAS-2026A": 0.61,
+        "SAS-2022A|SAS-2023A": 0.64,
+        "SAS-2022A|SAS-2024A": 0.6,
+        "SAS-2022A|SAS-2025A": 0.56,
+        "SAS-2022A|SAS-2026A": 0.62,
+        "SAS-2023A|SAS-2024A": 0.67,
+        "SAS-2023A|SAS-2025A": 0.7,
+        "SAS-2023A|SAS-2026A": 0.68,
+        "SAS-2024A|SAS-2025A": 0.92,
+        "SAS-2024A|SAS-2026A": 0.88,
+        "SAS-2025A|SAS-2026A": 0.91
+      },
+      "consecutive": {
+        "SAS-2018A|SAS-2019A": 0.29,
+        "SAS-2019A|SAS-2020A": 0.39,
+        "SAS-2020A|SAS-2021A": 0.7,
+        "SAS-2021A|SAS-2022A": 0.87,
+        "SAS-2022A|SAS-2023A": 0.64,
+        "SAS-2023A|SAS-2024A": 0.67,
+        "SAS-2024A|SAS-2025A": 0.92,
+        "SAS-2025A|SAS-2026A": 0.91
+      }
+    },
+    "B": {
+      "pairs": {
+        "SAS-2018B|SAS-2019B": 0.52,
+        "SAS-2018B|SAS-2020B": 0.46,
+        "SAS-2018B|SAS-2021B": 0.41,
+        "SAS-2018B|SAS-2022B": 0.39,
+        "SAS-2018B|SAS-2023B": 0.49,
+        "SAS-2018B|SAS-2024B": 0.46,
+        "SAS-2018B|SAS-2026B": 0.38,
+        "SAS-2019B|SAS-2020B": 0.85,
+        "SAS-2019B|SAS-2021B": 0.77,
+        "SAS-2019B|SAS-2022B": 0.6,
+        "SAS-2019B|SAS-2023B": 0.63,
+        "SAS-2019B|SAS-2024B": 0.64,
+        "SAS-2019B|SAS-2026B": 0.55,
+        "SAS-2020B|SAS-2021B": 0.85,
+        "SAS-2020B|SAS-2022B": 0.61,
+        "SAS-2020B|SAS-2023B": 0.66,
+        "SAS-2020B|SAS-2024B": 0.61,
+        "SAS-2020B|SAS-2026B": 0.72,
+        "SAS-2021B|SAS-2022B": 0.75,
+        "SAS-2021B|SAS-2023B": 0.7,
+        "SAS-2021B|SAS-2024B": 0.59,
+        "SAS-2021B|SAS-2026B": 0.66,
+        "SAS-2022B|SAS-2023B": 0.85,
+        "SAS-2022B|SAS-2024B": 0.76,
+        "SAS-2022B|SAS-2026B": 0.64,
+        "SAS-2023B|SAS-2024B": 0.91,
+        "SAS-2023B|SAS-2026B": 0.8,
+        "SAS-2024B|SAS-2026B": 0.88
+      },
+      "consecutive": {
+        "SAS-2018B|SAS-2019B": 0.52,
+        "SAS-2019B|SAS-2020B": 0.85,
+        "SAS-2020B|SAS-2021B": 0.85,
+        "SAS-2021B|SAS-2022B": 0.75,
+        "SAS-2022B|SAS-2023B": 0.85,
+        "SAS-2023B|SAS-2024B": 0.91,
+        "SAS-2024B|SAS-2026B": 0.88
+      }
+    }
+  },
+  "national_yield_kg_ha": {
+    "SAS-2018A": {
+      "bean": 875.0,
+      "cassava": 13551.0,
+      "cooking_banana": 18970.0,
+      "irish_potato": 8646.0,
+      "maize": 1525.0,
+      "paddy_rice": 3420.0,
+      "soybean": 506.0,
+      "wheat": 1325.0
+    },
+    "SAS-2019A": {
+      "bean": 843.0,
+      "cassava": 14153.0,
+      "cooking_banana": null,
+      "irish_potato": 9430.0,
+      "maize": 1539.0,
+      "paddy_rice": 4041.0,
+      "soybean": 555.0,
+      "wheat": 1291.0
+    },
+    "SAS-2020A": {
+      "bean": 626.0,
+      "cassava": 14056.0,
+      "cooking_banana": 13794.0,
+      "irish_potato": 8298.0,
+      "maize": 1598.0,
+      "paddy_rice": 3600.0,
+      "soybean": 498.0,
+      "wheat": 988.0
+    },
+    "SAS-2021A": {
+      "bean": null,
+      "cassava": 14220.0,
+      "cooking_banana": 13614.0,
+      "irish_potato": 8881.0,
+      "maize": 1600.0,
+      "paddy_rice": 4160.0,
+      "soybean": 518.0,
+      "wheat": 1018.0
+    },
+    "SAS-2022A": {
+      "bean": 651.0,
+      "cassava": 14044.0,
+      "cooking_banana": 13733.0,
+      "irish_potato": 8612.0,
+      "maize": 1595.0,
+      "paddy_rice": 4246.0,
+      "soybean": 509.0,
+      "wheat": 1150.0
+    },
+    "SAS-2023A": {
+      "bean": 632.0,
+      "cassava": 13472.0,
+      "cooking_banana": 14171.0,
+      "irish_potato": 8174.0,
+      "maize": 1737.0,
+      "paddy_rice": 3963.0,
+      "soybean": 396.0,
+      "wheat": 1220.0
+    },
+    "SAS-2024A": {
+      "bean": 709.0,
+      "cassava": 13340.0,
+      "cooking_banana": 14567.0,
+      "irish_potato": 8541.0,
+      "maize": 2038.0,
+      "paddy_rice": 4071.0,
+      "soybean": 608.0,
+      "wheat": 1288.0
+    },
+    "SAS-2025A": {
+      "bean": 705.0,
+      "cassava": 13542.0,
+      "cooking_banana": 14327.0,
+      "irish_potato": 8736.0,
+      "maize": 1985.0,
+      "paddy_rice": 4080.0,
+      "soybean": 533.0,
+      "wheat": 1319.0
+    },
+    "SAS-2026A": {
+      "bean": 700.0,
+      "cassava": 13671.0,
+      "cooking_banana": 14770.0,
+      "irish_potato": 8906.0,
+      "maize": 1994.0,
+      "paddy_rice": 4131.0,
+      "soybean": 534.0,
+      "wheat": 1401.0
+    },
+    "SAS-2018B": {
+      "bean": 868.0,
+      "cassava": 11398.0,
+      "cooking_banana": 17891.0,
+      "irish_potato": 6531.0,
+      "maize": 1171.0,
+      "paddy_rice": 3532.0,
+      "soybean": 343.0,
+      "wheat": 973.0
+    },
+    "SAS-2019B": {
+      "bean": 818.0,
+      "cassava": 14747.0,
+      "cooking_banana": null,
+      "irish_potato": 8575.0,
+      "maize": 1232.0,
+      "paddy_rice": 3967.0,
+      "soybean": 492.0,
+      "wheat": 1111.0
+    },
+    "SAS-2020B": {
+      "bean": 740.0,
+      "cassava": 15073.0,
+      "cooking_banana": 18573.0,
+      "irish_potato": 8019.0,
+      "maize": 1298.0,
+      "paddy_rice": 4264.0,
+      "soybean": 477.0,
+      "wheat": 1068.0
+    },
+    "SAS-2021B": {
+      "bean": 761.0,
+      "cassava": 15021.0,
+      "cooking_banana": 18163.0,
+      "irish_potato": 7624.0,
+      "maize": 1291.0,
+      "paddy_rice": 4159.0,
+      "soybean": 477.0,
+      "wheat": 1050.0
+    },
+    "SAS-2022B": {
+      "bean": 783.0,
+      "cassava": 15204.0,
+      "cooking_banana": 18337.0,
+      "irish_potato": 6263.0,
+      "maize": 1349.0,
+      "paddy_rice": 4132.0,
+      "soybean": 525.0,
+      "wheat": 1162.0
+    },
+    "SAS-2023B": {
+      "bean": 789.0,
+      "cassava": 14836.0,
+      "cooking_banana": 17455.0,
+      "irish_potato": 6777.0,
+      "maize": 1254.0,
+      "paddy_rice": 4212.0,
+      "soybean": 430.0,
+      "wheat": 1265.0
+    },
+    "SAS-2024B": {
+      "bean": 737.0,
+      "cassava": 14325.0,
+      "cooking_banana": 17010.0,
+      "irish_potato": 6846.0,
+      "maize": 1284.0,
+      "paddy_rice": 4143.0,
+      "soybean": 426.0,
+      "wheat": 1267.0
+    },
+    "SAS-2026B": {
+      "bean": 730.0,
+      "cassava": 13990.0,
+      "cooking_banana": 16874.0,
+      "irish_potato": 6855.0,
+      "maize": 1292.0,
+      "paddy_rice": 4581.0,
+      "soybean": 417.0,
+      "wheat": 1164.0
+    }
+  },
+  "national_inputs_pct": {
+    "SAS-2018A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": null,
+      "inorganic_fert_farmers_pct": null,
+      "organic_fert_farmers_pct": null
+    },
+    "SAS-2019A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 22.4,
+      "inorganic_fert_farmers_pct": 26.1,
+      "organic_fert_farmers_pct": 53.3
+    },
+    "SAS-2020A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 35.2,
+      "inorganic_fert_farmers_pct": 33.8,
+      "organic_fert_farmers_pct": 63.64
+    },
+    "SAS-2021A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 37.12,
+      "inorganic_fert_farmers_pct": 40.9,
+      "organic_fert_farmers_pct": 67.0
+    },
+    "SAS-2022A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 33.11,
+      "inorganic_fert_farmers_pct": 38.59,
+      "organic_fert_farmers_pct": 69.69
+    },
+    "SAS-2023A": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 37.13,
+      "inorganic_fert_farmers_pct": 59.6,
+      "organic_fert_farmers_pct": 87.9
+    },
+    "SAS-2024A": {
+      "erosion_protection_farmers_pct": 90.63,
+      "improved_seed_farmers_pct": 39.69,
+      "inorganic_fert_farmers_pct": 64.49,
+      "organic_fert_farmers_pct": 89.12
+    },
+    "SAS-2025A": {
+      "erosion_protection_farmers_pct": 90.29,
+      "improved_seed_farmers_pct": 37.25,
+      "inorganic_fert_farmers_pct": 63.18,
+      "organic_fert_farmers_pct": 87.96
+    },
+    "SAS-2026A": {
+      "erosion_protection_farmers_pct": 92.39,
+      "improved_seed_farmers_pct": 36.98,
+      "inorganic_fert_farmers_pct": 67.15,
+      "organic_fert_farmers_pct": 90.18
+    },
+    "SAS-2018B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": null,
+      "inorganic_fert_farmers_pct": null,
+      "organic_fert_farmers_pct": null
+    },
+    "SAS-2019B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 11.8,
+      "inorganic_fert_farmers_pct": 23.1,
+      "organic_fert_farmers_pct": 46.9
+    },
+    "SAS-2020B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 15.55,
+      "inorganic_fert_farmers_pct": 25.8,
+      "organic_fert_farmers_pct": 51.7
+    },
+    "SAS-2021B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 17.23,
+      "inorganic_fert_farmers_pct": 32.73,
+      "organic_fert_farmers_pct": 56.34
+    },
+    "SAS-2022B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 8.68,
+      "inorganic_fert_farmers_pct": 27.53,
+      "organic_fert_farmers_pct": 57.92
+    },
+    "SAS-2023B": {
+      "erosion_protection_farmers_pct": null,
+      "improved_seed_farmers_pct": 20.87,
+      "inorganic_fert_farmers_pct": 51.6,
+      "organic_fert_farmers_pct": 83.4
+    },
+    "SAS-2024B": {
+      "erosion_protection_farmers_pct": 89.17,
+      "improved_seed_farmers_pct": 17.96,
+      "inorganic_fert_farmers_pct": 51.95,
+      "organic_fert_farmers_pct": 80.08
+    },
+    "SAS-2026B": {
+      "erosion_protection_farmers_pct": 92.73,
+      "improved_seed_farmers_pct": 20.9,
+      "inorganic_fert_farmers_pct": 57.5,
+      "organic_fert_farmers_pct": 81.34
+    }
+  },
+  "yield_shifts_over_20pct": [
+    {
+      "crop": "bean",
+      "from_release": "SAS-2019A",
+      "to_release": "SAS-2020A",
+      "change": -0.257
+    },
+    {
+      "crop": "wheat",
+      "from_release": "SAS-2019A",
+      "to_release": "SAS-2020A",
+      "change": -0.235
+    },
+    {
+      "crop": "soybean",
+      "from_release": "SAS-2022A",
+      "to_release": "SAS-2023A",
+      "change": -0.222
+    },
+    {
+      "crop": "soybean",
+      "from_release": "SAS-2023A",
+      "to_release": "SAS-2024A",
+      "change": 0.535
+    },
+    {
+      "crop": "cassava",
+      "from_release": "SAS-2018B",
+      "to_release": "SAS-2019B",
+      "change": 0.294
+    },
+    {
+      "crop": "irish_potato",
+      "from_release": "SAS-2018B",
+      "to_release": "SAS-2019B",
+      "change": 0.313
+    },
+    {
+      "crop": "soybean",
+      "from_release": "SAS-2018B",
+      "to_release": "SAS-2019B",
+      "change": 0.434
+    }
+  ]
+}

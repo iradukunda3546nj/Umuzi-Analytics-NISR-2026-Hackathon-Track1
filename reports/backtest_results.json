@@ -1,0 +1,334 @@
+{
+  "snapshot_id": "snap-20261125T044618Z-3e5a0b09",
+  "design": "Does a statistical model beat the rules at anticipating next season's shortfall?\n\nDesign (fixed before the results were seen):\n\nTask. For each district, crop and season type, predict whether the district's\nyield will be \"below national\" (ratio < 0.90, as in the app) in the next release\nof the same season type. Only reliable observations count (yield reported and\nharvested area >= 500 ha). A prediction may use only releases published before\nthe target release.\n\nUnits. District x priority crop x target release, where the target is reliable\nand at least 2 of the 3 previous releases of that season type are reliable (the\nsame evidence minimum the app applies), so every rule below is defined.\n\nRule baselines (no fitting beyond counting), over the previous 3 releases:\n  last_1        behind in the most recent reliable one\n  last_2_both   behind in the 2 most recent reliable ones\n  last_3_all    behind in every reliable one of the 3\n  last_3_two    behind in at least 2 of the 3\n  all_history   behind in every earlier reliable release since 2018 (rule set 1.0)\nModel: L2-regularised logistic regression on the most recent ratio, the mean\nratio and the share behind over the 3 previous releases, the number of reliable\nones, log harvested area, and the district's pooled improved-seed and\ninorganic-fertilizer gaps to national at the last release (0 + a missing flag\nwhere not comparable, i.e. 2018). Refit for every target release on all units\nwhose target is earlier (expanding window).\n\nProbabilities. A rule's probability is the share of training units in the same\nrule state that turned out behind, so rules and model are compared on Brier\nscore as well as on balanced accuracy.\n\nPeriods. Selection: targets 2021-2023 (A and B). Held-out test: 2024A, 2025A,\n2026A, 2024B, 2026B, the releases the app reports on.\n\nAdoption criterion. Replace the rules with the model only if, on the test\nperiod, the model's Brier score is lower than the best rule's with a 95%\ndistrict-cluster bootstrap interval that excludes zero AND balanced accuracy\nimproves by at least 0.02. Otherwise keep the rules.",
+  "n_units": {
+    "selection": 588,
+    "test": 754
+  },
+  "base_rate": {
+    "selection": 0.4,
+    "test": 0.373
+  },
+  "selection": {
+    "last_1": {
+      "balanced_accuracy": 0.822,
+      "recall": 0.766,
+      "precision": 0.807,
+      "brier": 0.1391,
+      "flagged": 223
+    },
+    "last_2_both": {
+      "balanced_accuracy": 0.782,
+      "recall": 0.638,
+      "precision": 0.852,
+      "brier": 0.1533,
+      "flagged": 176
+    },
+    "last_3_all": {
+      "balanced_accuracy": 0.759,
+      "recall": 0.574,
+      "precision": 0.871,
+      "brier": 0.1609,
+      "flagged": 155
+    },
+    "last_3_two": {
+      "balanced_accuracy": 0.803,
+      "recall": 0.711,
+      "precision": 0.819,
+      "brier": 0.148,
+      "flagged": 204
+    },
+    "all_history": {
+      "balanced_accuracy": 0.71,
+      "recall": 0.451,
+      "precision": 0.906,
+      "brier": 0.1782,
+      "flagged": 117
+    },
+    "model": {
+      "balanced_accuracy": 0.818,
+      "recall": 0.74,
+      "precision": 0.825,
+      "brier": 0.1244,
+      "flagged": 211
+    }
+  },
+  "test": {
+    "last_1": {
+      "balanced_accuracy": 0.868,
+      "recall": 0.854,
+      "precision": 0.811,
+      "brier": 0.1112,
+      "flagged": 296
+    },
+    "last_2_both": {
+      "balanced_accuracy": 0.845,
+      "recall": 0.747,
+      "precision": 0.886,
+      "brier": 0.1148,
+      "flagged": 237
+    },
+    "last_3_all": {
+      "balanced_accuracy": 0.792,
+      "recall": 0.63,
+      "precision": 0.889,
+      "brier": 0.1391,
+      "flagged": 199
+    },
+    "last_3_two": {
+      "balanced_accuracy": 0.844,
+      "recall": 0.808,
+      "precision": 0.799,
+      "brier": 0.1254,
+      "flagged": 284
+    },
+    "all_history": {
+      "balanced_accuracy": 0.693,
+      "recall": 0.402,
+      "precision": 0.934,
+      "brier": 0.1739,
+      "flagged": 121
+    },
+    "model": {
+      "balanced_accuracy": 0.867,
+      "recall": 0.836,
+      "precision": 0.83,
+      "brier": 0.0931,
+      "flagged": 283
+    }
+  },
+  "test_by_release": {
+    "SAS-2024A": {
+      "last_1": {
+        "balanced_accuracy": 0.796,
+        "recall": 0.836,
+        "precision": 0.689,
+        "brier": 0.1663,
+        "flagged": 74
+      },
+      "last_2_both": {
+        "balanced_accuracy": 0.769,
+        "recall": 0.656,
+        "precision": 0.784,
+        "brier": 0.1655,
+        "flagged": 51
+      },
+      "last_3_all": {
+        "balanced_accuracy": 0.739,
+        "recall": 0.574,
+        "precision": 0.795,
+        "brier": 0.1763,
+        "flagged": 44
+      },
+      "last_3_two": {
+        "balanced_accuracy": 0.754,
+        "recall": 0.689,
+        "precision": 0.712,
+        "brier": 0.18,
+        "flagged": 59
+      },
+      "all_history": {
+        "balanced_accuracy": 0.673,
+        "recall": 0.41,
+        "precision": 0.806,
+        "brier": 0.1984,
+        "flagged": 31
+      },
+      "model": {
+        "balanced_accuracy": 0.803,
+        "recall": 0.82,
+        "precision": 0.714,
+        "brier": 0.1302,
+        "flagged": 70
+      }
+    },
+    "SAS-2024B": {
+      "last_1": {
+        "balanced_accuracy": 0.854,
+        "recall": 0.796,
+        "precision": 0.83,
+        "brier": 0.112,
+        "flagged": 47
+      },
+      "last_2_both": {
+        "balanced_accuracy": 0.835,
+        "recall": 0.714,
+        "precision": 0.897,
+        "brier": 0.1145,
+        "flagged": 39
+      },
+      "last_3_all": {
+        "balanced_accuracy": 0.795,
+        "recall": 0.612,
+        "precision": 0.938,
+        "brier": 0.1282,
+        "flagged": 32
+      },
+      "last_3_two": {
+        "balanced_accuracy": 0.874,
+        "recall": 0.857,
+        "precision": 0.808,
+        "brier": 0.1087,
+        "flagged": 52
+      },
+      "all_history": {
+        "balanced_accuracy": 0.704,
+        "recall": 0.408,
+        "precision": 1.0,
+        "brier": 0.1589,
+        "flagged": 20
+      },
+      "model": {
+        "balanced_accuracy": 0.885,
+        "recall": 0.837,
+        "precision": 0.872,
+        "brier": 0.0915,
+        "flagged": 47
+      }
+    },
+    "SAS-2025A": {
+      "last_1": {
+        "balanced_accuracy": 0.918,
+        "recall": 0.889,
+        "precision": 0.918,
+        "brier": 0.0793,
+        "flagged": 61
+      },
+      "last_2_both": {
+        "balanced_accuracy": 0.857,
+        "recall": 0.746,
+        "precision": 0.94,
+        "brier": 0.1087,
+        "flagged": 50
+      },
+      "last_3_all": {
+        "balanced_accuracy": 0.77,
+        "recall": 0.571,
+        "precision": 0.923,
+        "brier": 0.1518,
+        "flagged": 39
+      },
+      "last_3_two": {
+        "balanced_accuracy": 0.819,
+        "recall": 0.778,
+        "precision": 0.79,
+        "brier": 0.1423,
+        "flagged": 62
+      },
+      "all_history": {
+        "balanced_accuracy": 0.69,
+        "recall": 0.381,
+        "precision": 1.0,
+        "brier": 0.179,
+        "flagged": 24
+      },
+      "model": {
+        "balanced_accuracy": 0.867,
+        "recall": 0.81,
+        "precision": 0.879,
+        "brier": 0.0801,
+        "flagged": 58
+      }
+    },
+    "SAS-2026A": {
+      "last_1": {
+        "balanced_accuracy": 0.889,
+        "recall": 0.873,
+        "precision": 0.859,
+        "brier": 0.0973,
+        "flagged": 64
+      },
+      "last_2_both": {
+        "balanced_accuracy": 0.9,
+        "recall": 0.841,
+        "precision": 0.93,
+        "brier": 0.0868,
+        "flagged": 57
+      },
+      "last_3_all": {
+        "balanced_accuracy": 0.841,
+        "recall": 0.714,
+        "precision": 0.938,
+        "brier": 0.1167,
+        "flagged": 48
+      },
+      "last_3_two": {
+        "balanced_accuracy": 0.889,
+        "recall": 0.873,
+        "precision": 0.859,
+        "brier": 0.1006,
+        "flagged": 64
+      },
+      "all_history": {
+        "balanced_accuracy": 0.685,
+        "recall": 0.381,
+        "precision": 0.96,
+        "brier": 0.1818,
+        "flagged": 25
+      },
+      "model": {
+        "balanced_accuracy": 0.892,
+        "recall": 0.857,
+        "precision": 0.885,
+        "brier": 0.0823,
+        "flagged": 61
+      }
+    },
+    "SAS-2026B": {
+      "last_1": {
+        "balanced_accuracy": 0.878,
+        "recall": 0.867,
+        "precision": 0.78,
+        "brier": 0.1009,
+        "flagged": 50
+      },
+      "last_2_both": {
+        "balanced_accuracy": 0.864,
+        "recall": 0.778,
+        "precision": 0.875,
+        "brier": 0.0983,
+        "flagged": 40
+      },
+      "last_3_all": {
+        "balanced_accuracy": 0.819,
+        "recall": 0.689,
+        "precision": 0.861,
+        "brier": 0.1205,
+        "flagged": 36
+      },
+      "last_3_two": {
+        "balanced_accuracy": 0.893,
+        "recall": 0.867,
+        "precision": 0.83,
+        "brier": 0.0918,
+        "flagged": 47
+      },
+      "all_history": {
+        "balanced_accuracy": 0.717,
+        "recall": 0.444,
+        "precision": 0.952,
+        "brier": 0.148,
+        "flagged": 21
+      },
+      "model": {
+        "balanced_accuracy": 0.893,
+        "recall": 0.867,
+        "precision": 0.83,
+        "brier": 0.0806,
+        "flagged": 47
+      }
+    }
+  },
+  "best_rule_on_selection": "last_1",
+  "model_vs_best_rule_test": {
+    "brier_diff_ci": [
+      -0.0252,
+      -0.0106
+    ],
+    "balanced_accuracy_diff_ci": [
+      -0.019,
+      0.015
+    ]
+  },
+  "decision": "keep rules"
+}

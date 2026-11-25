@@ -15,7 +15,8 @@ Roll back to an earlier approved snapshot:
 Show the active snapshot, releases and warnings:
     python -m scripts.refresh_data status
 
-Rebuild the store from data/sources.json (initial bootstrap):
+Rebuild the store from data/sources.json (initial bootstrap or historical backfill;
+all releases are gated and published together as one snapshot):
     python -m scripts.refresh_data bootstrap --approve
 """
 from __future__ import annotations
@@ -92,15 +93,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"snapshots: {[s['snapshot_id'] for s in store.list_snapshots()]}")
         return 0
     if args.cmd == "bootstrap":
+        # One snapshot for the whole source list; any failing release blocks the batch.
         sources = json.loads((Path(args.data_dir) / "sources.json").read_text(encoding="utf-8"))
-        rc = 0
-        for s in sources:
-            res = store.ingest(Path(args.data_dir) / s["file"], s["release_id"], s["season_year"],
-                               s["season"], source_url=s["source_url"], approve=args.approve,
-                               publication_date=s.get("publication_date", ""))
-            _print_result(res)
-            rc |= res.status == "rejected"
-        return rc
+        res = store.ingest_batch([{**s, "file": Path(args.data_dir) / s["file"]} for s in sources],
+                                 approve=args.approve)
+        _print_result(res)
+        return 1 if res.status == "rejected" else 0
     return 2
 
 
