@@ -150,8 +150,8 @@ def build_finding(ev: pd.DataFrame, panel: pd.DataFrame, district: str,
         headline = (f"{district}'s {c.lower()} yield was {pct(ratio)} of the national yield in "
                     f"{release_name(latest)}, not below the 90% benchmark.")
     else:
-        headline = (f"There is not enough reliable evidence to judge {district}'s {c.lower()} yield in "
-                    f"Season {season}: {row['limited_reason']}.")
+        headline = (f"{district}'s {c.lower()} figures are too uncertain to judge in Season {season}: "
+                    f"{row['limited_reason']}.")
 
     figures = []
     if pd.notna(row["latest_yield_kg_ha"]):

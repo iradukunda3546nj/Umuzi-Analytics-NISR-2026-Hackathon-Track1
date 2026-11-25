@@ -49,20 +49,24 @@ def district_target_svg(f: Finding, gap: float = GAP_THRESHOLD) -> str:
     """
     r = f.row
     ratio = r["latest_ratio"]
-    w, h, x0, x1 = 540, 180, 22, 490
-    hi = max(1.15, (ratio if ratio == ratio else 0) + 0.08)
-    lo = 0.4
+    w, h, x0, x1 = 540, 196, 22, 490
+    known = ratio == ratio
+    hi = max(1.15, (ratio if known else 0) + 0.08)
+    lo = max(0.0, min(0.4, (ratio if known else 1) - 0.12))   # the arrow never falls off the left edge
+    uncertain = not bool(r["latest_reliable"])                 # too few fields: draw it faint, claim no gap
     bx = x0 + (1.0 - lo) / (hi - lo) * (x1 - x0)            # bullseye centre
     sx = lambda v: x0 + (max(min(v, hi), lo) - lo) / (hi - lo) * (x1 - x0)
     y = 92
-    color = MARK_COLORS[f.category]
+    color = "#a8a398" if uncertain else MARK_COLORS[f.category]
     parts = [f"<svg class='umz-target-svg' viewBox='0 0 {w} {h}' width='100%' role='img' "
              f"aria-label='{escape(f.district)} {escape(crop_name(f.crop))} yield as a share of Rwanda&#39;s'>"]
     # benchmark zone and line
     gx = sx(gap)
     parts += [
         f"<line x1='{gx:.1f}' y1='{y - 46}' x2='{gx:.1f}' y2='{y + 34}' stroke='{INK_3}' stroke-width='1.4' stroke-dasharray='4 4'/>",
-        f"<text x='{gx - 6:.1f}' y='{y + 50}' text-anchor='end' font-size='14' fill='{INK_2}'>{gap:.0%} line</text>",
+        # key for the dashed line, at the foot of the drawing so it never meets the bullseye labels
+        f"<line x1='{x0}' y1='{h - 12}' x2='{x0 + 22}' y2='{h - 12}' stroke='{INK_3}' stroke-width='1.4' stroke-dasharray='4 4'/>",
+        f"<text x='{x0 + 30}' y='{h - 8}' font-size='13' fill='{INK_2}'>shortfall line: {gap:.0%} of the Rwanda average</text>",
         # bullseye = Rwanda
         f"<g class='umz-bull'><circle cx='{bx:.1f}' cy='{y}' r='34' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
         f"<circle cx='{bx:.1f}' cy='{y}' r='23' fill='{RED}'/><circle cx='{bx:.1f}' cy='{y}' r='13' fill='#ffffff'/>",
@@ -71,9 +75,9 @@ def district_target_svg(f: Finding, gap: float = GAP_THRESHOLD) -> str:
     ]
     if r["national_yield_kg_ha"] == r["national_yield_kg_ha"]:
         parts.append(f"<text x='{bx:.1f}' y='{y + 72}' text-anchor='middle' font-size='14' fill='{INK_2}'>"
-                     f"{r['national_yield_kg_ha'] / 1000:.2f} t/ha</text>")
+                     f"average {r['national_yield_kg_ha'] / 1000:.2f} t/ha</text>")
     if ratio != ratio:                                          # NaN: nothing published
-        parts.append(f"<text x='{x0}' y='{y + 5}' font-size='15' fill='{INK_2}'>No yield published for "
+        parts.append(f"<text x='{x0}' y='{y + 5}' font-size='15' fill='{INK_2}'>No harvest figure published for "
                      f"{escape(release_name(f.latest_release))}</text></svg>")
         return "".join(parts)
     hx = sx(ratio)
@@ -86,16 +90,19 @@ def district_target_svg(f: Finding, gap: float = GAP_THRESHOLD) -> str:
         f"<polygon points='{hx - 20:.1f},{y - 12} {hx + 2:.1f},{y} {hx - 20:.1f},{y + 12}' fill='{color}'/>"
         f"<line x1='{hx - 8:.1f}' y1='{y - 30}' x2='{hx - 8:.1f}' y2='{y - 12}' stroke='{color}' stroke-width='1.5'/>"
         f"<text x='{min(max(hx - 8, 80), 440):.1f}' y='{y - 36}' text-anchor='middle' font-size='20' font-weight='700' "
-        f"fill='{INK}'>{escape(f.district)} {pct(ratio)}</text></g>",
+        f"fill='{INK_2 if uncertain else INK}'>{escape(f.district)} {pct(ratio)}{'?' if uncertain else ''}</text></g>",
         # fletching
         f"<path d='M{tail + 2} {y} l-10 -10 M{tail + 2} {y} l-10 10 M{tail + 12} {y} l-10 -10 M{tail + 12} {y} l-10 10' "
         f"stroke='{color}' stroke-width='2.5' stroke-linecap='round'/>",
     ]
     short = (r["national_yield_kg_ha"] - r["latest_yield_kg_ha"]) / 1000
-    if short > 0 and hx < bx - 70:
+    if uncertain:
+        parts.append(f"<text x='{x0}' y='{y + 36}' font-size='14' font-style='italic' fill='{INK_2}'>"
+                     "Too few fields surveyed to be sure</text>")
+    elif short > 0 and hx < bx - 70:
         mid = (hx + bx - 34) / 2
         parts.append(f"<text x='{mid:.1f}' y='{y + 30}' text-anchor='middle' font-size='15' font-weight='600' fill='{RED}'>"
-                     f"{short:.2f} t/ha short</text>")
+                     f"{short:.2f} t/ha less</text>")
     parts.append("</svg>")
     return "".join(parts)
 
@@ -105,13 +112,13 @@ def pattern_tiles_html(f: Finding) -> str:
     tiles = []
     for i, p in enumerate(f.window):
         if p.ratio is None:
-            state, ic, val, lab = "missing", "dash", "n/r", "not published"
+            state, ic, val, lab = "missing", "dash", "&ndash;", "no figure"
         elif not p.reliable:
-            state, ic, val, lab = "thin", "dash", pct(p.ratio), "too few hectares"
+            state, ic, val, lab = "thin", "dash", pct(p.ratio) + "?", "too few fields"
         elif p.below:
-            state, ic, val, lab = "below", "cross", pct(p.ratio), "below the line"
+            state, ic, val, lab = "below", "cross", pct(p.ratio), "short"
         else:
-            state, ic, val, lab = "not below", "check", pct(p.ratio), "not below"
+            state, ic, val, lab = "not below", "check", pct(p.ratio), "on par or above"
         ink = "#ffffff" if state == "below" else INK
         tiles.append(
             f"<div class='umz-tile' style='background:{STATE_COLORS[state]};color:{ink};animation-delay:{0.15 * i:.2f}s'>"
@@ -120,7 +127,7 @@ def pattern_tiles_html(f: Finding) -> str:
     return "<div class='umz-tiles'>" + "".join(tiles) + "</div>"
 
 
-def _input_row(s: InputSignal, ic: str, i: int) -> str:
+def _input_row(s: InputSignal, ic: str, i: int, here: str = "Here") -> str:
     if s.lower is None:
         return (f"<div class='umz-inp'><div class='umz-inp-ic'>{icon(ic, 30)}</div><div class='umz-inp-body'>"
                 f"<div class='umz-inp-name'>{escape(s.name)}</div><div class='umz-inp-note'>Not published per "
@@ -130,7 +137,7 @@ def _input_row(s: InputSignal, ic: str, i: int) -> str:
         f"<div class='umz-inp'><div class='umz-inp-ic' style='color:{col}'>{icon(ic, 30)}</div>"
         f"<div class='umz-inp-body'><div class='umz-inp-name'>{escape(s.name)} "
         f"<span class='umz-inp-word' style='color:{col}'>{escape(s.word)}</span></div>"
-        f"<div class='umz-bar'><span class='umz-bar-lab'>Here</span><span class='umz-bar-track'>"
+        f"<div class='umz-bar'><span class='umz-bar-lab'>{escape(here)}</span><span class='umz-bar-track'>"
         f"<span class='umz-bar-fill' style='width:{s.district_pct:.1f}%;background:{col};animation-delay:{0.2 * i:.1f}s'></span>"
         f"</span><b>{s.district_pct:.0f}%</b></div>"
         f"<div class='umz-bar'><span class='umz-bar-lab'>Rwanda</span><span class='umz-bar-track'>"
@@ -138,10 +145,10 @@ def _input_row(s: InputSignal, ic: str, i: int) -> str:
         f"</span><b>{s.national_pct:.0f}%</b></div></div></div>")
 
 
-def inputs_html(e: Explanation) -> str:
-    return (_input_row(e.seed, "seed", 0) + _input_row(e.fertilizer, "bag", 1)
-            + "<div class='umz-fine'>Share of farmers using it on any crop, "
-              f"{escape(e.survey)}. NISR does not publish it per crop by district.</div>")
+def inputs_html(e: Explanation, here: str = "Here") -> str:
+    return (_input_row(e.seed, "seed", 0, here) + _input_row(e.fertilizer, "bag", 1, here)
+            + "<div class='umz-fine'>Share of farmers using it, on any crop, in "
+              f"{escape(e.survey)}. The survey does not split this by crop for each district.</div>")
 
 
 def verdict_html(e: Explanation, category: str) -> str:
@@ -163,11 +170,13 @@ def action_card_html(e: Explanation, who: str) -> str:
 
 
 # ------------------------------------------------------------------ landing page
-def hook_cards_html(cards: list[tuple[str, str, str]]) -> str:
+def hook_cards_html(cards: list[tuple[str, str, str, str]]) -> str:
+    """(icon, kicker word, question, one line) per card."""
     out = []
-    for i, (ic, title, line) in enumerate(cards):
+    for i, (ic, kick, title, line) in enumerate(cards):
         out.append(f"<div class='umz-hook' style='animation-delay:{0.12 * i + 0.1:.2f}s'>"
-                   f"<div class='umz-hook-ic'>{icon(ic, 34, 1.7)}</div><div class='umz-hook-t'>{escape(title)}</div>"
+                   f"<div class='umz-hook-top'><div class='umz-hook-ic'>{icon(ic, 30, 1.7)}</div>"
+                   f"<span class='umz-hook-k'>{escape(kick)}</span></div><div class='umz-hook-t'>{escape(title)}</div>"
                    f"<div class='umz-hook-l'>{escape(line)}</div></div>")
     return "<div class='umz-hooks'>" + "".join(out) + "</div>"
 
@@ -186,44 +195,46 @@ def flow_html(steps: list[tuple[str, str]]) -> str:
     return "<div class='umz-flow'>" + "".join(out) + "</div>"
 
 
-# ------------------------------------------------------------------ Rwanda vs PSTA 5 target
+# ------------------------------------------------------------------ Rwanda vs the national goal
 def target_arrow_svg(t: TargetPosition) -> str:
-    """An arrow heading to a bullseye at the PSTA 5 target, with Rwanda's position marked on it."""
-    w, h, x0, x1 = 560, 150, 24, 470          # x1: centre of the bullseye
-    lo = min(t.baseline_t_ha, t.yield_t_ha) * 0.85
+    """Rwanda's yield today on an arrow heading to a bullseye at the PSTA 5 goal.
+
+    Only two labels sit on the drawing (today, goal) so nothing collides; the PSTA
+    starting point is stated in the caption under it instead.
+    """
+    w, h, x0, x1 = 560, 140, 24, 470          # x1: centre of the bullseye
+    lo = min(t.baseline_t_ha, t.yield_t_ha) * 0.6
     hi = t.target_t_ha
     sx = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)
-    y = 82
-    cur, base = sx(min(t.yield_t_ha, hi)), sx(t.baseline_t_ha)
-    lx = min(max(cur, 95), x1 - 120)          # keep the "now" label inside the frame
+    y = 78
+    cur = sx(min(t.yield_t_ha, hi))
+    lx = min(max(cur, 90), x1 - 150)          # keep the "today" label clear of the goal label
     gap = t.target_t_ha - t.yield_t_ha
     parts = [
-        f"<svg viewBox='0 0 {w} {h}' width='100%' style='max-width:760px;display:block' role='img' aria-label='National {escape(crop_name(t.crop))} "
-        f"yield {t.yield_t_ha:.2f} t/ha against a target of {t.target_t_ha:.2f} t/ha'>",
+        f"<svg viewBox='0 0 {w} {h}' width='100%' style='max-width:760px;display:block' role='img' aria-label='Rwanda "
+        f"{escape(crop_name(t.crop))} yield {t.yield_t_ha:.2f} t/ha against a goal of {t.target_t_ha:.2f} t/ha'>",
         f"<line x1='{x0}' y1='{y}' x2='{x1 - 30}' y2='{y}' stroke='{GREY}' stroke-width='6' stroke-linecap='round'/>",
         f"<line class='umz-shaft' x1='{x0}' y1='{y}' x2='{cur}' y2='{y}' stroke='{ACCENT}' stroke-width='6' "
         f"stroke-linecap='round' style='--len:{max(cur - x0, 1):.0f}'/>",
         f"<polygon points='{x1 - 32},{y - 9} {x1 - 16},{y} {x1 - 32},{y + 9}' fill='{GREY}'/>",
-        f"<circle cx='{x1}' cy='{y}' r='26' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
-        f"<circle cx='{x1}' cy='{y}' r='17' fill='{RED}'/>",
-        f"<circle cx='{x1}' cy='{y}' r='9' fill='#ffffff'/>",
-        f"<circle cx='{x1}' cy='{y}' r='4' fill='{RED}'/>",
-        f"<text x='{x1}' y='{y + 46}' text-anchor='middle' font-size='13' font-weight='700' fill='{INK}'>"
-        f"Target {t.target_t_ha:.2f} t/ha</text>",
-        f"<text x='{x1}' y='{y + 62}' text-anchor='middle' font-size='11' fill='{INK_2}'>{escape(t.agricultural_year)}</text>",
-        f"<line x1='{base}' y1='{y + 8}' x2='{base}' y2='{y + 18}' stroke='{INK_3}' stroke-width='1.5'/>",
-        f"<text x='{base}' y='{y + 32}' text-anchor='middle' font-size='11' fill='{INK_3}'>"
-        f"PSTA baseline {t.baseline_t_ha:.2f}</text>",
+        f"<g class='umz-bull'><circle cx='{x1}' cy='{y}' r='26' fill='#ffffff' stroke='{RED}' stroke-width='3'/>",
+        f"<circle cx='{x1}' cy='{y}' r='17' fill='{RED}'/><circle cx='{x1}' cy='{y}' r='9' fill='#ffffff'/>",
+        f"<circle cx='{x1}' cy='{y}' r='4' fill='{RED}'/></g>",
+        f"<text x='{x1}' y='{y + 48}' text-anchor='middle' font-size='15' font-weight='700' fill='{INK}'>"
+        f"Goal {t.target_t_ha:.2f} t/ha</text>",
+        f"<text x='{x1}' y='{y - 36}' text-anchor='middle' font-size='12' fill='{INK_2}'>by {escape(t.agricultural_year)}</text>",
         f"<circle cx='{cur}' cy='{y}' r='9' fill='{ACCENT}' stroke='#ffffff' stroke-width='3'/>",
-        f"<line x1='{cur}' y1='{y - 12}' x2='{cur}' y2='{y - 30}' stroke='{ACCENT}' stroke-width='1.5'/>",
-        f"<text x='{lx}' y='{y - 52}' text-anchor='middle' font-size='13' font-weight='700' fill='{INK}'>"
-        f"Rwanda now: {t.yield_t_ha:.2f} t/ha</text>",
-        f"<text x='{lx}' y='{y - 36}' text-anchor='middle' font-size='12' fill='{INK_2}'>"
-        f"{t.attainment:.0%} of the target</text>",
+        f"<text x='{lx}' y='{y - 22}' text-anchor='middle' font-size='15' font-weight='700' fill='{INK}'>"
+        f"Rwanda today: {t.yield_t_ha:.2f} t/ha</text>",
+        f"<text x='{lx}' y='{y + 30}' text-anchor='middle' font-size='13' fill='{INK_2}'>"
+        f"{t.attainment:.0%} of the goal</text>",
     ]
     if gap > 0:
-        mid = (cur + x1 - 26) / 2
-        parts.append(f"<text x='{mid}' y='{y - 10}' text-anchor='middle' font-size='11' fill='{RED}'>"
-                     f"{gap:.2f} t/ha to go</text>")
+        # Below the line, right of the "% of the goal" label; left out when it would not fit
+        # (the caption under the drawing states it anyway).
+        gx = max((cur + x1 - 26) / 2, lx + 105)
+        if gx + 48 < x1 - 30:
+            parts.append(f"<text x='{gx:.1f}' y='{y + 30}' text-anchor='middle' font-size='13' "
+                         f"font-weight='600' fill='{RED}'>{gap:.2f} t/ha to go</text>")
     parts.append("</svg>")
     return "".join(parts)

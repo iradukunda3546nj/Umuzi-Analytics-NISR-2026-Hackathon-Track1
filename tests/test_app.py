@@ -33,7 +33,7 @@ def test_landing_page_explains_itself_and_leads_on():
     at = run(view="home")
     md = text(at)
     assert "Umuzi <span>Analytics</span>" in md and "umz-hook" in md
-    assert "17</b><span>NISR surveys" in md                   # counted from the snapshot, not typed in
+    assert "17</b><span>surveys read" in md                   # counted from the snapshot, not typed in
     at.button(key="cta_explore").click().run()
     assert at.session_state["view"] == "explore"
 
@@ -58,7 +58,8 @@ def test_why_button_opens_the_explanation():
     at.button(key="why_btn").click().run()
     assert at.session_state["view"] == "why"
     md = text(at)
-    assert "Is it a pattern?" in md and "Seed and fertilizer?" in md and "Take action" in md
+    assert "Is it a pattern?" in md and "Enough seed and fertilizer?" in md and "Take action" in md
+    assert "Why is the harvest low here?" in md
 
 
 def test_why_page_and_assistant_state_the_same_finding():
@@ -100,3 +101,26 @@ def test_brief_download_and_methods():
 def test_non_default_benchmark_is_flagged():
     at = run(view="explore", gap=0.8)
     assert "non-default benchmark settings" in text(at)
+
+
+def test_thin_evidence_is_not_presented_as_a_firm_gap():
+    # Ruhango Irish potato, Season A 2026: a yield is printed, but from too few fields.
+    at = run(view="explore", season="A", crop="irish_potato", district="Ruhango")
+    md = text(at)
+    assert "Too few fields to be sure" in md and "Too uncertain to judge" in md
+    assert "t/ha less" not in md                                # no confident shortfall on the arrow
+    assert [b.label for b in at.button if b.key == "why_btn"] == ["Why can't we be sure?"]
+
+
+def test_why_page_keeps_season_names_intact():
+    at = run(view="why", season="B", crop="cassava", district="Musanze")
+    md = text(at)
+    assert "2026b" not in md and "Season B 2026" in md
+
+
+def test_chat_marks_a_change_of_district():
+    at = run(view="ask", season="A", crop="maize", district="Ruhango")
+    at.chat_input[0].set_value("What should we check?").run()
+    at.session_state["district"] = "Musanze"
+    at.run()
+    assert "Now looking at Musanze, maize, Season A" in text(at)

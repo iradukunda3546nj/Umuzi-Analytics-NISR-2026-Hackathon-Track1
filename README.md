@@ -18,7 +18,7 @@ Choose a crop and a district (type to search), then a season. The Rwanda map sho
 | Repeatedly below national, low input uptake | Under 90% of the national yield in at least 2 of the last 3 surveys of that season; improved-seed and fertilizer uptake both below national | Input access and timing first |
 | Repeatedly below national, input uptake not low | Same pattern, but input uptake is not low | Soils, erosion, varieties, water |
 | Below national in the latest season only | One-season drop | Check for a season shock; re-check next survey |
-| Evidence too limited to judge | Not reported, or under 500 ha harvested | Verify in the field before acting |
+| Too uncertain to judge | Not reported, or under 500 ha harvested (the figure is shown, marked uncertain) | Verify in the field before acting |
 | Not below national | At or above 90% of national now | - |
 
 These are **checks, not prescriptions**. The survey shows where yields are low, not why.
@@ -27,7 +27,7 @@ The app has five sections, each answering one question:
 
 | Section | Question it answers | What the user sees |
 |---|---|---|
-| Home | What is this, and who is it for? | Four picture cards, the data in one line, the path Pick a district, See the gap, Ask why, Take action |
+| Home | What is this, and who is it for? | One question and a promise in plain words, four cards (Where, When, Why, What), the data in one line, the path Pick a district, See how it compares, Ask why, Take action |
 | Your district | How far is it from Rwanda's yield? | Map (click a district), an arrow flying to a bullseye that stands for Rwanda's yield, the last 3 surveys as tick/cross tiles, Rwanda against the PSTA 5 target |
 | Why? | Pattern or one-off? Seed or fertilizer? What to check? | Three numbered cards (survey tiles; seed and fertilizer bars, here vs Rwanda; the verdict), a "Take action" card with 2-4 field checks, the brief download, and the assistant |
 | Ask Umuzi | Anything across districts and crops | The assistant (see below) |
@@ -99,7 +99,7 @@ python -m scripts.refresh_data bootstrap --approve  # rebuild the snapshot from 
 python -m scripts.history_eda                       # reports/history_eda.json
 python -m scripts.backtest                          # reports/backtest_results.json
 python -m scripts.run_analysis                      # reports/analysis_results.json, reports/figures/
-python -m pytest                                    # 57 tests
+python -m pytest                                    # 74 tests
 ```
 
 `bootstrap` and the source audit in `history_eda` read the original downloads from `data/incoming/` (not committed). Every workbook actually used is committed as a checksum-named copy in `data/raw/nisr_sas/`, and the published snapshot in `data/snapshots/` is what the app, tests and other scripts read.

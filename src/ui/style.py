@@ -25,12 +25,18 @@ CSS = """
 .umz-hero h1 {font-family:'DM Serif Display', Georgia, serif; font-weight:400; font-size:clamp(44px, 7vw, 86px);
               line-height:1.0; margin:0; color:#13302a; letter-spacing:.5px;}
 .umz-hero h1 span {color:var(--ever-2);}
-.umz-hero p {font-size:clamp(17px, 2vw, 22px); color:#1f2421; margin:14px auto 0 auto; max-width:760px;}
+.umz-hero .umz-q {font-size:clamp(20px, 2.4vw, 27px); font-weight:700; color:#13302a; margin:18px auto 0 auto;
+              max-width:820px; line-height:1.3;}
+.umz-hero p {font-size:clamp(16px, 1.8vw, 20px); color:#1f2421; margin:10px auto 0 auto; max-width:760px; line-height:1.45;}
+.umz-hero p b {color:var(--ever);}
 .umz-hooks {display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin:28px 0 10px 0;}
 .umz-hook {background:rgba(255,255,255,.93); border-radius:16px; padding:20px 18px; box-shadow:0 8px 28px rgba(16,40,32,.16);
            animation: umz-rise .7s cubic-bezier(.2,.7,.2,1) both; backdrop-filter: blur(4px);}
-.umz-hook-ic {width:56px; height:56px; border-radius:50%; background:#e7efe9; color:var(--ever);
-              display:flex; align-items:center; justify-content:center; margin-bottom:12px;}
+.umz-hook-top {display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.umz-hook-ic {width:52px; height:52px; border-radius:50%; background:#e7efe9; color:var(--ever);
+              display:flex; align-items:center; justify-content:center;}
+.umz-hook-k {font-size:12px; font-weight:800; letter-spacing:1.6px; background:var(--sun); color:#1f2421;
+             border-radius:999px; padding:3px 11px;}
 .umz-hook-t {font-size:19px; font-weight:700; color:var(--ink); line-height:1.25;}
 .umz-hook-l {font-size:14.5px; color:var(--ink-2); margin-top:6px; line-height:1.4;}
 .umz-stats {display:flex; flex-wrap:wrap; justify-content:center; gap:10px 34px; margin:18px auto 6px auto;
@@ -92,6 +98,7 @@ CSS = """
            color:var(--ever); font-size:19px; font-weight:800; padding:14px 10px; animation: umz-pulse 2.4s 1.6s infinite;}
 .st-key-why_btn button:hover {background:var(--ever); color:#fff; border-style:solid;}
 .st-key-why_btn button p {font-size:19px; font-weight:800;}
+.st-key-why_btn button [data-testid="stIconMaterial"] {font-size:28px;}
 
 /* ---------- inputs */
 .umz-inp {display:flex; gap:14px; align-items:center; padding:10px 0; border-bottom:1px dashed var(--line);}
@@ -125,6 +132,9 @@ CSS = """
 .umz-checks li span {color:#8a6400; display:flex;}
 
 /* ---------- assistant */
+.umz-chat-note {text-align:center; font-size:12.5px; color:var(--ink-3); margin:10px 0; display:flex;
+                 align-items:center; gap:10px;}
+.umz-chat-note::before, .umz-chat-note::after {content:""; flex:1; border-top:1px solid var(--line);}
 .umz-ask-head {display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:var(--ink);}
 [class*="st-key-sugg_"] button {border-radius:999px; font-size:13px; padding:3px 12px; min-height:30px;
            background:#eef4f0; border:1px solid #cfe0d5; color:var(--ever);}

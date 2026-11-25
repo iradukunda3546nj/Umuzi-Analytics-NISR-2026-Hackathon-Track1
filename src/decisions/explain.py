@@ -8,9 +8,10 @@ The "Why" page, the action card and the Umuzi Assistant all read this object,
 so the words a user sees are the same everywhere. Nothing is computed here
 that `evidence_table` did not already compute; this module only words it.
 
-Wording rules: "use" rather than "uptake"; "lower than Rwanda" rather than
-"below the national mean"; no claim of cause, because the survey records yields
-and input use, not why a yield was low.
+Wording rules: plain words a farmer or district officer would use ("harvest",
+"the Rwanda average", "fewer farmers use it here"), not "uptake" or "below the
+national mean"; no claim of cause, because the survey records yields and input
+use, not why a yield was low.
 """
 from __future__ import annotations
 
@@ -27,7 +28,7 @@ PLAIN_CATEGORY = {
     CATEGORY_REPEATED_LOW_INPUT: "Repeated shortfall, seed and fertilizer use low",
     CATEGORY_REPEATED_INPUTS_OK: "Repeated shortfall, seed and fertilizer use not low",
     CATEGORY_DIP: "One-season dip",
-    CATEGORY_INSUFFICIENT: "Not enough data",
+    CATEGORY_INSUFFICIENT: "Too uncertain to judge",
     CATEGORY_NOT_BELOW: "On par with Rwanda or above",
 }
 
@@ -71,7 +72,7 @@ class InputSignal:
     def word(self) -> str:
         if self.lower is None:
             return "Not published"
-        return "Lower than Rwanda" if self.lower else "Not lower than Rwanda"
+        return "Fewer use it here" if self.lower else "Same or more here"
 
 
 @dataclass
@@ -106,13 +107,14 @@ def explain(f: Finding) -> Explanation:
 
     if f.is_repeated:
         pattern = ("A repeated shortfall",
-                   f"Below 90% of Rwanda's {c} yield in {n_below} of the last {len(reliable)} reliable surveys.")
+                   f"Under 90% of the Rwanda {c} average in {n_below} of the last {len(reliable)} surveys with enough fields.")
     elif cat == CATEGORY_DIP:
-        pattern = ("A one-season dip", f"Below 90% of Rwanda's yield in {latest} only.")
+        pattern = ("A one-season dip", f"Under 90% of the Rwanda average in {latest} only.")
     elif cat == CATEGORY_NOT_BELOW:
-        pattern = ("No shortfall", f"{pct(row['latest_ratio'])} of Rwanda's {c} yield in {latest}.")
+        pattern = ("No shortfall", f"{pct(row['latest_ratio'])} of the Rwanda {c} average in {latest}.")
     else:
-        pattern = ("Not enough data", f"{str(row['limited_reason']).capitalize()}.")
+        reason = str(row["limited_reason"])
+        pattern = ("Can't tell yet", f"{reason[:1].upper()}{reason[1:]}.")   # keeps "Season B" intact
 
     if cat == CATEGORY_REPEATED_LOW_INPUT:
         verdict = ("Seed and fertilizer use are both low here",
@@ -134,9 +136,11 @@ def explain(f: Finding) -> Explanation:
         verdict = ("It could be a one-season shock",
                    "Check weather, pests and planting dates before moving resources.")
     elif cat == CATEGORY_NOT_BELOW:
-        verdict = ("No shortfall to explain", "This district is not below the benchmark for this crop.")
+        verdict = ("Doing well", "This district harvests as much as the Rwanda average or more. "
+                                 "Its practices may help neighbours.")
     else:
-        verdict = ("Too little evidence to judge", "Confirm the yield in the field before planning.")
+        verdict = ("Check the figures first",
+                   "The survey cannot say much here. Confirm the harvest locally before planning.")
 
     return Explanation(category_label=PLAIN_CATEGORY[cat],
                        is_shortfall=cat in (CATEGORY_REPEATED_LOW_INPUT, CATEGORY_REPEATED_INPUTS_OK,

@@ -41,7 +41,7 @@ CATEGORY_SHORT = {
     CATEGORY_REPEATED_LOW_INPUT: "Repeated shortfall, seed and fertilizer use low",
     CATEGORY_REPEATED_INPUTS_OK: "Repeated shortfall, seed and fertilizer use not low",
     CATEGORY_DIP: "One-season dip",
-    CATEGORY_INSUFFICIENT: "Not enough data",
+    CATEGORY_INSUFFICIENT: "Too uncertain to judge",
     CATEGORY_NOT_BELOW: "On par with Rwanda or above",
 }
 # Cell states in the pattern grid (same hues as the categories they lead to).
@@ -177,17 +177,20 @@ def category_map(ev: pd.DataFrame, snapshot_id: str, crop: str, season: str,
     scale = []
     for i, c in enumerate(CATEGORY_ORDER):
         scale += [[i / n, CATEGORY_COLORS[c]], [(i + 1) / n, CATEGORY_COLORS[c]]]
-    pattern = [f"{int(b)} of {int(r)}" for b, r in zip(ev["below_in_window"], ev["reliable_in_window"])]
+    # Hover lines in plain words (no "national", no "reliable").
+    pattern = [f"Short in {int(b)} of the last {int(r)} surveys with enough fields" if r else
+               "No recent survey had enough fields to judge"
+               for b, r in zip(ev["below_in_window"], ev["reliable_in_window"])]
+    harvest = [f"Harvest: {v * 100:.0f}% of the Rwanda average" if pd.notna(v) else "No harvest figure published"
+               for v in ev["latest_ratio"]]
+    area = [f"Harvested here: {v:,.0f} ha" if pd.notna(v) else "" for v in ev["latest_harvested_ha"]]
     fig = go.Figure(go.Choropleth(
         geojson=gj, featureidkey="properties.shapeName", locations=ev["district"],
         z=ev["category"].map(code) + 0.5, zmin=0, zmax=n, colorscale=scale, showscale=False,
         marker=dict(line=dict(color="#6b6f6c", width=0.8)), showlegend=False,
-        customdata=np.c_[ev["category"].map(CATEGORY_SHORT), (ev["latest_ratio"] * 100).round(0),
-                         pattern, ev["latest_harvested_ha"].round(0)],
-        hovertemplate="<b>%{location}</b><br>%{customdata[0]}"
-                      "<br>Latest yield: %{customdata[1]:.0f}% of national"
-                      "<br>Below national in %{customdata[2]} reliable recent surveys"
-                      "<br>Harvested area: %{customdata[3]:,} ha<extra></extra>"))
+        customdata=np.c_[ev["category"].map(CATEGORY_SHORT), harvest, pattern, area],
+        hovertemplate="<b>%{location}</b><br>%{customdata[0]}<br>%{customdata[1]}"
+                      "<br>%{customdata[2]}<br>%{customdata[3]}<extra></extra>"))
     if not compact:
         counts = ev["category"].value_counts()
         for c in CATEGORY_ORDER:

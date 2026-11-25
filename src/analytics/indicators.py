@@ -131,20 +131,20 @@ def evidence_table(records: pd.DataFrame, crop: str, season: str, params: Params
 
         limited = ""
         if pd.isna(lt["yield_kg_ha"]):
-            limited = f"no {season} {latest[4:8]} yield was published for this district"
+            limited = f"NISR published no Season {season} {latest[4:8]} yield for this district"
         elif not latest_ok:
-            limited = (f"only {lt['harvested_ha']:,.0f} ha were harvested in {latest[4:]}, "
-                       f"under the {params.min_harvested_ha:,.0f} ha reliability minimum")
+            limited = (f"only {lt['harvested_ha']:,.0f} ha were harvested here in Season {season} {latest[4:8]}, "
+                       f"too few fields for a firm average ({params.min_harvested_ha:,.0f} ha needed)")
         if limited:
             category = CATEGORY_INSUFFICIENT
         elif not bool(lt["below"]):
             category = CATEGORY_NOT_BELOW
         elif n_rel < params.min_reliable:
             category = CATEGORY_INSUFFICIENT
-            limited = f"only {n_rel} of the last {len(window)} releases are reliable"
+            limited = f"only {n_rel} of the last {len(window)} surveys had enough fields to judge"
         elif repeated and not inputs_known:
             category = CATEGORY_INSUFFICIENT
-            limited = "input uptake is not published per farmer for this release"
+            limited = "seed and fertilizer use were not published per farmer for this survey"
         elif repeated:
             category = CATEGORY_REPEATED_LOW_INPUT if inputs_low else CATEGORY_REPEATED_INPUTS_OK
         else:
