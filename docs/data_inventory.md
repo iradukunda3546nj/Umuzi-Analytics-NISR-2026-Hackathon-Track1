@@ -1,50 +1,62 @@
-# Data Inventory
+# Data inventory
 
-All sources were retrieved on **2026-10-29** (UTC timestamps in `data/raw/reference/download_log.txt`). Licence for NISR content: **CC BY 4.0** (https://statistics.gov.rw/terms-use, read 2026-10-29).
+Every source the app uses or relies on, where it came from, and what it can and cannot tell us.
+NISR content is published under Creative Commons Attribution 4.0 (https://statistics.gov.rw/terms-use).
 
-## Used in the application
+## Used in the app
 
-| ID | Publisher | Content | Grain | Status | Local file | SHA-256 |
-|---|---|---|---|---|---|---|
-| SAS-2024A | NISR | SAS 2024 Season A tables (Excel, 34 sheets) | District, national, LSF/SSF rows | Downloaded, inspected, ingested | `data/raw/nisr_sas/SAS-2024A__6848e1b3c8ca.xlsx` | `6848e1b3c8caadbf68c75916512f435e43a65d07734cbcdb3bcbbef3bb45c358` |
-| SAS-2024B | NISR | SAS 2024 Season B tables (33 sheets) | same | same | `data/raw/nisr_sas/SAS-2024B__0be9b2749740.xlsx` | `0be9b2749740d6a9fdb963fddd1874f448dfedf9c54e15fef55f6fdbe459c911` |
-| SAS-2025A | NISR | SAS 2025 Season A tables (34 sheets) | same | same | `data/raw/nisr_sas/SAS-2025A__d853e32bdf8e.xlsx` | `d853e32bdf8e1c396ffa487c3a786413e82753d0f89a95679cd56a6c20d2669b` |
-| SAS-2026A | NISR | SAS 2026 Season A tables (35 sheets) | same | same | `data/raw/nisr_sas/SAS-2026A__c4e4cb4c4e69.xlsx` | `c4e4cb4c4e697febac1cb332280189a4dc6ff7f10d0de956bff279b284c5d4c2` |
-| SAS-2026B | NISR | SAS 2026 Season B tables (33 sheets) | same | same | `data/raw/nisr_sas/SAS-2026B__5ca81c6b0a54.xlsx` | `5ca81c6b0a54c4a282ed718d134423920cc75279a5827bbe772fe6eb1a4e9d27` |
-| PSTA5-targets | MINAGRI | PSTA 5 Abridged version, results framework p.21 (yield targets) | National, annual | Downloaded, inspected; 8 rows transcribed | `data/reference/psta5_productivity_targets.csv` | (PDF not redistributed; 11 MB; URL below) |
-| RWA-ADM2 | geoBoundaries (wmgeolab), from NISR geodata | District boundaries, simplified, 30 features | District polygons | Downloaded, inspected | `data/raw/boundaries/geoBoundaries-RWA-ADM2_simplified.geojson` | `56b0995c7a7735847659b766e00c5cfa29b1b3a197f231dc396f399948c46c09` |
-
-Source URLs and landing pages for every SAS file are in `data/sources.json`. PSTA 5: https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf. Boundaries: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RWA/ADM2/geoBoundaries-RWA-ADM2_simplified.geojson (metadata: source "Open Data Rwanda", licence CC BY 4.0, boundary year 2012, 30 units).
-
-## Used for validation only
-
-| ID | Content | Use |
+| Source | What it is | Local copy |
 |---|---|---|
-| SAS-2024-Annual | SAS 2024 Annual tables (79 sheets; Seasons A, B, C) | Cross-check: the standalone 2024A and 2024B releases match it cell for cell (max difference 0.0); `tests/test_real_data.py`. SHA-256 `5c7c6024d9a7b766d9911348aa3b5d5316555c6aa4a8c53f10dc290e2d8906e6` |
-| SAS-2026A report | *SAS 2026 Season A Final Report* (PDF, 65 pp.) | Methodology facts: 1,200 segments allocated at district level (p.13); two-stage design, 25 points per segment (p.14); yields from farmer estimation (p.22); sampling errors national only (p.16-18). Not redistributed (23 MB). |
+| NISR Seasonal Agricultural Survey (SAS), 2018 to 2023 | Annual table workbooks, each holding Season A and Season B tables, downloaded from the [NISR SAS page](https://statistics.gov.rw/data-sources/surveys/Seasonal-Agricultural-Survey). Original file names are recorded in `data/sources.json`. | `data/raw/nisr_sas/SAS-2018A__...xlsx` to `SAS-2023A__...xlsx` (one file per year, named after its first season) |
+| NISR SAS 2024 Season A | Table workbook, 34 sheets | `data/raw/nisr_sas/SAS-2024A__6848e1b3c8ca.xlsx` (SHA-256 `6848e1b3c8caadbf68c75916512f435e43a65d07734cbcdb3bcbbef3bb45c358`) |
+| NISR SAS 2024 Season B | Table workbook, 33 sheets | `data/raw/nisr_sas/SAS-2024B__0be9b2749740.xlsx` (`0be9b2749740d6a9fdb963fddd1874f448dfedf9c54e15fef55f6fdbe459c911`) |
+| NISR SAS 2025 Season A | Table workbook, 34 sheets | `data/raw/nisr_sas/SAS-2025A__d853e32bdf8e.xlsx` (`d853e32bdf8e1c396ffa487c3a786413e82753d0f89a95679cd56a6c20d2669b`) |
+| NISR SAS 2026 Season A | Table workbook, 35 sheets | `data/raw/nisr_sas/SAS-2026A__c4e4cb4c4e69.xlsx` (`c4e4cb4c4e697febac1cb332280189a4dc6ff7f10d0de956bff279b284c5d4c2`) |
+| NISR SAS 2026 Season B | Table workbook, 33 sheets | `data/raw/nisr_sas/SAS-2026B__5ca81c6b0a54.xlsx` (`5ca81c6b0a54c4a282ed718d134423920cc75279a5827bbe772fe6eb1a4e9d27`) |
+| MINAGRI PSTA 5, abridged plan | National yield goals, results framework p.21 ([PDF](https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf)) | 8 rows copied by hand into `data/reference/psta5_productivity_targets.csv` |
+| District boundaries | geoBoundaries RWA ADM2, simplified, 30 districts, from NISR geodata, CC BY 4.0 ([file](https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RWA/ADM2/geoBoundaries-RWA-ADM2_simplified.geojson)) | `data/raw/boundaries/` (SHA-256 `56b0995c7a7735847659b766e00c5cfa29b1b3a197f231dc396f399948c46c09`) |
 
-## Sought but not available
+Every file name carries the start of its checksum, so any change to a file can be detected
+(`tests/test_real_data.py` checks this). Exact download links for 2024-2026 are in `data/sources.json`;
+download times are in `data/raw/reference/download_log.txt`.
+
+## Used to check the data or explain the method (not loaded into the app)
+
+| Source | How it is used |
+|---|---|
+| NISR SAS 2024 annual workbook | The separate 2024 Season A and B files match it cell for cell (`tests/test_real_data.py`). Stored at `data/raw/reference/SAS_2024_Annual_Tables.xlsx`. |
+| [NISR SAS Season B 2026 main report](https://statistics.gov.rw/sites/default/files/documents/2026-09/SAS%202026B_Main%20report.pdf) | How the survey works: 1,200 sample squares of 300 by 300 m, 25 points each (pp.10-12); squares per district (Tables 3 and 4); large-scale farmers are farms of at least 10 ha, or 2 ha for horticulture (p.7); yields are farmer-reported (p.20); margins of error and plot counts for national crop areas only (Table 5, p.17). This is the basis for the 500 ha rule (`docs/methodology.md`, section 4). Not stored in the repository (about 10 MB). |
+| [MINAGRI PSTA 5 abridged plan](https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf) | The 50% productivity goal (p.14) and the yield targets (p.21), checked against `data/reference/psta5_productivity_targets.csv` (all 8 rows match). Not stored (11 MB). |
+
+## Looked for but not used
 
 | Item | Status |
 |---|---|
-| SAS 2025 Season B tables | Not located on statistics.gov.rw on 2026-10-29 (search and URL patterns tried). Treated as missing, never as zero. |
-| SAS releases before 2024 | Landing pages for 2019 to 2023 exist but listed no table downloads at the time of inspection. Not ingested. |
-| SAS microdata (plot level) | Not requested; access-controlled through the NISR microdata catalogue. Not needed for district planning. |
-| Agricultural Household Survey 2024 tables | Not ingested within the deadline. Candidate future source for farm-level constraints. |
-| CHIRPS rainfall | Considered, not ingested. Rainfall hypotheses are marked NOT TESTABLE. |
+| SAS Season B 2025 tables | Not found on statistics.gov.rw. Treated as missing, never as zero. |
+| SAS 2014 to 2017 | Checked with `scripts/history_eda.py`. The 2015, 2016 and 2017 table workbooks give yields only by land type or province (the 2017 table titled "by district" has province columns). For 2014 only the PDF report was found, and it was not machine-read. None of these years is used. |
+| SAS plot-level microdata | Access is by request through the NISR microdata catalogue. With it, real margins of error for district yields could be computed, replacing the 500 ha rule. Not requested within the hackathon. |
+| Agricultural Household Survey 2024 | Not used within the deadline. A possible future source for farm-level constraints. |
+| Rainfall (CHIRPS) | Considered, not used, so the app makes no claim about rainfall. |
 
 ## What these data are, and are not
 
-- **Scale**: published district estimates, plus national and LSF/SSF rows. No household, plot or sector records.
-- **Design**: multiple-frame survey; area frame of 1,200 segments (20 in Nyarugenge and Kicukiro to 68 in Nyagatare, 2026A Table 4) plus a list frame of large-scale farmers; design weights applied by NISR.
-- **Yield**: farmer-estimated (SAS 2026A report, p.22), kg per harvested ha.
-- **Uncertainty**: standard errors and CVs are published only for national crop areas (e.g. 2026A Table 5). District standard errors are not published.
-- **Temporal**: Season A (sowing roughly September, harvest roughly February) and Season B (sowing roughly February to March) are different agronomic seasons and are never pooled in the analysis.
+- **Level:** published district averages plus national figures. No household, plot or sector records.
+- **How the survey is drawn:** NISR samples 1,200 squares of land (20 in Nyarugenge to 68 in Nyagatare) and
+  separately visits every large farm in full. NISR applies the weights; we use its published averages.
+- **Yield:** kilograms per harvested hectare; the harvest amount is reported by the farmer, the area is
+  measured by GPS.
+- **Uncertainty:** margins of error are published only for national crop areas, not for district yields.
+- **Seasons:** Season A (sown around September, harvested around February) and Season B (sown around
+  March) are different growing seasons and are never combined.
 
-## Data-quality observations (computed; see `reports/eda_findings.md`)
+## Data-quality notes (details in `reports/eda_findings.md`)
 
-- Production equals yield x harvested area / 1000 in all 2,587 district-crop cells where all three were observed.
-- Cells printed as 0: 198 (2024A), 125 (2024B), 225 (2025A), 165 (2026A), 138 (2026B). Treated as "not reported".
-- Harvested area exceeds cultivated area in 5 (2024A), 22 (2024B) and 11 (2025A) cells, mostly bananas.
-- National row labels vary: "National" (crop tables), "Total" (inorganic fertilizer, 2026A), "S/Total" (production). Handled explicitly; a gate rejects any release missing a national value.
-- 2026A Table 5, Fruits: printed estimate 8,183 ha lies outside its printed 95% CI (9,050 to 17,975). Not used by the app; reported here as a publication inconsistency.
+- Production equals yield times harvested area in all 2,587 cells of the 2024-2026 surveys where all three
+  are published.
+- Cells printed as 0 in 2024-2026: 198, 125, 225, 165 and 138. All are treated as "not reported".
+- Harvested area is larger than planted area by more than 1% in 1, 8 and 1 cells (2024 A, 2024 B,
+  2025 A), 8 of them paddy rice. Flagged, not changed.
+- The national row is labelled "National", "Total" or "S/Total" depending on the table. Handled
+  explicitly; a check refuses any survey missing a national figure.
+- Season B 2026 main report, Table 5 (p.17), Fruits: the printed estimate (15,535 ha) lies outside its own
+  printed 95% range (9,235 to 15,347). Not used by the app; noted as a publication inconsistency.

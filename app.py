@@ -29,7 +29,7 @@ from src.assistant.umuzi import Selection, UmuziData, answer, suggestions_for
 from src.config import (DATA_DIR, DISTRICTS, GAP_THRESHOLD, MIN_HARVESTED_HA, PRODUCT_NAME,
                         ROOT)
 from src.decisions.brief import brief_csv, build_brief
-from src.decisions.explain import explain
+from src.decisions.explain import PLAIN_CATEGORY, explain
 from src.decisions.finding import crop_name, pct, release_name, target_position
 from src.services.snapshot_store import SnapshotStore
 from src.services.status import missing_releases, release_status
@@ -172,8 +172,8 @@ def selection_bar() -> tuple[str, str, str]:
     if ss.get("crop") not in crop_options(ss["season"]):
         ss["crop"] = "maize"
     if ss["gap"] != GAP_THRESHOLD or ss["min_ha"] != MIN_HARVESTED_HA:
-        st.markdown(f"<div class='umz-warn'>Testing non-default benchmark settings (below = under {ss['gap']:.0%} of "
-                    f"national, reliable from {ss['min_ha']:,.0f} ha). Reset them in Evidence.</div>",
+        st.markdown(f"<div class='umz-warn'>Testing non-default cut-offs (short = under {ss['gap']:.0%} of the "
+                    f"national average, counted from {ss['min_ha']:,.0f} ha). Reset them in Evidence.</div>",
                     unsafe_allow_html=True)
     return ss["crop"], ss["district"], ss["season"]
 
@@ -396,8 +396,8 @@ def page_evidence() -> None:
         ["Survey by survey", f"{district} over time", "Seed and fertilizer", "All districts table",
          "Data and methods"])
     with tab_grid:
-        st.caption("Each cell is the district's yield as % of the national yield in that survey. The outlined block "
-                   "is the last 3 surveys, which decide the map colour.")
+        st.caption("Each cell is the district's harvest per hectare as a share of the national average in that survey. "
+                   "The outlined block is the last 3 surveys, which decide the label.")
         st.plotly_chart(charts.pattern_grid(ev, data.panel, SID, crop, season, highlight=district),
                         width="stretch", config=PLOT_CONFIG)
     with tab_hist:
@@ -408,90 +408,113 @@ def page_evidence() -> None:
     with tab_inp:
         st.plotly_chart(charts.input_context_chart(ev, SID, crop, season, highlight=district),
                         width="stretch", config=PLOT_CONFIG)
-        st.caption("Share of farmers using the input on any crop in the district; NISR does not publish it per "
-                   "crop at district level.")
+        st.caption("Share of farmers in the district who used the input on any crop. NISR does not publish it per "
+                   "crop for each district.")
     with tab_all:
-        cols = {"district": "District", "province": "Province", "category": "Finding",
-                "latest_ratio": "Yield as % of national (latest)", "below_in_window": "Below in last 3 surveys",
-                "reliable_in_window": "Reliable of last 3", "latest_harvested_ha": "Harvested ha (latest)",
-                "improved_seed_pct": "Improved seed %", "inorganic_fert_pct": "Inorganic fertilizer %"}
+        cols = {"district": "District", "province": "Province", "category": "Label",
+                "latest_ratio": "Share of national average (latest)", "below_in_window": "Short in last 3 surveys",
+                "reliable_in_window": "Surveys with enough fields (of 3)", "latest_harvested_ha": "Harvested ha (latest)",
+                "improved_seed_pct": "Farmers using improved seed %", "inorganic_fert_pct": "Farmers using fertilizer %"}
         show = ev[list(cols)].rename(columns=cols)
-        show["Yield as % of national (latest)"] = show["Yield as % of national (latest)"] * 100
+        show["Label"] = show["Label"].map(PLAIN_CATEGORY)
+        show["Share of national average (latest)"] = show["Share of national average (latest)"] * 100
         st.dataframe(show, hide_index=True, width="stretch", column_config={
-            "Yield as % of national (latest)": st.column_config.NumberColumn(format="%.1f%%"),
+            "Share of national average (latest)": st.column_config.NumberColumn(format="%.1f%%"),
             "Harvested ha (latest)": st.column_config.NumberColumn(format="%.0f"),
-            "Improved seed %": st.column_config.NumberColumn(format="%.1f"),
-            "Inorganic fertilizer %": st.column_config.NumberColumn(format="%.1f")})
+            "Farmers using improved seed %": st.column_config.NumberColumn(format="%.1f"),
+            "Farmers using fertilizer %": st.column_config.NumberColumn(format="%.1f")})
         st.download_button("Download table (CSV)", ev.to_csv(index=False).encode("utf-8"),
                            file_name=f"umuzi_{crop}_season{season}_{SID}.csv", mime="text/csv")
     with tab_meth:
         methods()
 
 
+BACKTEST_NAMES = {
+    "last_1": "Short in the latest survey",
+    "last_2_both": "Short in both of the last 2",
+    "last_3_all": "Short in all of the last 3",
+    "last_3_two": "Short in 2 of the last 3 (used by the app)",
+    "all_history": "Short in every survey since 2018 (first version)",
+    "model": "Statistical model (logistic regression)",
+}
+
+
 def methods() -> None:
     eda, bt = report("history_eda.json"), report("backtest_results.json")
     st.markdown(f"""
-**How a district is labelled.** For the chosen crop and season, each district's yield is divided by the national
-yield of the same survey. It is *below national* when under {GAP_THRESHOLD:.0%} (NISR publishes no district margins
-of error, so smaller gaps are not flagged). An estimate is *reliable* when a yield is reported and at least
-{MIN_HARVESTED_HA:,.0f} ha were harvested. *Repeatedly below* means below in at least 2 of the last 3 surveys of
-that season, with at least 2 reliable. Seed and fertilizer use are then compared with national: both below
-national gives the "seed and fertilizer use low" label.""")
+**How a district gets its label.** For the chosen crop and season, the district's harvest per hectare is divided
+by the national average of the same survey. A survey counts as *short* when the district is under
+{GAP_THRESHOLD:.0%} of the national average: NISR publishes no margin of error for district yields, so smaller gaps
+cannot be told apart from survey noise. A survey counts only if a yield was published and the crop covered at
+least {MIN_HARVESTED_HA:,.0f} ha in the district. *Repeated* means short in at least 2 of the last 3 surveys of
+that season. Seed and fertilizer use are then compared with the national share: when both are lower, the label
+points to inputs first. The full explanation is in `docs/methodology.md` in the repository.
 
-    st.markdown("**1. Which survey years can be used.** Every downloaded file was checked for district-level yield tables.")
+**Why {MIN_HARVESTED_HA:,.0f} ha.** NISR does not measure every field. It samples 1,200 squares of land and
+records the plot under each of 25 points in every square. Its Season B 2026 report (Table 5, p.17) shows that for
+the five main seasonal crops the survey observes 21 to 42 plots per 1,000 ha, so 500 ha corresponds to about 10 to
+21 plots. Below that, a district average may rest on only a few farmers' answers.""")
+
+    st.markdown("**1. Which survey years can be used.** Every downloaded file was checked for yield tables by district.")
     if eda.get("source_audit"):
         st.dataframe(pd.DataFrame(eda["source_audit"]).sort_values(["year", "kind"]), hide_index=True, width="stretch")
-    st.markdown("2014-2017 report yields only by land-use stratum or province, so district analysis starts in 2018. "
-                "Season B 2025 was not published. 2018 reports input use per plot or without a stated basis, not per "
-                "farmer, so its input figures are not used.")
+    st.markdown("The 2015-2017 tables give yields only by land type or province, and for 2014 only a PDF report was "
+                "found, so district analysis starts in 2018. "
+                "Season B 2025 was not published. In 2018, seed and fertilizer use were counted per plot rather than "
+                "per farmer, so those figures are not used.")
 
-    st.markdown("**2. Checks on every survey** (run automatically before data can go live).")
+    st.markdown("**2. Checks every survey must pass** (run automatically before the data can be used).")
     status, missing = cached_status(SID)
     st.dataframe(status[["release", "gate", "yield_cells_observed", "yield_cells_not_reported", "warnings", "notes"]],
                  hide_index=True, width="stretch")
     if missing:
-        st.caption("Missing between first and last survey: " + ", ".join(missing))
+        st.caption("Missing between the first and last survey: " + ", ".join(missing))
     if eda.get("reprinted_national_check"):
         d = pd.DataFrame(eda["reprinted_national_check"])
-        st.markdown(f"Duplicates and revisions: {len(d)} national production values that later workbooks re-print "
-                    f"for the previous year match the original survey with a largest difference of "
-                    f"{d['diff_pct'].abs().max():.2f}%. The 2024 annual workbook matches the separate 2024 Season A and "
+        st.markdown(f"Duplicates and revisions: {len(d)} national production figures that later workbooks re-print "
+                    f"for the previous year match the original survey (largest difference "
+                    f"{d['diff_pct'].abs().max():.2f}%). The 2024 annual workbook matches the separate 2024 Season A and "
                     "B files cell for cell.")
 
-    st.markdown("**3. Do districts keep their position over time?** Median rank agreement (Spearman) of district "
-                "yield ratios between consecutive surveys of the same season, across six priority crops.")
+    st.markdown("**3. Do districts keep their place over time?** How closely the order of districts in one survey "
+                "matches the next survey of the same season (1 = same order, 0 = unrelated), middle value across "
+                "six priority crops.")
     if eda.get("rank_agreement"):
-        ra = [dict(season=s, surveys=k.replace("SAS-", "").replace("|", " to "), median_rho=v)
+        ra = [dict(season=s, surveys=k.replace("SAS-", "").replace("|", " to "), agreement=v)
               for s in "AB" for k, v in eda["rank_agreement"][s]["consecutive"].items()]
         st.dataframe(pd.DataFrame(ra), hide_index=True, width="stretch")
-        early = [r["median_rho"] for r in ra if r["season"] == "A" and r["surveys"][:4] in ("2018", "2019")]
-        later = [r["median_rho"] for r in ra if r["season"] == "A" and r["surveys"][:4] >= "2020"]
-        st.markdown(f"Season A agreement is weak from 2018 to 2020 ({', '.join(f'{v:.2f}' for v in early)}) and "
-                    f"{min(later):.2f} to {max(later):.2f} since, so the label uses the most recent three surveys "
+        early = [r["agreement"] for r in ra if r["season"] == "A" and r["surveys"][:4] in ("2018", "2019")]
+        later = [r["agreement"] for r in ra if r["season"] == "A" and r["surveys"][:4] >= "2020"]
+        st.markdown(f"In Season A the order agrees weakly from 2018 to 2020 ({', '.join(f'{v:.2f}' for v in early)}) "
+                    f"and {min(later):.2f} to {max(later):.2f} since, so the label uses the three most recent surveys "
                     "rather than all history.")
 
-    st.markdown("**4. Would a statistical model flag next season's shortfalls better than the rules?**")
+    st.markdown("**4. Could a statistical model spot next season's shortfalls better than simple rules?**")
     if bt:
-        rows = [dict(method=k.replace("_", " "), balanced_accuracy=v["balanced_accuracy"],
-                     shortfalls_caught=v["recall"], precision=v["precision"], brier_score=v["brier"])
+        rows = [dict(method=BACKTEST_NAMES.get(k, k), balanced_accuracy=v["balanced_accuracy"],
+                     shortfalls_caught=v["recall"] * 100, flags_that_were_right=v["precision"] * 100)
                 for k, v in bt["test"].items()]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", column_config={
+            "shortfalls_caught": st.column_config.NumberColumn(format="%.0f%%"),
+            "flags_that_were_right": st.column_config.NumberColumn(format="%.0f%%")})
         ci = bt["model_vs_best_rule_test"]["balanced_accuracy_diff_ci"]
         st.markdown(
-            f"Tested on the {bt['n_units']['test']} district-crop cases of 2024-2026, using only earlier surveys to "
-            f"predict each one. The logistic model was no more accurate than the best rule (difference "
-            f"{ci[0]:+.3f} to {ci[1]:+.3f}, 95% interval), so **the rules were kept** ({bt['decision']}). The old rule "
-            f"'below in every survey' caught only {bt['test']['all_history']['recall']:.0%} of next-season shortfalls; "
-            f"'below in 2 of the last 3' catches {bt['test']['last_3_two']['recall']:.0%}, which is why it is the "
-            "rule now used.")
+            f"Each method used only earlier surveys to say whether a district would be short in the next survey, for "
+            f"{bt['n_units']['test']} district-crop cases in 2024-2026. Balanced accuracy weighs shortfalls caught and "
+            f"false alarms equally (0.5 is guessing, 1.0 is perfect). The model was no more accurate than the best "
+            f"rule (difference {ci[0]:+.3f} to {ci[1]:+.3f}, 95% range), so **the rules were kept**. "
+            f"'Short in 2 of the last 3' was chosen for its meaning rather than its score: it tells a pattern from a "
+            f"one-off and still catches {bt['test']['last_3_two']['recall']:.0%} of next-season shortfalls, against "
+            f"{bt['test']['all_history']['recall']:.0%} for the first version of the rules. Every district short in "
+            "the latest survey is still flagged, as a repeated shortfall or a one-season dip.")
 
-    with st.expander("Test the benchmark settings (sensitivity)"):
+    with st.expander("Try other cut-offs"):
         ss["w_gap"], ss["w_min_ha"] = ss["gap"], ss["min_ha"]
-        st.slider("Below national if yield is under this share of national", 0.70, 0.98, key="w_gap", step=0.01,
-                  on_change=sync, args=("gap",))
-        st.select_slider("Reliable from this harvested area (ha)", [100.0, 200.0, 500.0, 1000.0, 2000.0],
-                         key="w_min_ha", on_change=sync, args=("min_ha",))
-        st.caption("Defaults: 90% and 500 ha. Changing them recolours the map and the assistant's answers.")
+        st.slider("Count a survey as short when the district is under this share of the national average", 0.70, 0.98,
+                  key="w_gap", step=0.01, on_change=sync, args=("gap",))
+        st.select_slider("Count a survey only when the crop covers at least this area (ha)",
+                         [100.0, 200.0, 500.0, 1000.0, 2000.0], key="w_min_ha", on_change=sync, args=("min_ha",))
+        st.caption("Defaults: 90% and 500 ha. Changing them recolours the map and changes the assistant's answers.")
 
 
 {"home": page_home, "explore": page_explore, "why": page_why, "ask": page_ask,

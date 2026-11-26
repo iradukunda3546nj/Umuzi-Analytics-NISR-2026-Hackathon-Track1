@@ -1,4 +1,8 @@
-# Data Dictionary
+# Data dictionary
+
+What each column in the stored data means. This file is for people who open the data or the code; the
+app itself shows plain labels. Every number in the app comes from `data/snapshots/<id>/records.csv`,
+which has one row per published cell of an NISR table.
 
 ## Canonical record (`data/snapshots/<id>/records.csv`)
 
@@ -43,11 +47,26 @@ Join key: (`release_id`, `district`, `crop`, `metric`). District names join to t
 | `window_releases` | the last 3 releases of the season type, ending at the latest |
 | `reliable_in_window`, `below_in_window` | counts over the window, reliable releases only |
 | `repeated_below` | latest release reliable, at least 2 reliable and at least 2 below in the window |
-| `limited_reason` | plain-language reason when the category is "Evidence too limited to judge" |
+| `limited_reason` | plain-language reason when the label is "Too uncertain to judge" |
 | `inputs_low` | district improved-seed and inorganic-fertilizer uptake both below national, latest release; unknown if any value is missing |
-| `category` | see `docs/methodology.md` |
+| `category` | the label; rules in `docs/methodology.md`, section 3 (names below) |
 | National A+B yield | (A production + B production) / (A harvested + B harvested), same SAS year, both seasons required |
 
 ## Reference table: `data/reference/psta5_productivity_targets.csv`
 
 `crop, baseline_2023, target_2024_25 ... target_2028_29, unit (MT/ha), source`. Transcribed from PSTA 5 Abridged, p.21.
+
+## Label names: in the data and on screen
+
+The stored data keep the original category names so older snapshots and reports stay readable. The app
+shows the plain names (`src/decisions/explain.py`).
+
+| Stored name (`category`) | Shown in the app |
+|---|---|
+| Repeatedly below national, low input uptake | Repeated shortfall, seed and fertilizer use low |
+| Repeatedly below national, input uptake not low | Repeated shortfall, seed and fertilizer use not low |
+| Below national in the latest season only | One-season dip |
+| Evidence too limited to judge | Too uncertain to judge |
+| Not below national | At or above the national average |
+
+"Uptake" in the stored names means the share of farmers who used the input on any crop.

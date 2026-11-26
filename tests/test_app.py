@@ -100,7 +100,7 @@ def test_brief_download_and_methods():
 
 def test_non_default_benchmark_is_flagged():
     at = run(view="explore", gap=0.8)
-    assert "non-default benchmark settings" in text(at)
+    assert "non-default cut-offs" in text(at)
 
 
 def test_thin_evidence_is_not_presented_as_a_firm_gap():

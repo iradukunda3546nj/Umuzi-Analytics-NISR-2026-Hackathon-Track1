@@ -102,9 +102,9 @@ def target_attainment_chart(nvt: pd.DataFrame, snapshot_id: str) -> go.Figure:
         customdata=np.c_[cur["yield_t_ha"].round(2), cur["target_t_ha"]], showlegend=False,
         hovertemplate="%{y}<br>Yield %{customdata[0]} t/ha<br>Target %{customdata[1]} t/ha<extra></extra>"))
     fig.add_vline(x=100, line=dict(color=REFERENCE, width=1.5, dash="dot"))
-    fig.add_annotation(x=100, y=1.0, yref="paper", text="PSTA 5 target", showarrow=False,
+    fig.add_annotation(x=100, y=1.0, yref="paper", text="PSTA 5 goal", showarrow=False,
                        xanchor="left", yanchor="bottom", xshift=4, font=dict(size=11, color=INK_2))
-    fig.update_xaxes(title="National Season A+B yield as % of the PSTA 5 target", ticksuffix="%", range=[30, 110])
+    fig.update_xaxes(title="National harvest per hectare (Seasons A and B) as % of the PSTA 5 goal", ticksuffix="%", range=[30, 110])
     ag = cur["agricultural_year"].iloc[0]
     n_below = int((cur["attainment"] < 1).sum())
     lead = "All" if n_below == len(cur) else f"{n_below} of"
@@ -213,11 +213,11 @@ def category_map(ev: pd.DataFrame, snapshot_id: str, crop: str, season: str,
     rel = ev["latest_release"].iloc[0]
     n_rep = int(ev["category"].isin(REPEATED).sum())
     fig = _base_layout(
-        fig, f"{crop_label(crop)}, Season {season}: {n_rep} districts repeatedly below national",
-        f"Latest survey {_release_short(rel)}. Repeatedly below = under {GAP_THRESHOLD:.0%} of national in at "
-        "least 2 of the last 3 surveys of this season.",
+        fig, f"{crop_label(crop)}, Season {season}: {n_rep} districts with a repeated shortfall",
+        f"Latest survey {_release_short(rel)}. Repeated shortfall = under {GAP_THRESHOLD:.0%} of the national average "
+        "in at least 2 of the last 3 surveys of this season.",
         _src(ev["window_releases"].iloc[0].replace(",", ", "), snapshot_id,
-             "Boundaries: geoBoundaries RWA ADM2 (source: NISR geodata, CC BY 4.0). Inputs = all crops pooled."),
+             "Boundaries: geoBoundaries RWA ADM2 (source: NISR geodata, CC BY 4.0). Seed and fertilizer use cover all crops."),
         height=560)
     if compact:
         fig.update_layout(title=None, height=470, margin=dict(l=0, r=0, t=0, b=0), annotations=[])
@@ -263,10 +263,10 @@ def pattern_grid(ev: pd.DataFrame, panel: pd.DataFrame, snapshot_id: str, crop: 
     fig = go.Figure(go.Heatmap(
         z=np.array(z) + 0.5, x=[_release_short(r) for r in rels], y=ev["district"], zmin=0, zmax=4,
         colorscale=scale, showscale=False, xgap=2, ygap=2, text=text, texttemplate="%{text}",
-        textfont=dict(size=10), hovertemplate="%{y}, %{x}: %{text} of national<extra></extra>"))
-    for name, label in [("below", f"Below {GAP_THRESHOLD:.0%} of national"), ("not below", "Not below"),
-                        ("thin", f"Under {MIN_HARVESTED_HA:,.0f} ha harvested (not counted)"),
-                        ("missing", "Not reported (n/r)")]:
+        textfont=dict(size=10), hovertemplate="%{y}, %{x}: %{text} of the national average<extra></extra>"))
+    for name, label in [("below", f"Short (under {GAP_THRESHOLD:.0%} of the national average)"), ("not below", "On par or above"),
+                        ("thin", f"Too few fields: under {MIN_HARVESTED_HA:,.0f} ha (not counted)"),
+                        ("missing", "No figure published (n/r)")]:
         fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", name=label,
                                  marker=dict(size=11, symbol="square", color=STATE_COLORS[name],
                                              line=dict(color="#6b6f6c", width=1))))
@@ -282,9 +282,9 @@ def pattern_grid(ev: pd.DataFrame, panel: pd.DataFrame, snapshot_id: str, crop: 
     fig.update_xaxes(side="top", showgrid=False, type="category", tickfont=dict(size=11, color=INK))
     n_rep = int(ev["category"].isin(REPEATED).sum())
     fig = _base_layout(
-        fig, f"{crop_label(crop)}, Season {season}: each district against national, survey by survey",
-        f"{n_rep} districts are below in at least 2 of the last 3 surveys (outlined block). "
-        "Cells: district yield as % of national.",
+        fig, f"{crop_label(crop)}, Season {season}: each district against the national average, survey by survey",
+        f"{n_rep} districts are short in at least 2 of the last 3 surveys (outlined block). "
+        "Cells: district harvest per hectare as % of the national average.",
         _src(f"Season {season} {rels[0][4:8]}-{rels[-1][4:8]}", snapshot_id,
              "District rankings from 2018-2019 agree only weakly with later years, so labels use the last 3 surveys."),
         height=max(640, 22 * len(ev) + 240), margin_l=110)
@@ -316,20 +316,20 @@ def district_history_chart(panel: pd.DataFrame, district: str, crop: str, season
                     line=dict(color=colors, width=2)), showlegend=False,
         customdata=np.c_[(d["yield_kg_ha"] / 1000).round(2), (d["national_yield_kg_ha"] / 1000).round(2),
                          d["harvested_ha"].round(0)],
-        hovertemplate="%{x}: %{y:.0f}% of national<br>%{customdata[0]} t/ha vs national %{customdata[1]} t/ha"
+        hovertemplate="%{x}: %{y:.0f}% of the national average<br>%{customdata[0]} t/ha vs national average %{customdata[1]} t/ha"
                       "<br>harvested %{customdata[2]:,} ha<extra></extra>"))
     fig.add_hline(y=100, line=dict(color=REFERENCE, width=1))
     fig.add_hline(y=GAP_THRESHOLD * 100, line=dict(color=red, width=1, dash="dot"))
-    fig.add_annotation(x=0, xref="paper", y=100, text="national", showarrow=False, xanchor="left",
+    fig.add_annotation(x=0, xref="paper", y=100, text="national average", showarrow=False, xanchor="left",
                        yanchor="bottom", font=dict(size=11, color=INK_2))
-    fig.add_annotation(x=0, xref="paper", y=GAP_THRESHOLD * 100, text=f"{GAP_THRESHOLD:.0%} benchmark",
+    fig.add_annotation(x=0, xref="paper", y=GAP_THRESHOLD * 100, text=f"shortfall line ({GAP_THRESHOLD:.0%})",
                        showarrow=False, xanchor="left", yanchor="top", font=dict(size=11, color=INK_2))
     top = max(130.0, float(np.nanmax(y)) + 10) if y.notna().any() else 130.0
-    fig.update_yaxes(title="Yield as % of national", ticksuffix="%", range=[0, top])
+    fig.update_yaxes(title="Harvest as % of the national average", ticksuffix="%", range=[0, top])
     fig.update_xaxes(title=None, type="category")
     return _base_layout(
         fig, f"{district}, {crop_label(crop).lower()}, Season {season}: every survey since {x[0][:4]}",
-        "Red dot: below the benchmark. Open circle: thin coverage or not reported (not counted).",
+        "Red dot: short (under the shortfall line). Open circle: too few fields or no figure published (not counted).",
         _src(f"Season {season} {x[0][:4]}-{x[-1][:4]}", snapshot_id), height=420)
 
 
@@ -357,7 +357,7 @@ def input_context_chart(ev: pd.DataFrame, snapshot_id: str, crop: str, season: s
             customdata=np.c_[(g["latest_ratio"] * 100).round(0)], hovertext=g["district"],
             hovertemplate="<b>%{hovertext}</b><br>Improved seed: %{x:.1f}% of farmers"
                           "<br>Inorganic fertilizer: %{y:.1f}% of farmers"
-                          "<br>Yield: %{customdata[0]:.0f}% of national<extra></extra>"))
+                          "<br>Harvest: %{customdata[0]:.0f}% of the national average<extra></extra>"))
     if highlight in set(d["district"]):
         r = d.set_index("district").loc[highlight]
         fig.add_trace(go.Scatter(x=[r["improved_seed_pct"]], y=[r["inorganic_fert_pct"]], mode="markers",
@@ -370,7 +370,7 @@ def input_context_chart(ev: pd.DataFrame, snapshot_id: str, crop: str, season: s
     fig.add_annotation(x=1.0, xref="paper", y=nfert, text=f"national {nfert:.0f}%", showarrow=False,
                        xanchor="right", yanchor="bottom", font=dict(size=11, color=INK_2))
     fig.add_annotation(x=0.01, y=0.01, xref="paper", yref="paper", xanchor="left", yanchor="bottom",
-                       text="Lower left: both inputs below national", showarrow=False,
+                       text="Lower left: both used by fewer farmers than nationally", showarrow=False,
                        font=dict(size=11, color=INK_3))
     fig.update_xaxes(title="Farmers using improved seed (%, all crops)", ticksuffix="%")
     fig.update_yaxes(title="Farmers using inorganic fertilizer (%, all crops)", ticksuffix="%")
@@ -378,9 +378,9 @@ def input_context_chart(ev: pd.DataFrame, snapshot_id: str, crop: str, season: s
     n_low = int((d["category"] == CATEGORY_REPEATED_LOW_INPUT).sum())
     rel = _release_short(d["latest_release"].iloc[0])
     return _base_layout(
-        fig, f"{crop_label(crop)}, Season {season}: {n_ok} of {n_ok + n_low} repeatedly-below districts "
+        fig, f"{crop_label(crop)}, Season {season}: {n_ok} of {n_ok + n_low} districts with a repeated shortfall "
              "do not have both seed and fertilizer use low",
-        f"Share of farmers using each input in {rel}, all crops pooled. Occurring together is not proof of cause.",
+        f"Share of farmers using each input in {rel}, on any crop. Low use alongside low harvests is not proof of cause.",
         _src(rel, snapshot_id, "Seed and fertilizer use is published per district for all crops combined, not per crop."),
         height=560)
 
@@ -408,8 +408,8 @@ def triage_matrix(cat_wide: pd.DataFrame, snapshot_id: str, season: str) -> go.F
     fig.update_xaxes(side="top", showgrid=False, tickfont=dict(size=12, color=INK))
     multi = int((cat_wide.isin(REPEATED).sum(axis=1) >= 3).sum())
     fig = _base_layout(
-        fig, f"Season {season}: {multi} districts are repeatedly below national in three or more priority crops",
-        "Evidence category for each district and PSTA 5 priority crop, latest survey of this season",
+        fig, f"Season {season}: {multi} districts have a repeated shortfall in three or more priority crops",
+        "Label for each district and PSTA 5 priority crop, latest survey of this season",
         _src(f"Season {season} surveys", snapshot_id), height=820, margin_l=110)
     fig.update_layout(margin=dict(t=150), legend=dict(y=1.09))
     return fig

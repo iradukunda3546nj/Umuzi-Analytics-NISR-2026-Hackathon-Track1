@@ -1,16 +1,20 @@
 # Data folder
 
+Everything the app reads, and where it came from. Files marked "never" are written only by the
+refresh command, so the published numbers always trace back to an unchanged NISR file.
+
 | Path | Contents | Edited by hand? |
 |---|---|---|
-| `raw/nisr_sas/` | Immutable copies of NISR Seasonal Agricultural Survey table workbooks, named `<release>__<sha256 prefix>.xlsx` | Never. Written only by the refresh command. |
+| `raw/nisr_sas/` | Unchanged copies of the NISR Seasonal Agricultural Survey table workbooks, named `<survey>__<start of checksum>.xlsx` | Never. Written only by the refresh command. |
 | `raw/boundaries/` | geoBoundaries RWA ADM2 simplified GeoJSON (30 districts, from NISR geodata, CC BY 4.0) and its metadata | No |
 | `raw/reference/` | SAS 2024 Annual workbook (validation cross-check) and the download log | No |
 | `reference/psta5_productivity_targets.csv` | PSTA 5 national yield targets, transcribed from MINAGRI PSTA 5 Abridged, p.21 | Yes, cited |
 | `sources.json` | Source URL, landing page and season for each ingested release | Yes |
-| `release_registry.json` | Every ingested raw file: checksum, adapter version, tables used, supersession lineage | No (written by pipeline) |
-| `snapshots/<id>/` | `records.csv` (canonical long records) and `manifest.json` (releases, gates, approval) | No |
+| `release_registry.json` | Every file loaded: checksum, reader version, tables used, and which file replaced which | No (written by the refresh command) |
+| `snapshots/<id>/` | `records.csv` (one row per published cell) and `manifest.json` (surveys included, check results, approval). The older snapshot is kept so the app can be rolled back and so Parts 1-4 of `reports/eda_findings.md` can be reproduced. | No |
 | `snapshots/ACTIVE.json` | Pointer to the approved snapshot the app reads | Only via `approve` or `rollback` |
 | `chatBOT.png` | Umuzi Assistant icon | - |
+| `BackGD.jpg` | Landing-page background photo | - |
 | `incoming/` (git-ignored) | Original downloads before staging; `incoming/nisr_sas_history/` holds the 2014-2023 files checked by `scripts/history_eda.py` | - |
 | `quarantine/` (git-ignored) | Rejected files with `reason.json` | - |
 

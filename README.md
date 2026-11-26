@@ -1,75 +1,117 @@
 ﻿# Umuzi Analytics
 
-**What Rwanda's agricultural survey says about each district's crop yields, and what to check next.**
+**Rwanda's farm survey, turned into a plain answer for every district: where the harvest falls short,
+whether it keeps happening, and what to check first.**
+
 NISR Big Data Hackathon 2026, Track 1: Agricultural Productivity.
 
 ## The problem
 
-Rwanda's NST2 and the PSTA 5 agriculture plan aim for a 50% increase in priority food crop productivity, with yield targets measured by the NISR Seasonal Agricultural Survey (SAS) (MINAGRI, PSTA 5 Abridged, p.14 and p.21). In 2025/26, national Season A+B yields for all eight PSTA 5 priority crops were below their targets, from 52% of target (soybean) to 97% (paddy rice).
+Rwanda's agriculture plan (PSTA 5) restates the NST2 goal of a 50% increase in agricultural
+productivity (MINAGRI, PSTA 5 Abridged, p.14) and sets yearly yield targets for eight priority food crops,
+measured with NISR's Seasonal Agricultural Survey (p.21). In 2025/26 the national harvest per hectare was below the plan's goal for all eight priority
+crops, from 52% of the goal (soybean) to 97% (paddy rice).
 
-The targets are national, but the work happens in districts. The survey is published one season at a time, as large tables whose numbering and layout change between years. From those tables it is hard to tell a district that is **repeatedly** below national from one that had **one bad season**, or to see whether a shortfall coincides with **low input uptake** or happens despite it.
+The goals are national, but the work happens in districts. The survey is published each season as dozens
+of large tables whose numbering and layout change from year to year. From those tables it is hard to
+answer three simple questions:
 
-## What Umuzi Analytics does
+- Is this district's harvest short **again and again**, or was it **one bad season**?
+- Do **fewer farmers use improved seed and fertilizer** here, or is the shortfall happening despite them?
+- So **what should the district team check first**?
 
-Choose a crop and a district (type to search), then a season. The Rwanda map shows every district's position; the selected district is outlined, and one short finding sits beside the map with the figures and survey releases behind it.
+## What the app does
 
-| Map colour | Meaning | Suggested check |
+Pick a crop, a district and a season. The app compares the district's harvest per hectare with the
+national average in the last three surveys and gives it one of five labels:
+
+| Label | What it means | First thing to check |
 |---|---|---|
-| Repeatedly below national, low input uptake | Under 90% of the national yield in at least 2 of the last 3 surveys of that season; improved-seed and fertilizer uptake both below national | Input access and timing first |
-| Repeatedly below national, input uptake not low | Same pattern, but input uptake is not low | Soils, erosion, varieties, water |
-| Below national in the latest season only | One-season drop | Check for a season shock; re-check next survey |
-| Too uncertain to judge | Not reported, or under 500 ha harvested (the figure is shown, marked uncertain) | Verify in the field before acting |
-| Not below national | At or above 90% of national now | - |
+| Repeated shortfall, seed and fertilizer use low | Under 90% of the national average in at least 2 of the last 3 surveys, and fewer farmers than nationally use both improved seed and fertilizer | Were inputs in stock, affordable and on time? |
+| Repeated shortfall, seed and fertilizer use not low | Same repeated shortfall, but input use is not low | Soil, slopes and erosion, varieties, water |
+| One-season dip | Short in the latest survey only | Weather, pests, planting dates; look again next season |
+| Too uncertain to judge | No figure published, or the crop covers under 500 ha in the district, so the average rests on very few sampled plots | Confirm the harvest locally before acting |
+| At or above the national average | At least 90% of the national average in the latest survey | What is working here that could help neighbours? |
 
-These are **checks, not prescriptions**. The survey shows where yields are low, not why.
+These are **things to check, not prescriptions**. The survey shows where harvests are low, not why.
 
-The app has five sections, each answering one question:
+The app has five sections, one question each:
 
-| Section | Question it answers | What the user sees |
+| Section | Question | What you see |
 |---|---|---|
-| Home | What is this, and who is it for? | One question and a promise in plain words, four cards (Where, When, Why, What), the data in one line, the path Pick a district, See how it compares, Ask why, Take action |
-| Your district | How far is it from Rwanda's yield? | Map (click a district), an arrow flying to a bullseye that stands for Rwanda's yield, the last 3 surveys as tick/cross tiles, Rwanda against the PSTA 5 target |
-| Why? | Pattern or one-off? Seed or fertilizer? What to check? | Three numbered cards (survey tiles; seed and fertilizer bars, here vs Rwanda; the verdict), a "Take action" card with 2-4 field checks, the brief download, and the assistant |
-| Ask Umuzi | Anything across districts and crops | The assistant (see below) |
-| Evidence | Can I trust it? | Survey-by-survey grid, district history, seed and fertilizer scatter, full table, data checks, backtest, sensitivity sliders |
+| Home | What is this, and who is it for? | One question, four cards (Where, When, Why, What), and the path: pick a district, see how it compares, ask why, take action |
+| Your district | How far is it from the national average? | A map you can click, an arrow flying towards a bullseye that stands for the national average, the last 3 surveys as tick or cross tiles, and Rwanda against its national goal |
+| Why? | A pattern or a one-off? Enough seed and fertilizer? What to check? | Three numbered cards, a "Take action" card with 1 to 4 field checks, a downloadable brief, and the assistant |
+| Ask Umuzi | Anything across districts and crops | The assistant |
+| Evidence | Can I trust it? | Every survey since 2018, the district's history, seed and fertilizer compared, the full table, the data checks, the backtest, and sliders to test the cut-offs |
 
-Links are shareable: `?view=why&district=Gasabo&crop=cassava&season=A` opens that page. Values are rounded to whole percent except next to the 90% line, where one more decimal keeps the side visible (89.6% below, 90.2% not below).
+Links can be shared: `?view=why&district=Gasabo&crop=cassava&season=A` opens that page. Percentages are
+rounded to whole numbers, except next to the 90% line, where one more decimal shows which side a district
+is on (89.6% is short, 90.2% is not).
 
-**Umuzi Assistant** (deterministic, no language model): answers *"How is Musanze doing?"*, *"Why?"*, *"What should we check?"*, *"What about Nyamagabe?"*, *"Which districts do best for beans?"*, *"How has it changed since 2018?"*, *"How far is Rwanda from the maize target?"*. It follows the selected district, tolerates misspelled district names and says how it read them, offers the next question as a button, and opens any district it talks about on the map. Its "why" and "what to check" answers use the same sentences as the Why page (`src/decisions/explain.py`). A question it does not understand gets one line saying so and a few questions it can answer, never a guess.
+**Umuzi Assistant.** Answers questions such as *"How is Musanze doing?"*, *"Why?"*, *"What should we
+check?"*, *"What about Nyamagabe?"*, *"Which districts do best for beans?"*, *"How has it changed since
+2018?"* and *"How far is Rwanda from the maize goal?"*. It does not use an AI language model: every answer
+is built from the same data and rules as the map, so it cannot invent a number. It follows the selected
+district, understands misspelled district names (and says how it read them), suggests the next question,
+and says plainly when it does not understand a question instead of guessing.
 
-### Findings (latest surveys; details in `reports/`)
-- District positions are persistent: rank correlations between consecutive 2024-2026 surveys of 0.70 to 0.99 for seven priority crops (all Holm-adjusted p = 0.004); 60 district-crop pairs were below national in all three Season A surveys of 2024-2026, against 16.9 expected by chance (p = 0.0005). These tests were pre-specified.
-- Maize, Season A: 14 districts are repeatedly below national. Only 3 (Gicumbi, Nyarugenge, Ruhango) have both seed and fertilizer uptake below national; 11 do not. Eight of those 11 (Ngororero, Rutsiro, Karongi, Nyabihu, Nyamasheke, Rubavu, Gakenke, Nyamagabe) combine above-national fertilizer uptake with below-national improved-seed uptake.
-- Season A: 11 districts are repeatedly below national in three or more priority crops; Season B: 8.
+## What the data show
 
-## How the data were used (and why)
+- **Shortfalls come back in the same districts.** For seven priority crops, the order of districts barely
+  changes from one survey to the next (rank agreement 0.70 to 0.99). 60 district-crop pairs were short in
+  all three Season A surveys of 2024-2026, against about 17 if positions were random (chance of 60 or
+  more: 0.05%). Both tests were written down before the results were seen.
+- **For maize, most repeated shortfalls are not about input supply.** In Season A, 14 districts have a
+  repeated maize shortfall. Only 3 (Gicumbi, Nyarugenge, Ruhango) have both seed and fertilizer use below
+  the national share. In 8 of the other 11 (Ngororero, Rutsiro, Karongi, Nyabihu, Nyamasheke, Rubavu,
+  Gakenke, Nyamagabe), fertilizer use is above the national share but improved seed use is below it, which
+  points to seed and varieties rather than fertilizer.
+- **Some districts are short in many crops at once:** 11 districts in three or more priority crops in
+  Season A, and 8 in Season B.
 
-**1. Sources checked from 2014 onward** (`scripts/history_eda.py`, `reports/history_eda.json`). Only the 2018 to 2026 workbooks contain district x crop x season yields; 2014-2016 report yields by land-use stratum and 2017 by province (its table titled "by district" has province columns). Season B 2025 was not published. Result: 17 comparable surveys, 2018 A to 2026 B.
+Details: `reports/eda_findings.md`.
 
-**2. Strict ingestion** (`src/ingestion/sas_adapter.py`). Tables are found by title, not number. The adapter handles each layout change explicitly and refuses to guess:
-- 2018 prints crops as rows and districts as columns; the national value is a "Grand Total" or "Overall Yield" column, never the province subtotal.
-- 2020-2022 tables re-print the previous year's national value ("National 2019 A"); only the row for the survey's own year is the reference. All 36 re-printed values match the earlier survey exactly (no revisions).
-- A crop printed twice with different values (2021 A "Bush bean") is dropped, not chosen.
-- A yield table must state kg/ha. A printed 0 or blank is stored as "not reported", never as zero.
-- 2018 reports input use per plot or without a stated basis, not per farmer, so it is not used; 2018 B harvested area has no season in its title, so `data/sources.json` names the sheet and the production = yield x area gate confirms it.
-- Every survey passes the same gates (30 districts, national row, production = yield x area) and all 17 are published together as one snapshot, or none are.
+## How it works, briefly
 
-**3. What the EDA found.**
-- District input uptake (seed, fertilizer) is published only for all crops together, in every year. Crop-specific seed use exists only nationally.
-- National levels shift between years in ways the files do not explain (for example national inorganic-fertilizer uptake goes from 39% of farmers in 2022 A to 60% in 2023 A, and national bean yield falls 26% from 2019 A to 2020 A). Comparing each district with the national value of the same survey removes such shifts.
-- District rankings agree weakly between consecutive Season A surveys from 2018 to 2020 (median rho 0.29 and 0.39) and much more strongly since (0.64 to 0.92; Season B 0.75 to 0.91 since 2019).
+The full explanation, in plain words, is in `docs/methodology.md`.
 
-**4. Model or rules?** (`scripts/backtest.py`, `reports/backtest_results.json`). The task: predict whether a district will be below national in the next survey of the same season, using only earlier surveys. On the held-out 2024-2026 surveys (754 district-crop cases), a logistic regression was no better at flagging shortfalls than the simple rule "below in the previous survey" (balanced accuracy 0.867 vs 0.868; 95% interval of the difference -0.019 to +0.015). It was better calibrated (Brier 0.093 vs 0.111), but that does not change which districts are flagged, so **the rules were kept**. The backtest also showed that the old rule, "below in every survey", caught only 40% of next-season shortfalls with nine years of history. "Below in at least 2 of the last 3 surveys" catches 81% and tolerates one noisy survey, so it is the rule now used (evidence rules 2.0).
+1. **Reading the tables.** NISR renumbers its tables between surveys, so the app finds each table by its
+   title. Each layout change since 2018 is handled explicitly. When something is ambiguous (for example a
+   crop printed twice with different values), the value is dropped rather than guessed.
+2. **Checking the data.** Every survey must include all 30 districts and the national figure, production
+   must equal yield times area, and percentages must lie between 0 and 100. A printed 0 or a blank is
+   stored as "not reported", never as zero. A survey that fails is refused, and the app keeps the previous
+   data.
+3. **Comparing like with like.** Each district is compared with the national average of the same survey,
+   which removes national swings such as the 26% drop in the national bean yield from Season A 2019 to Season A 2020. Seasons A and B are
+   never mixed. Only the last 3 surveys decide the label, because district rankings from 2018 and 2019
+   agree poorly with later years.
+4. **Why 500 ha.** NISR measures a sample of plots: for the five main seasonal crops it observes 21 to 42
+   plots per 1,000 ha (SAS Season B 2026 main report, Table 5), so 500 ha corresponds to about 10 to 21
+   plots. Below that, a district average may rest on only a handful of farmers' answers, so the app marks
+   it "too uncertain to judge".
+5. **Rules or a statistical model?** We tested whether a statistical model (logistic regression) could
+   anticipate next season's shortfalls better than simple rules, using only earlier surveys, on 754 cases
+   from 2024-2026. It could not: balanced accuracy 0.867 for the model against 0.868 for the simplest rule
+   ("short in the latest survey"), a difference between -0.019 and +0.015. So the app uses transparent
+   rules that anyone can check by hand.
+6. **Why "2 of the last 3".** It was chosen for its meaning, not because it scored highest. It separates a
+   pattern from a one-off, which "short in the latest survey" cannot, and it still catches 81% of next-season
+   shortfalls (the first version, "short in every survey since 2018", caught only 40%). The app also flags
+   every district short in the latest survey as a "one-season dip", so nothing is hidden.
 
 ## Data
 
-| Source | Use |
+| Source | Used for |
 |---|---|
-| NISR Seasonal Agricultural Survey district tables, 2018 A to 2026 B except 2025 B (statistics.gov.rw, CC BY 4.0) | Yields, harvested and cultivated area, production, improved-seed and fertilizer uptake |
-| MINAGRI PSTA 5 Abridged plan, results framework p.21 | National yield targets |
+| NISR Seasonal Agricultural Survey, district tables, Season A 2018 to Season B 2026 (Season B 2025 was not published); statistics.gov.rw, CC BY 4.0 | Harvest per hectare, harvested and planted area, production, seed and fertilizer use |
+| NISR SAS Season B 2026 main report | How the survey samples land, which justifies the 500 ha rule |
+| MINAGRI PSTA 5 abridged plan, results framework p.21 | National yield goals |
 | geoBoundaries RWA ADM2 (from NISR geodata, CC BY 4.0) | District map |
 
-Checksum-named copies of every workbook used are in `data/raw/nisr_sas/`; provenance is in `data/sources.json` and `data/release_registry.json`. The 2024-2026 files have exact download URLs; the 2018-2023 annual workbooks were downloaded from the [NISR SAS page](https://statistics.gov.rw/data-sources/surveys/Seasonal-Agricultural-Survey) and keep their original file names in `data/sources.json`.
+Unchanged copies of every workbook used are in `data/raw/nisr_sas/`, named with their checksum, and the
+origin of each is recorded in `data/sources.json`. See `docs/data_inventory.md` for every source.
 
 Credit: **National Institute of Statistics of Rwanda**, Seasonal Agricultural Survey.
 
@@ -89,41 +131,53 @@ python -m scripts.refresh_data ingest --file "<Tables_2027 Season A.xlsx>" --rel
 python -m scripts.refresh_data approve --snapshot <id printed above>
 ```
 
-The survey is validated before it can be approved. A failing file is quarantined and the app keeps the previous snapshot. Rollback: `python -m scripts.refresh_data rollback --snapshot <id>`. Refresh is analyst-initiated; nothing is scheduled.
+The new survey is checked before it can be approved. A file that fails is set aside and the app keeps the
+previous data. To go back: `python -m scripts.refresh_data rollback --snapshot <id>`. Updates are started
+by an analyst; nothing runs on a schedule.
 
 ## Reproducing everything
 
 ```bash
 pip install -r requirements-dev.txt
-python -m scripts.refresh_data bootstrap --approve  # rebuild the snapshot from data/sources.json
-python -m scripts.history_eda                       # reports/history_eda.json
-python -m scripts.backtest                          # reports/backtest_results.json
-python -m scripts.run_analysis                      # reports/analysis_results.json, reports/figures/
-python -m pytest                                    # 74 tests
+python -m scripts.refresh_data bootstrap --approve  # rebuild the data from data/sources.json
+python -m scripts.history_eda                       # which years can be used: reports/history_eda.json
+python -m scripts.backtest                          # rules against the model: reports/backtest_results.json
+python -m scripts.run_analysis                      # tests and charts: reports/analysis_results.json, reports/figures/
+python -m pytest                                    # 74 automated tests
 ```
 
-`bootstrap` and the source audit in `history_eda` read the original downloads from `data/incoming/` (not committed). Every workbook actually used is committed as a checksum-named copy in `data/raw/nisr_sas/`, and the published snapshot in `data/snapshots/` is what the app, tests and other scripts read.
+`bootstrap` and `history_eda` read the original downloads from `data/incoming/`, which is not committed.
+Every workbook the app uses is committed in `data/raw/nisr_sas/`, and the app, tests and scripts read the
+published data in `data/snapshots/`.
 
-## Repository map
+## What is where
 
 ```
-app.py                      Streamlit application: Home, Your district, Why?, Ask Umuzi, Evidence
-src/ingestion/              NISR SAS adapter (title-based discovery, 2018-2026 layouts)
-src/validation/             schema and quality gates
-src/services/               versioned snapshot store, data status
-src/analytics/              indicators and evidence rules (single source of formulas)
-src/decisions/              the Finding, its plain-language explanation (explain.py) and the Evidence Brief
-src/assistant/              Umuzi Assistant (deterministic, answers from the same Finding)
-src/viz/                    charts, map, target arrows, tiles, input bars, icons (hand-drawn SVG)
-src/ui/                     page stylesheet and animations (switched off under reduced motion)
-scripts/                    refresh_data, history_eda, backtest, run_analysis, download_sources
-tests/                      pipeline and historical layouts (synthetic fixtures), rules, real data, assistant, app
-data/                       raw files, snapshots, registry, sources, PSTA 5 targets, assistant icon, landing photo
-docs/  reports/  demo/      methodology and limitations, analysis outputs, demo
+app.py               the app: Home, Your district, Why?, Ask Umuzi, Evidence
+src/ingestion/       reads NISR workbooks (finds tables by title; 2018-2026 layouts)
+src/validation/      the checks a survey must pass before it is used
+src/services/        stores each version of the data and allows rollback
+src/analytics/       the comparisons and the labelling rules (one place for every formula)
+src/decisions/       the finding for a district, its plain-language explanation, and the downloadable brief
+src/assistant/       Umuzi Assistant (answers from the same finding as the map)
+src/viz/             map, charts, target arrows, tiles, bars and hand-drawn icons
+src/ui/              page style and animations (animations switch off if the device asks for less motion)
+scripts/             refresh the data, check history, backtest, run the analysis, download sources
+tests/               automated tests for every step
+data/                NISR files, stored data versions, sources, national goals, images
+docs/                how it works (methodology), limitations, data inventory and dictionary, AI use
+reports/             analysis results and charts
+demo/                demo video and slides
 ```
 
-## Limitations (full list in `docs/limitations.md`)
-Yields are farmer-reported and NISR publishes no district margins of error; input uptake is pooled across crops; associations are not effects; "below national" is not "below potential"; 2018-2019 district rankings are weakly comparable with later years, so labels use the last 3 surveys; Season B 2025 is missing; the tool has not yet been tested with planners.
+## Limitations
 
-## Competition notes
-- AI use is disclosed in `docs/AI_USE_DISCLOSURE.md`.
+Yields are reported by farmers, and NISR publishes no margin of error for districts. Seed and fertilizer
+use are for all crops together. Patterns are not causes. "Below the national average" is not "below what
+is possible". Small crops rest on few sampled plots. Season B 2025 is missing. The app has not yet been
+tested with planners, and no agronomist has reviewed the thresholds or field checks. Full list:
+`docs/limitations.md`.
+
+## AI use
+
+Disclosed in `docs/AI_USE_DISCLOSURE.md`.

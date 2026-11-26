@@ -1,16 +1,41 @@
-# Limitations
+# What the app cannot tell you
 
-1. **Farmer-reported yields.** SAS yields come from farmer estimation, not crop cuts (SAS 2026A report, p.22). District differences may partly reflect reporting differences.
-2. **No district standard errors.** NISR publishes sampling errors at national level only. The coverage threshold and cross-season consistency are proxies, not confidence intervals. Small yield-ratio differences (a few hundredths) should not be read as real.
-3. **Possible sample overlap across seasons.** The reports inspected do not say whether segments are revisited. If they are, the high cross-season consistency (H1) overstates independent confirmation.
-4. **Comparable history starts in 2018, and the early years are weakly comparable.** 2014-2017 publish no district yields. District rankings in 2018-2019 agree only weakly with later years (median rank agreement 0.29-0.39 against 0.64-0.92 since 2020), so labels use the last 3 releases. 2025 Season B is missing, so the Season B window is 2023, 2024 and 2026. The 2018 input tables are not comparable and are not used.
-5. **Inputs are pooled across crops.** District input uptake is the share of farmers using an input on any crop. A district can have high fertilizer uptake overall and low use on maize.
-6. **Associations, not effects.** H3 associations are ecological (n <= 30) and confounded by agro-ecology, altitude, rainfall and programme targeting. Nothing here estimates what an input or intervention would change.
-7. **Relative, not agronomic, benchmark.** "Below national" is not "below potential". Crops grown outside their best agro-ecological zone (for example Irish potato in the eastern lowlands) will appear as repeatedly below national that may not be fixable or worth fixing.
-8. **District averages hide variation.** Sector, household, gender and farm-size differences are invisible. LSF and SSF are combined in district yields.
-9. **Threshold sensitivity.** Moving the gap threshold from 0.90 to 0.80 or 0.95 changes 23% to 37% of maize Season A classifications. Coverage-threshold changes have less effect.
-10. **Target comparison is approximate.** PSTA 5's exact aggregation method is not in the abridged plan; Season C is excluded.
-11. **Boundary vintage.** District boundaries are geoBoundaries (boundary year 2012, from NISR geodata). District names and count match the SAS tables; the boundaries are for display only.
-12. **Not field-tested.** No planner, agronomist or farmer has used the tool yet. Usefulness and time savings are unmeasured.
-13. **Refresh is manual.** New releases must be downloaded and approved by an analyst; there is no scheduled retrieval.
-14. **Light theme only.** The chart palette was validated for a light surface; dark mode is not offered.
+1. **Yields are what farmers report.** NISR measures plot areas with GPS but takes harvest amounts from
+   the farmer (SAS Season B 2026 main report, p.20). Some district differences may come from how people
+   report, not from what they harvested.
+2. **No margin of error for districts.** NISR publishes margins of error only for national crop areas
+   (report Table 5, p.17), not for yields and not for districts. The 500 ha rule and the "2 of the last 3
+   surveys" rule are safeguards, not confidence intervals. Small differences, a few percent, should not be
+   read as real.
+3. **Small crops rest on few farmers.** A crop grown on a few hundred hectares in a district may appear on
+   only a handful of sampled plots (see `docs/methodology.md`, section 4). The app labels these "too
+   uncertain to judge" instead of hiding them.
+4. **The same land may be surveyed again.** The reports do not say whether the same sample squares are
+   revisited each season. If they are, the strong season-to-season consistency partly reflects the same
+   plots being measured again.
+5. **Usable history starts in 2018, and the early years compare poorly.** The 2015-2017 tables give no district
+   yields, and for 2014 only a PDF report was found. District rankings in 2018 and 2019 agree only weakly with later years, so labels use the last 3
+   surveys. Season B 2025 is missing, so the Season B window is 2023, 2024 and 2026. Input figures for 2018
+   are counted per plot instead of per farmer and are not used.
+6. **Seed and fertilizer use cover all crops.** The district figure is the share of farmers using the input
+   on any crop. A district can use plenty of fertilizer overall and little on maize.
+7. **Patterns, not causes.** Low input use alongside low yields does not prove that more inputs would help.
+   Altitude, rainfall, soils and where programmes were targeted all play a part. Nothing here estimates
+   what an intervention would change.
+8. **"Below the national average" is not "below what is possible".** A crop grown outside its best zone
+   (for example Irish potato in the eastern lowlands) can look short every season without being fixable
+   or worth fixing.
+9. **District averages hide differences inside the district.** Sectors, households, women and men, and
+   small and large farms are not visible. NISR's district yields combine small and large farms, so a few
+   large commercial farms can raise a district's average.
+10. **The 90% line matters.** Moving it to 80% or 95% changes 17% to 23% of maize Season A labels and up
+    to 30% of maize Season B labels. The 500 ha line matters less for maize and beans, but for Irish potato
+    lowering it to 200 ha changes 23% of labels (`reports/analysis_results.json`, "sensitivity").
+11. **The goal comparison is approximate.** PSTA 5 does not state exactly how it combines seasons, and
+    Season C is left out.
+12. **Map boundaries are for display.** They come from geoBoundaries (2012, from NISR data). District names
+    match the survey tables exactly.
+13. **Not yet tested with users or experts.** No planner, agronomist or farmer has used the app yet, and no
+    agronomist has reviewed the thresholds or the field checklists.
+14. **Updates are manual.** A new survey must be downloaded and approved by an analyst; nothing runs on a
+    schedule.
