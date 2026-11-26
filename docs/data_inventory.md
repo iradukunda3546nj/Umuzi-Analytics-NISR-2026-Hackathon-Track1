@@ -5,20 +5,20 @@ NISR content is published under Creative Commons Attribution 4.0 (https://statis
 
 ## Used in the app
 
-| Source | What it is | Local copy |
-|---|---|---|
-| NISR Seasonal Agricultural Survey (SAS), 2018 to 2023 | Annual table workbooks, each holding Season A and Season B tables, downloaded from the [NISR SAS page](https://statistics.gov.rw/data-sources/surveys/Seasonal-Agricultural-Survey). Original file names are recorded in `data/sources.json`. | `data/raw/nisr_sas/SAS-2018A__...xlsx` to `SAS-2023A__...xlsx` (one file per year, named after its first season) |
-| NISR SAS 2024 Season A | Table workbook, 34 sheets | `data/raw/nisr_sas/SAS-2024A__6848e1b3c8ca.xlsx` (SHA-256 `6848e1b3c8caadbf68c75916512f435e43a65d07734cbcdb3bcbbef3bb45c358`) |
-| NISR SAS 2024 Season B | Table workbook, 33 sheets | `data/raw/nisr_sas/SAS-2024B__0be9b2749740.xlsx` (`0be9b2749740d6a9fdb963fddd1874f448dfedf9c54e15fef55f6fdbe459c911`) |
-| NISR SAS 2025 Season A | Table workbook, 34 sheets | `data/raw/nisr_sas/SAS-2025A__d853e32bdf8e.xlsx` (`d853e32bdf8e1c396ffa487c3a786413e82753d0f89a95679cd56a6c20d2669b`) |
-| NISR SAS 2026 Season A | Table workbook, 35 sheets | `data/raw/nisr_sas/SAS-2026A__c4e4cb4c4e69.xlsx` (`c4e4cb4c4e697febac1cb332280189a4dc6ff7f10d0de956bff279b284c5d4c2`) |
-| NISR SAS 2026 Season B | Table workbook, 33 sheets | `data/raw/nisr_sas/SAS-2026B__5ca81c6b0a54.xlsx` (`5ca81c6b0a54c4a282ed718d134423920cc75279a5827bbe772fe6eb1a4e9d27`) |
-| MINAGRI PSTA 5, abridged plan | National yield goals, results framework p.21 ([PDF](https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf)) | 8 rows copied by hand into `data/reference/psta5_productivity_targets.csv` |
-| District boundaries | geoBoundaries RWA ADM2, simplified, 30 districts, from NISR geodata, CC BY 4.0 ([file](https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RWA/ADM2/geoBoundaries-RWA-ADM2_simplified.geojson)) | `data/raw/boundaries/` (SHA-256 `56b0995c7a7735847659b766e00c5cfa29b1b3a197f231dc396f399948c46c09`) |
+| Source | What it is |
+|---|---|
+| NISR Seasonal Agricultural Survey (SAS), 2018 to 2023 | Annual table workbooks, each holding Season A and Season B tables, from the [NISR SAS page](https://statistics.gov.rw/data-sources/surveys/Seasonal-Agricultural-Survey) |
+| NISR SAS 2024 Season A | Table workbook, 34 sheets |
+| NISR SAS 2024 Season B | Table workbook, 33 sheets |
+| NISR SAS 2025 Season A | Table workbook, 34 sheets |
+| NISR SAS 2026 Season A | Table workbook, 35 sheets |
+| NISR SAS 2026 Season B | Table workbook, 33 sheets |
+| MINAGRI PSTA 5, abridged plan | National yield goals, results framework p.21 ([PDF](https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf)) |
+| District boundaries | geoBoundaries RWA ADM2, simplified, 30 districts, from NISR geodata, CC BY 4.0 ([file](https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RWA/ADM2/geoBoundaries-RWA-ADM2_simplified.geojson)) |
 
-Every file name carries the start of its checksum, so any change to a file can be detected
-(`tests/test_real_data.py` checks this). Exact download links for 2024-2026 are in `data/sources.json`;
-download times are in `data/raw/reference/download_log.txt`.
+Where each NISR file came from is recorded in `data/sources.json` (the exact link for 2024-2026, the NISR
+download page and original file name for 2018-2023). Every file is kept unchanged,
+and an automated test confirms that none has been altered since it was downloaded.
 
 ## Used to check the data or explain the method (not loaded into the app)
 
